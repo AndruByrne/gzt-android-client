@@ -1,14 +1,11 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.app.Activity;
 import android.databinding.BindingAdapter;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.anthropicandroid.R;
-import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 

@@ -2,14 +2,11 @@ package com.anthropicandroid.gzt.activity;
 
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 
 import com.anthropicandroid.BR;
 import com.anthropicandroid.R;
 import com.anthropicandroid.databinding.GztSettingsActivityBinding;
-import com.anthropicandroid.databinding.PurchasedMolotovsBinding;
-import com.anthropicandroid.databinding.SansUserPurchasedMolotovsBinding;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 

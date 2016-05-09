@@ -6,10 +6,7 @@ package com.anthropicandroid.gzt.modules;
 
 import com.anthropicandroid.gzt.services.SubscriptionAccountant;
 
-import javax.inject.Named;
-
 import dagger.Component;
-import rx.Observable;
 
 @UserScope
 @Component(
