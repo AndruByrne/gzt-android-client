@@ -22,7 +22,8 @@ public class ApplicationPreferences {
         NUMBER_OF_GARLIC_CLOVES(0),
         PLAYER_HEALTH(0),
         ZOMBIES_KILLED(0),
-        DAYS_ALIVE(0);
+        DAYS_ALIVE(0),
+        SLAIN_ZOMBIES(0);
 
         public Integer defaultInt;
 
@@ -40,7 +41,7 @@ public class ApplicationPreferences {
     }
 
     public boolean setPreference(Preferences preference, Integer integer) {
-        boolean result = false;
+        boolean result;
         try {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putInt(preference.name(), integer);

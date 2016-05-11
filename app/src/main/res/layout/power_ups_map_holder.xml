@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <data>
+        <import type="java.lang.Boolean"/>
+        <variable
+            name="touch_handlers"
+            type="com.anthropicandroid.gzt.activity.TouchHandlers" />
+    </data>
+        
+    <FrameLayout
+        android:id="@+id/map_view_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:elevation="@dimen/powerup_map_view_elevation"
+        android:onClick="@{touch_handlers.hide_powerups}"
+        app:zoom_in="@{Boolean.valueOf(true)}"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/trans_red"
+            android:text="test view"
+            />
+
+    </FrameLayout>
+
+</layout>

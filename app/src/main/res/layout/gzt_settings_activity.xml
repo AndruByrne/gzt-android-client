@@ -16,6 +16,7 @@
     </data>
 
     <LinearLayout
+        android:id="@+id/gzt_settings_root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/pure_white"
@@ -42,6 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:text="@string/status_card_label"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -52,6 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/status_card_label"
                     android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginTop="5dp"
                     android:text="@string/health_label"
                     android:textAppearance="?android:attr/textAppearanceMedium"
@@ -64,9 +67,32 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@id/health_label"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     app:settings_health_value="@{Preferences.PLAYER_HEALTH}"/>
 
+                <TextView
+                    android:id="@+id/slain_zombies_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/health_label"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:text="Slain Zombies"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/bright_green"
+                    />
+
+                <TextView
+                    android:id="@+id/slain_zombies_readout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/slain_zombies_label"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    app:settings_health_value="@{Preferences.SLAIN_ZOMBIES}"/>
 
             </RelativeLayout>
 
@@ -76,7 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:elevation="15dp"
+            android:elevation="@dimen/settings_cards_elevation"
             card_view:cardBackgroundColor="@color/purpley_gray">
 
             <RelativeLayout
@@ -92,6 +118,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:layout_marginBottom="10dp"
                     android:text="@string/inventory_title"
@@ -102,8 +129,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_below="@+id/inventory_title"
                     android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginTop="5dp"
                     android:gravity="center_vertical"
                     android:text="@string/molotov_count_title"
@@ -116,6 +145,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/number_of_molotovs_label"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     app:settings_warning_value="@{Preferences.NUMBER_OF_BUILT_MOLOTOVS}" />
 
@@ -127,16 +157,19 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_toStartOf="@id/built_molotovs_readout"
+                    android:layout_toLeftOf="@id/built_molotovs_readout"
                     android:text="+"
                     android:textColor="@color/bright_green" />
 
                 <Button
                     android:id="@+id/purchased_molotovs_button"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignBaseline="@+id/number_of_molotovs_label"
                     android:layout_toStartOf="@id/molotov_readout_plus_sign"
+                    android:layout_toLeftOf="@id/molotov_readout_plus_sign"
                     android:background="@color/light_purpley_gray"
+                    android:onClick="@{touch_handlers.purchaseMolotovs}"
                     app:purchased_settings_value="@{Preferences.NUMBER_OF_PURCHASED_MOLOTOVS}" />
 
                 <TextView
@@ -144,8 +177,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_below="@+id/number_of_molotovs_label"
                     android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginTop="5dp"
                     android:gravity="center_vertical"
                     android:text="@string/number_of_garlic_cloves_label"
@@ -157,6 +192,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBaseline="@+id/number_of_garlic_cloves_label"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
                     android:textColor="@color/bright_green"
                     app:settings_value="@{Preferences.NUMBER_OF_GARLIC_CLOVES}" />
 
@@ -167,6 +203,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:elevation="@dimen/settings_cards_elevation"
             card_view:cardBackgroundColor="@color/purpley_gray">
 
             <RelativeLayout
@@ -175,14 +212,14 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:elevation="15dp">
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:id="@+id/mute_notifications_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:text="Mute Notifications (not recommended)"
                     android:textAppearance="?android:attr/textAppearanceMedium"
@@ -193,6 +230,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
                     android:onClick="@{touch_handlers.muteNotifications}"
                     android:textColor="@color/bright_green"
                     app:checked_settings_value="@{Preferences.MUTE_NOTIFICATIONS}" />
@@ -204,7 +242,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:elevation="5dp"
+            android:elevation="@dimen/settings_cards_elevation"
             card_view:cardBackgroundColor="@color/purpley_gray">
 
             <RelativeLayout
@@ -220,6 +258,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:gravity="center_vertical"
                     android:text="@string/local_powerups_button_label"
@@ -227,9 +266,12 @@
                     android:textColor="@color/bright_green" />
 
                 <ImageView
+                    android:id="@+id/map_view_origin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:onClick="@{touch_handlers.show_powerups}"
                     android:src="@android:drawable/ic_menu_mapmode" />
 
             </RelativeLayout>
