@@ -2,7 +2,7 @@ package com.anthropicandroid.gzt.modules;
 
 import android.app.Application;
 
-import com.anthropicandroid.gzt.activity.GZTAnimatorRepository;
+import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
 import com.anthropicandroid.gzt.activity.TouchHandlers;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 import com.anthropicandroid.gzt.services.SubscriptionAccountant;
@@ -28,7 +28,7 @@ public interface ApplicationComponent {
 
     ApplicationPreferences getPreferenceStorage();
 
-    GZTAnimatorRepository getGZTAnimatorSetRepository();
+    GZTZoomAnimator getGZTAnimatorSetRepository();
 
     SubscriptionAccountant getSubscriptionAccountant();
 

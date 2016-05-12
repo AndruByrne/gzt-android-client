@@ -8,24 +8,15 @@
             name="touch_handlers"
             type="com.anthropicandroid.gzt.activity.TouchHandlers" />
     </data>
-        
-    <FrameLayout
+
+    <TextView
         android:id="@+id/map_view_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
+        android:background="@color/trans_red"
         android:elevation="@dimen/powerup_map_view_elevation"
+        android:text="test view"
         android:onClick="@{touch_handlers.hide_powerups}"
-        app:zoom_in="@{Boolean.valueOf(true)}"
-        >
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/trans_red"
-            android:text="test view"
-            />
-
-    </FrameLayout>
+        app:zoom_in="@{Boolean.valueOf(true)}"/>
 
 </layout>

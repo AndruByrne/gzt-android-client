@@ -14,21 +14,20 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import com.anthropicandroid.gzt.ZombieTrackerApplication;
+public class GZTZoomAnimator {
 
-public class GZTAnimatorRepository {
-
-    public static final String TAG = GZTAnimatorRepository.class.getSimpleName();
+    public static final String TAG = GZTZoomAnimator.class.getSimpleName();
     private AnimatorSet currentAnimatorSet;
 
     private final SparseArray<AnimationPrecursor> animationPrecursors = new SparseArray<>();
 
-    public GZTAnimatorRepository() {
+    public GZTZoomAnimator() {
     }
 
-    public void initializeAnimationSet(View targetView, View beginningView, View viewToFill) {
+    public void initializeAnimation(View targetView, View beginningView, View viewToFill) {
         // get stand and end bounds as well as global offset; build an animation precursor with those params and add to map
         Log.d(TAG, "initializing animation set");
         final Rect startBounds = new Rect();
@@ -53,12 +52,12 @@ public class GZTAnimatorRepository {
 
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet //  assign location and scaling values with precursor as beginning
-                    .play(ObjectAnimator.ofFloat(viewToZoomTo, View.X, precursor.startBounds.left, precursor.finalBounds.left))
-                    .with(ObjectAnimator.ofFloat(viewToZoomTo, View.Y, precursor.startBounds.top, precursor.finalBounds.top))
+                    .play(ObjectAnimator.ofFloat(viewToZoomTo, View.Y, precursor.startBounds.top, precursor.finalBounds.top))
+                    .with(ObjectAnimator.ofFloat(viewToZoomTo, View.X, precursor.startBounds.left, precursor.finalBounds.left))
                     .with(ObjectAnimator.ofFloat(viewToZoomTo, View.SCALE_X, precursor.startScale, 1f))
                     .with(ObjectAnimator.ofFloat(viewToZoomTo, View.SCALE_Y, precursor.startScale, 1f));
             animatorSet.setDuration(animationDuration);
-            animatorSet.setInterpolator(new DecelerateInterpolator());
+            animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
             animatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationCancel(Animator animation) {
@@ -70,6 +69,7 @@ public class GZTAnimatorRepository {
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     currentAnimatorSet = null;
+                    Log.d(TAG, "zoomedView bounds top: " + viewToZoomTo.getTop() + " bottom: " + viewToZoomTo.getBottom() + " left: " + viewToZoomTo.getLeft() + " right: " + viewToZoomTo.getRight());
                 }
             });
             animatorSet.start();
@@ -102,6 +102,7 @@ public class GZTAnimatorRepository {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
+                    Log.d(TAG, "unZoomedView bounds top: " + zoomedView.getTop() + " bottom: " + zoomedView.getBottom() + " left: " + zoomedView.getLeft() + " right: " + zoomedView.getRight());
                     ((ViewGroup)viewToOpacify.getRootView()).removeView(zoomedView); //  remove zooming view from layout
                     viewToOpacify.setAlpha(1f); //  restore old view's opacity
                     currentAnimatorSet = null; //  remove animation
@@ -124,19 +125,22 @@ public class GZTAnimatorRepository {
             this.finalBounds = finalBounds;
             startBounds.offset(-globalOffset.x, -globalOffset.y);
             finalBounds.offset(-globalOffset.x, -globalOffset.y);
+            Log.d(TAG, "start bounds top: " + startBounds.top + " bottom: " + startBounds.bottom + " left: " + startBounds.left + " right: " + startBounds.right);
+            Log.d(TAG, "final bounds top: " + finalBounds.top+" bottom: "+finalBounds.bottom+" left: "+finalBounds.left+" right: "+finalBounds.right);
             // set starting bounds to same aspect ratio as final bounds
-            if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width() / finalBounds.height()) {
+            if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width() / startBounds.height()) {
                 //  extend start bounds horizontally
                 startScale = (float) startBounds.height() / finalBounds.height();
                 float startWidth = startScale * finalBounds.width();
-                float deltaWidth = (startWidth - finalBounds.width()) / 2;
+                float deltaWidth = (startWidth - startBounds.width()) / 2;
                 startBounds.left -= deltaWidth;
                 startBounds.right += deltaWidth;
             } else {
+                Log.d(TAG, " extending vertically ");
                 //  extend start bounds vertically
                 startScale = (float) startBounds.width() / finalBounds.width();
                 float startHeight = startScale * finalBounds.height();
-                float deltaHeight = (startHeight - finalBounds.height()) / 2;
+                float deltaHeight = (startHeight - startBounds.height()) / 2;
                 startBounds.top -= deltaHeight;
                 startBounds.bottom += deltaHeight;
             }

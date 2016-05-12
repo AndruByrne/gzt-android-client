@@ -2,11 +2,8 @@ package com.anthropicandroid.gzt.activity;
 
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
-import android.test.mock.MockApplication;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,11 +22,11 @@ import com.anthropicandroid.gzt.services.ApplicationPreferences;
 final public class TouchHandlers {
 
     public static final String TAG = TouchHandlers.class.getCanonicalName();
-    GZTAnimatorRepository animatorSetRepository;
+    GZTZoomAnimator zoomAnimator;
     private GztSettingsActivityBinding activityBinding;
 
-    public TouchHandlers(GZTAnimatorRepository animatorSetRepository) {
-        this.animatorSetRepository = animatorSetRepository;
+    public TouchHandlers(GZTZoomAnimator zoomAnimator) {
+        this.zoomAnimator = zoomAnimator;
     }
 
     public void muteNotifications(View view) {
@@ -65,7 +62,7 @@ final public class TouchHandlers {
 
         View mapViewFrame = mapHolderBinding.mapViewFrame; //  get map view
 
-        animatorSetRepository.initializeAnimationSet(mapViewFrame, mapViewOrigin, rootView); //  store necessary variables for animation
+        zoomAnimator.initializeAnimation(mapViewFrame, mapViewOrigin, rootView); //  store necessary variables for animation
 
         mapViewOrigin.setAlpha(0f);  //  disappear old view and add new view
         rootView.addView(mapViewFrame);
@@ -73,7 +70,7 @@ final public class TouchHandlers {
     }
 
     public void hide_powerups(View view) {
-        animatorSetRepository.unZoomAndReplaceWithInDuration(view, activityBinding.mapViewOrigin, 1000);
+        zoomAnimator.unZoomAndReplaceWithInDuration(view, activityBinding.mapViewOrigin, 1000);
         ((ZombieTrackerApplication) ((Activity) view.getContext()).getApplication()).retireMapComponent();
 
     }

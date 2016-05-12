@@ -6,7 +6,7 @@ package com.anthropicandroid.gzt.modules;
 
 import android.databinding.DataBindingComponent;
 
-import com.anthropicandroid.gzt.activity.GZTAnimatorRepository;
+import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
 
 import dagger.Component;
 
@@ -15,5 +15,5 @@ import dagger.Component;
         dependencies = ApplicationComponent.class
 )
 public interface GZTMapComponent extends DataBindingComponent{
-    GZTAnimatorRepository getGZTAnimatorSetRepository();
+    GZTZoomAnimator getGZTAnimatorSetRepository();
 }
