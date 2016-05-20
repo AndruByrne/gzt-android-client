@@ -20,17 +20,18 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.Stack;
 
-public class GZTZoomAnimator {
+public class GZTAnimator {
 
-    public static final String TAG = GZTZoomAnimator.class.getSimpleName();
+    public static final String TAG = GZTAnimator.class.getSimpleName();
     public static final int UNZOOM_SPEED = 500;
     public static final int ZOOM_SPEED = 700;
-    private AnimatorSet currentAnimatorSet;
 
-    private final SparseArray<AnimationPrecursor> animationPrecursors = new SparseArray<>();
+    private AnimatorSet currentAnimatorSet;
     private Stack<View> reversableViews = new Stack<>();
 
-    public GZTZoomAnimator() {
+    private final SparseArray<AnimationPrecursor> animationPrecursors = new SparseArray<>();
+
+    public GZTAnimator() {
     }
 
     public void addViewAndPrepareToZoom(View targetView, View beginningView, View viewToMatch) {
@@ -48,7 +49,7 @@ public class GZTZoomAnimator {
         targetView.bringToFront(); //  bring to front for systems without elevation
     }
 
-    public void zoomToView(final View viewToZoomTo) {
+    public void zoomToView(final View viewToZoomTo) { //  will eventually be animateView
         if (currentAnimatorSet != null) currentAnimatorSet.cancel();
         AnimationPrecursor precursor = animationPrecursors.get(viewToZoomTo.getId());
         if (precursor == null)
@@ -63,8 +64,19 @@ public class GZTZoomAnimator {
         }
     }
 
-    public boolean unZoomView(final View zoomedView) { //  should be general unanimate
-        final AnimationPrecursor precursor = animationPrecursors.get(zoomedView.getId()); //  put type of animation as enum in precursor
+    public boolean undoLastAnimation() {
+        return !reversableViews.isEmpty() && undoAnimation(reversableViews.pop());
+    }
+
+    private boolean undoAnimation(View view) { //  should be general unanimate
+        int id = view.getId();
+        AnimationPrecursor animationPrecursor = animationPrecursors.get(id);
+        animationPrecursors.delete(id);
+        // when other animations are added, add a switch for a animation-type enum in precursor
+        return unZoomPrecursor(animationPrecursor);
+    }
+
+    private boolean unZoomPrecursor(final AnimationPrecursor precursor) {
         if (precursor == null) {
             Log.e(TAG, "precursor null when unZooming ");
             return false;
@@ -72,7 +84,6 @@ public class GZTZoomAnimator {
             if (currentAnimatorSet != null) currentAnimatorSet.cancel();
             AnimatorSet animatorSet = getUnZoomAnimatorSet(precursor);
             animatorSet.start();
-            animationPrecursors.remove(zoomedView.getId());
             currentAnimatorSet = animatorSet;
             return true;
         }
@@ -134,10 +145,6 @@ public class GZTZoomAnimator {
         return animatorSet;
     }
 
-    public boolean undoLastAnimation() {
-        return !reversableViews.isEmpty() && unZoomView(reversableViews.pop());
-    }
-
     private static class AnimationPrecursor {
 
         private View targetView;
@@ -173,8 +180,8 @@ public class GZTZoomAnimator {
                 startScale = (float) startBounds.width() / finalBounds.width();
                 float startHeight = startScale * finalBounds.height();
                 float deltaHeight = (startHeight - startBounds.height()) / 2;
-                startBounds.top += deltaHeight;
-                startBounds.bottom -= deltaHeight;
+                startBounds.top -= deltaHeight;
+                startBounds.bottom += deltaHeight;
             }
         }
     }

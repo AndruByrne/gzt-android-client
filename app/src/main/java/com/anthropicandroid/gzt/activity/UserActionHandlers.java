@@ -22,10 +22,10 @@ import com.google.android.gms.common.GoogleApiAvailability;
 final public class UserActionHandlers {
 
     public static final String TAG = UserActionHandlers.class.getSimpleName();
-    GZTZoomAnimator zoomAnimator;
-    private GztSettingsActivityBinding activityBinding;
 
-    public UserActionHandlers(GZTZoomAnimator zoomAnimator) {
+    private GZTAnimator zoomAnimator;
+
+    public UserActionHandlers(GZTAnimator zoomAnimator) {
         this.zoomAnimator = zoomAnimator;
     }
 
@@ -48,7 +48,7 @@ final public class UserActionHandlers {
     public void show_powerups(View view) {
         Activity context = (Activity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) context.getApplication();
-        activityBinding = DataBindingUtil.findBinding(view);
+        GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
 
         GoogleApiAvailability instance = GoogleApiAvailability.getInstance();
         if (instance.isGooglePlayServicesAvailable(view.getContext()) != ConnectionResult.SUCCESS) {
@@ -62,9 +62,9 @@ final public class UserActionHandlers {
 
             mapHolderBinding.setUserActionHandlers(this); //  assign touch handlers to map view
 
+//            View viewToMatch = activityBinding.aCardView; //  get view to fill
             LinearLayout viewToMatch = activityBinding.gztSettingsRootView; //  get view to fill
             ExtranetMapView extranetMapView = mapHolderBinding.extranetMapView; //  get map view
-
             zoomAnimator.addViewAndPrepareToZoom(extranetMapView, view, viewToMatch); //  store necessary variables for animation and launch view with binding adapter with zoom
         }
     }

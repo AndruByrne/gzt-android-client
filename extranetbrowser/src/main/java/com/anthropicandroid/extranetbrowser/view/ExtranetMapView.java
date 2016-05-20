@@ -67,10 +67,11 @@ public class ExtranetMapView extends MapView {
             final OnMapReadyCallback clientCallback,
             Observable<GoogleMap> googleMapObservable,
             Observable<Occasion> extranetMarkersObservable) {
+
         // On call, zip marker and map using marker thread once; add markers to map and return callback at some point
         Func2<GoogleMap, Occasion, MarkerOptions> mapToMarkerOptions = new Func2<GoogleMap, Occasion, MarkerOptions>() {
             @Override
-            public MarkerOptions call(GoogleMap googleMap, Occasion occasion) {
+            public MarkerOptions call(GoogleMap googleMap, Occasion occasion) { //  this runs off the main thread
                 if (myGoogleMap == null)
                     myGoogleMap = googleMap;
                 return new MarkerOptions()
@@ -78,7 +79,8 @@ public class ExtranetMapView extends MapView {
             }
         };
 
-        Observable.combineLatest(googleMapObservable, extranetMarkersObservable, mapToMarkerOptions)
+        Observable
+                .combineLatest(googleMapObservable, extranetMarkersObservable, mapToMarkerOptions) //  wait until both obs return first onNext, then combine with function
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         new Action1<MarkerOptions>() {
@@ -123,5 +125,4 @@ public class ExtranetMapView extends MapView {
     private void getGoogleMap(OnMapReadyCallback callback) {
         super.getMapAsync(callback);
     }
-
 }

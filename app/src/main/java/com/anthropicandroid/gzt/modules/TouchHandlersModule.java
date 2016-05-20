@@ -4,7 +4,7 @@ package com.anthropicandroid.gzt.modules;
  * Created by Andrew Brin on 5/4/2016.
  */
 
-import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
+import com.anthropicandroid.gzt.activity.GZTAnimator;
 import com.anthropicandroid.gzt.activity.UserActionHandlers;
 
 import javax.inject.Singleton;
@@ -17,13 +17,13 @@ public class TouchHandlersModule {
 
     @Provides
     @Singleton
-    UserActionHandlers getTouchHandlers(GZTZoomAnimator gztZoomAnimator){
-        return new UserActionHandlers(gztZoomAnimator);
+    UserActionHandlers getTouchHandlers(GZTAnimator gztAnimator){
+        return new UserActionHandlers(gztAnimator);
     }
 
     @Provides
     @Singleton
-    GZTZoomAnimator getGZTAnimatorSetRepository(){
-        return new GZTZoomAnimator();
+    GZTAnimator getGZTAnimatorSetRepository(){
+        return new GZTAnimator();
     }
 }

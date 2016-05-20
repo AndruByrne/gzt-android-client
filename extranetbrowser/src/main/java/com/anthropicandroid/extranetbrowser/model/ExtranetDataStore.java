@@ -63,9 +63,7 @@ public class ExtranetDataStore {
                 .flatMap(new Func1<List<String>, Observable<Occasion>>() {
                     @Override
                     public Observable<Occasion> call(final List<String> occasionKeys) {
-                        Log.d(TAG, "putting into occasions hash");
                         waspHolder.extranetOccasionsHash.put("Occasion_Key", new Occasion());
-                        Log.d(TAG, "put into occasions hash");
                         return getCachedOccasionsAndRecordFailures(occasionKeys);
                     }
                 });

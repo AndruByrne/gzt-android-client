@@ -6,8 +6,8 @@ package com.anthropicandroid.gzt.modules;
 
 import android.databinding.DataBindingComponent;
 
+import com.anthropicandroid.gzt.activity.GZTAnimator;
 import com.anthropicandroid.gzt.activity.GZTSettingsActivity;
-import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
 import com.anthropicandroid.gzt.activity.MapViewLifecycleHolder;
 import com.anthropicandroid.gzt.activity.UserActionHandlers;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
@@ -26,7 +26,7 @@ public interface SansUserSettingsAdapterComponent extends DataBindingComponent {
     UserActionHandlers getUserActionHandlers();
     ApplicationPreferences getPreferenceStorage();
     MapViewLifecycleHolder getMapViewHolder();
-    GZTZoomAnimator getGZTZoomAnimator();
+    GZTAnimator getGZTZoomAnimator();
 
     void inject(GZTSettingsActivity gztSettingsActivity);
 }
