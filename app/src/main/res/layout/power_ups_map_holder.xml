@@ -5,18 +5,18 @@
     <data>
         <import type="java.lang.Boolean"/>
         <variable
-            name="touch_handlers"
-            type="com.anthropicandroid.gzt.activity.TouchHandlers" />
+            name="user_action_handlers"
+            type="com.anthropicandroid.gzt.activity.UserActionHandlers" />
     </data>
 
-    <TextView
-        android:id="@+id/map_view_frame"
+    <com.anthropicandroid.extranetbrowser.view.ExtranetMapView
+        android:id="@+id/extranet_map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/trans_red"
         android:elevation="@dimen/powerup_map_view_elevation"
-        android:text="test view"
-        android:onClick="@{touch_handlers.hide_powerups}"
+        app:get_extranet_map="@{Boolean.valueOf(true)}"
         app:zoom_in="@{Boolean.valueOf(true)}"/>
+
 
 </layout>

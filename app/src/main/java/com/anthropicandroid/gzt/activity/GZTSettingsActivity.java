@@ -4,13 +4,21 @@ import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 
-import com.anthropicandroid.BR;
-import com.anthropicandroid.R;
-import com.anthropicandroid.databinding.GztSettingsActivityBinding;
+import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
+import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 
+import javax.inject.Inject;
+
 final public class GZTSettingsActivity extends Activity {
+
+    public static final String TAG = GZTSettingsActivity.class.getSimpleName();
+    @Inject
+    public MapViewLifecycleHolder mapViewHolder;
+    @Inject
+    public UserActionHandlers userActionHandlers;
+    //  need an onbackpressed handler
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,11 +27,38 @@ final public class GZTSettingsActivity extends Activity {
         ZombieTrackerApplication application = (ZombieTrackerApplication) getApplication();
         SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent = application.createSansUserAdapterComponent();
         // bootstrap into dagger graph
+        sansUserSettingsAdapterComponent.inject(this);
         final GztSettingsActivityBinding gztSettingsActivityBinding = DataBindingUtil.setContentView(
                 this,
                 R.layout.gzt_settings_activity,
                 sansUserSettingsAdapterComponent);
-        // assign touch handlers
-        gztSettingsActivityBinding.setVariable(BR.touch_handlers, sansUserSettingsAdapterComponent.getTouchHandlers());
+
+        mapViewHolder.onCreate(savedInstanceState);
+        // assign user action handlers
+        gztSettingsActivityBinding.setUserActionHandlers(userActionHandlers);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapViewHolder.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mapViewHolder.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mapViewHolder.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!userActionHandlers.backPressedConsumed())
+            super.onBackPressed();
     }
 }

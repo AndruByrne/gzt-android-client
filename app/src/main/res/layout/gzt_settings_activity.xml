@@ -10,8 +10,8 @@
         <import type="com.anthropicandroid.gzt.services.ApplicationPreferences.Preferences" />
 
         <variable
-            name="touch_handlers"
-            type="com.anthropicandroid.gzt.activity.TouchHandlers" />
+            name="user_action_handlers"
+            type="com.anthropicandroid.gzt.activity.UserActionHandlers" />
 
     </data>
 
@@ -169,7 +169,7 @@
                     android:layout_toStartOf="@id/molotov_readout_plus_sign"
                     android:layout_toLeftOf="@id/molotov_readout_plus_sign"
                     android:background="@color/light_purpley_gray"
-                    android:onClick="@{touch_handlers.purchaseMolotovs}"
+                    android:onClick="@{user_action_handlers.purchaseMolotovs}"
                     app:purchased_settings_value="@{Preferences.NUMBER_OF_PURCHASED_MOLOTOVS}" />
 
                 <TextView
@@ -231,7 +231,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:onClick="@{touch_handlers.muteNotifications}"
+                    android:onClick="@{user_action_handlers.muteNotifications}"
                     android:textColor="@color/bright_green"
                     app:checked_settings_value="@{Preferences.MUTE_NOTIFICATIONS}" />
 
@@ -271,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:onClick="@{touch_handlers.show_powerups}"
+                    android:onClick="@{user_action_handlers.show_powerups}"
                     android:src="@android:drawable/ic_menu_mapmode" />
 
             </RelativeLayout>

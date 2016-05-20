@@ -5,7 +5,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.anthropicandroid.R;
+import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 

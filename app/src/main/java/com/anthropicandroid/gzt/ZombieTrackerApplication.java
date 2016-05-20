@@ -28,15 +28,17 @@ public class ZombieTrackerApplication extends Application {
         instance = this;
         applicationComponent = DaggerApplicationComponent.builder()
                 .appModule(new AppModule(this))
-                .threadingModule(getThreadingModule())
+                .threadingModule(getThreadingModule()) //  getting for overriding with mocks in testing
                 .build();
     }
 
     public GZTMapComponent createMapComponent() {
-        mapComponent = DaggerGZTMapComponent
-                .builder()
-                .applicationComponent(applicationComponent)
-                .build();
+        if (mapComponent==null) {
+            mapComponent = DaggerGZTMapComponent
+                    .builder()
+                    .sansUserSettingsAdapterComponent(sansUserSettingsAdapterComponent)
+                    .build();
+        }
         return mapComponent;
     }
 
@@ -74,5 +76,5 @@ public class ZombieTrackerApplication extends Application {
 
     public void releaseSansUserAdapterComponent() { sansUserSettingsAdapterComponent = null; }
 
-    public void retireMapComponent() { mapComponent = null; }
+    public void releaseMapComponent() { mapComponent = null; }
 }

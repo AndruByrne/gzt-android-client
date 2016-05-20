@@ -10,6 +10,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -17,31 +18,37 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
+import java.util.Stack;
+
 public class GZTZoomAnimator {
 
     public static final String TAG = GZTZoomAnimator.class.getSimpleName();
+    public static final int UNZOOM_SPEED = 500;
+    public static final int ZOOM_SPEED = 700;
     private AnimatorSet currentAnimatorSet;
 
     private final SparseArray<AnimationPrecursor> animationPrecursors = new SparseArray<>();
+    private Stack<View> reversableViews = new Stack<>();
 
     public GZTZoomAnimator() {
     }
 
-    public void initializeAnimation(View targetView, View beginningView, View viewToFill) {
+    public void addViewAndPrepareToZoom(View targetView, View beginningView, View viewToMatch) {
         // get stand and end bounds as well as global offset; build an animation precursor with those params and add to map
         Log.d(TAG, "initializing animation set");
-        final Rect startBounds = new Rect();
-        final Rect finalBounds = new Rect();
-        final Point globalOffset = new Point();
-
-        beginningView.getGlobalVisibleRect(startBounds);
-        viewToFill.getGlobalVisibleRect(finalBounds, globalOffset);
-
+        View rootView = beginningView.getRootView();
         //  index by id of targetView
-        animationPrecursors.put(targetView.getId(), new AnimationPrecursor(startBounds, finalBounds, globalOffset));
+        animationPrecursors.put(targetView.getId(), new AnimationPrecursor(
+                targetView,
+                beginningView,
+                viewToMatch));
+        //  disappear old view and add new view
+        beginningView.setAlpha(0f);
+        ((ViewGroup) rootView).addView(targetView); //  this view starts the animation
+        targetView.bringToFront(); //  bring to front for systems without elevation
     }
 
-    public void zoomToViewInDuration(final View viewToZoomTo, int animationDuration) {
+    public void zoomToView(final View viewToZoomTo) {
         if (currentAnimatorSet != null) currentAnimatorSet.cancel();
         AnimationPrecursor precursor = animationPrecursors.get(viewToZoomTo.getId());
         if (precursor == null)
@@ -49,84 +56,109 @@ public class GZTZoomAnimator {
         else {
             viewToZoomTo.setPivotX(0f);
             viewToZoomTo.setPivotY(0f);
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet //  assign location and scaling values with precursor as beginning
-                    .play(ObjectAnimator.ofFloat(viewToZoomTo, View.Y, precursor.startBounds.top, precursor.finalBounds.top))
-                    .with(ObjectAnimator.ofFloat(viewToZoomTo, View.X, precursor.startBounds.left, precursor.finalBounds.left))
-                    .with(ObjectAnimator.ofFloat(viewToZoomTo, View.SCALE_X, precursor.startScale, 1f))
-                    .with(ObjectAnimator.ofFloat(viewToZoomTo, View.SCALE_Y, precursor.startScale, 1f));
-            animatorSet.setDuration(animationDuration);
-            animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
-            animatorSet.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    super.onAnimationCancel(animation);
-                    currentAnimatorSet = null;
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    currentAnimatorSet = null;
-                    Log.d(TAG, "zoomedView bounds top: " + viewToZoomTo.getTop() + " bottom: " + viewToZoomTo.getBottom() + " left: " + viewToZoomTo.getLeft() + " right: " + viewToZoomTo.getRight());
-                }
-            });
+            AnimatorSet animatorSet = getZoomAnimatorSet(precursor);
             animatorSet.start();
             currentAnimatorSet = animatorSet;
+            reversableViews.add(viewToZoomTo);
         }
     }
 
-    public void unZoomAndReplaceWithInDuration(final View zoomedView, final View viewToOpacify, int duration) {
-        AnimationPrecursor precursor = animationPrecursors.get(zoomedView.getId());
-        if (precursor == null)
+    public boolean unZoomView(final View zoomedView) { //  should be general unanimate
+        final AnimationPrecursor precursor = animationPrecursors.get(zoomedView.getId()); //  put type of animation as enum in precursor
+        if (precursor == null) {
             Log.e(TAG, "precursor null when unZooming ");
-        else {
+            return false;
+        } else {
             if (currentAnimatorSet != null) currentAnimatorSet.cancel();
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet //  assign location and scaling values with precursor as target
-                    .play(ObjectAnimator.ofFloat(zoomedView, View.X, precursor.startBounds.left))
-                    .with(ObjectAnimator.ofFloat(zoomedView, View.Y, precursor.startBounds.top))
-                    .with(ObjectAnimator.ofFloat(zoomedView, View.SCALE_X, precursor.startScale))
-                    .with(ObjectAnimator.ofFloat(zoomedView, View.SCALE_Y, precursor.startScale));
-            animatorSet
-                    .setDuration(duration)
-                    .setInterpolator(new DecelerateInterpolator());
-            animatorSet.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    ((ViewGroup) zoomedView.getRootView()).removeView(zoomedView); //  remove zooming view from layout
-                    viewToOpacify.setAlpha(1f); //  restore old view's opacity
-                    currentAnimatorSet = null; //  remove animation
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    Log.d(TAG, "unZoomedView bounds top: " + zoomedView.getTop() + " bottom: " + zoomedView.getBottom() + " left: " + zoomedView.getLeft() + " right: " + zoomedView.getRight());
-                    ((ViewGroup)viewToOpacify.getRootView()).removeView(zoomedView); //  remove zooming view from layout
-                    viewToOpacify.setAlpha(1f); //  restore old view's opacity
-                    currentAnimatorSet = null; //  remove animation
-                }
-            });
+            AnimatorSet animatorSet = getUnZoomAnimatorSet(precursor);
             animatorSet.start();
+            animationPrecursors.remove(zoomedView.getId());
             currentAnimatorSet = animatorSet;
+            return true;
         }
+    }
+
+    @NonNull
+    private AnimatorSet getZoomAnimatorSet(final AnimationPrecursor precursor) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        Log.d(TAG, "startbounds top: " + precursor.startBounds.top + " bottom: " + precursor.startBounds.bottom);
+        animatorSet //  assign location and scaling values with precursor as beginning
+                .play(ObjectAnimator.ofFloat(precursor.targetView, View.Y, precursor.startBounds.top, precursor.finalBounds.top))
+                .with(ObjectAnimator.ofFloat(precursor.targetView, View.X, precursor.startBounds.left, precursor.finalBounds.left))
+                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_X, precursor.startScale, 1f))
+                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_Y, precursor.startScale, 1f));
+        animatorSet.setDuration(ZOOM_SPEED);
+        animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+                currentAnimatorSet = null;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                currentAnimatorSet = null;
+            }
+        });
+        return animatorSet;
+    }
+
+    @NonNull
+    private AnimatorSet getUnZoomAnimatorSet(final AnimationPrecursor precursor) {
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet //  assign location and scaling values with precursor as target
+                .play(ObjectAnimator.ofFloat(precursor.targetView, View.X, precursor.startBounds.left))
+                .with(ObjectAnimator.ofFloat(precursor.targetView, View.Y, precursor.startBounds.top))
+                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_X, precursor.startScale))
+                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_Y, precursor.startScale));
+        animatorSet
+                .setDuration(UNZOOM_SPEED)
+                .setInterpolator(new DecelerateInterpolator());
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                ((ViewGroup) precursor.rootView).removeView(precursor.targetView); //  remove zooming view from layout
+                precursor.beginningView.setAlpha(1f); //  restore old view's opacity
+                currentAnimatorSet = null; //  remove animation
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                ((ViewGroup) precursor.rootView).removeView(precursor.targetView); //  remove zooming view from layout
+                precursor.beginningView.setAlpha(1f); //  restore old view's opacity
+                currentAnimatorSet = null; //  remove animation
+            }
+        });
+        return animatorSet;
+    }
+
+    public boolean undoLastAnimation() {
+        return !reversableViews.isEmpty() && unZoomView(reversableViews.pop());
     }
 
     private static class AnimationPrecursor {
 
-        private Rect startBounds;
-        private Rect finalBounds;
-        private float startScale;
+        private View targetView;
+        private View beginningView;
+        private View rootView;
+        final Rect startBounds = new Rect();
+        final Rect finalBounds = new Rect();
+        final Point globalOffset = new Point();
+        final private float startScale;
 
-        public AnimationPrecursor(Rect startBounds, Rect finalBounds, Point globalOffset) {
+        public AnimationPrecursor(View targetView, View beginningView, View viewToMatch) {
+            this.targetView = targetView;
+            this.beginningView = beginningView;
+            this.rootView = beginningView.getRootView();
             // calculate starting and ending bounds for the zoomed-in view
-            this.startBounds = startBounds;
-            this.finalBounds = finalBounds;
-            startBounds.offset(-globalOffset.x, -globalOffset.y);
+
+            beginningView.getGlobalVisibleRect(startBounds);
+            viewToMatch.getGlobalVisibleRect(finalBounds, globalOffset);
+
+//            startBounds.offset(-globalOffset.x, -globalOffset.y);
             finalBounds.offset(-globalOffset.x, -globalOffset.y);
-            Log.d(TAG, "start bounds top: " + startBounds.top + " bottom: " + startBounds.bottom + " left: " + startBounds.left + " right: " + startBounds.right);
-            Log.d(TAG, "final bounds top: " + finalBounds.top+" bottom: "+finalBounds.bottom+" left: "+finalBounds.left+" right: "+finalBounds.right);
             // set starting bounds to same aspect ratio as final bounds
             if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width() / startBounds.height()) {
                 //  extend start bounds horizontally
@@ -136,13 +168,13 @@ public class GZTZoomAnimator {
                 startBounds.left -= deltaWidth;
                 startBounds.right += deltaWidth;
             } else {
-                Log.d(TAG, " extending vertically ");
                 //  extend start bounds vertically
+                Log.d(TAG, "extending vertically");
                 startScale = (float) startBounds.width() / finalBounds.width();
                 float startHeight = startScale * finalBounds.height();
                 float deltaHeight = (startHeight - startBounds.height()) / 2;
-                startBounds.top -= deltaHeight;
-                startBounds.bottom += deltaHeight;
+                startBounds.top += deltaHeight;
+                startBounds.bottom -= deltaHeight;
             }
         }
     }
