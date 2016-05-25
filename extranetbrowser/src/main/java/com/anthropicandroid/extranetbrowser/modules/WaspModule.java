@@ -6,20 +6,13 @@ package com.anthropicandroid.extranetbrowser.modules;
 
 import android.content.Context;
 
-import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.WaspHolder;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ExtranetOccasionModule {
-
-    @Provides
-    @ExtranetMapViewScope
-    ExtranetOccasionProvider getExtranetOccasionProvider(Context context, WaspHolder waspHolder){
-        return new ExtranetOccasionProvider(context, waspHolder);
-    }
+public class WaspModule {
 
     @Provides
     @ExtranetMapViewScope

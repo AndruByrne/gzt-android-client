@@ -12,6 +12,8 @@ import net.rehacktive.waspdb.WaspHash;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -34,7 +36,7 @@ final public class ExtranetOccasionProvider {
         NO_CACHED_OCCASION
     }
 
-    public ExtranetOccasionProvider(Context context, WaspHolder waspHolder) {
+    @Inject public ExtranetOccasionProvider(Context context, WaspHolder waspHolder) {
         this.context = context;
         this.waspHolder = waspHolder;
     }

@@ -14,6 +14,8 @@ import com.anthropicandroid.extranetbrowser.model.Occasion;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewComponent;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
+import com.anthropicandroid.extranetbrowser.modules.MapModule;
+import com.anthropicandroid.extranetbrowser.modules.WaspModule;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,19 +27,20 @@ import java.util.List;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func2;
 
-public class ExtranetMapView extends MapView {
+public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsyncGetter{
 
     public static final String TAG = ExtranetMapView.class.getSimpleName();
 
     @Inject public ExtranetOccasionProvider extranetOccasionProvider;
+    @Inject public Observable<GoogleMap> googleMapObservable;
 
     private GoogleMap myGoogleMap;
+
     private ExtranetMapViewComponent extranetMapViewComponent;
 
     public ExtranetMapView(Context context) {
@@ -59,7 +62,7 @@ public class ExtranetMapView extends MapView {
     public void getMapAsync(final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
         populateAndReturnMapToCallback(
                 clientCallback,
-                getGoogleMapObservable(),
+                googleMapObservable,
                 extranetOccasionProvider.getOccasionsSubsetObservable(keysToShow));
     }
 
@@ -67,8 +70,17 @@ public class ExtranetMapView extends MapView {
     public void getMapAsync(final OnMapReadyCallback clientCallback) {
         populateAndReturnMapToCallback(
                 clientCallback,
-                getGoogleMapObservable(),
+                googleMapObservable,
                 extranetOccasionProvider.getGlobalOccasions());
+    }
+
+    void setExtranetMapViewComponent(ExtranetMapViewComponent extranetMapViewComponent) {
+        this.extranetMapViewComponent = extranetMapViewComponent;
+        extranetMapViewComponent.inject(this);
+    }
+
+    public void getSuperMapViewAsync(OnMapReadyCallback callback) {
+        super.getMapAsync(callback);
     }
 
     @Override
@@ -81,6 +93,8 @@ public class ExtranetMapView extends MapView {
         extranetMapViewComponent = DaggerExtranetMapViewComponent
                 .builder()
                 .contextModule(new ContextModule(context))
+                .waspModule(new WaspModule())
+                .mapModule(new MapModule(this))
                 .build();
         extranetMapViewComponent.inject(this);
     }
@@ -138,27 +152,6 @@ public class ExtranetMapView extends MapView {
                                 Log.d(TAG, "map marker populating observable completed");
                             }
                         });
-    }
-
-    private Observable<GoogleMap> getGoogleMapObservable() {
-        // On subscription, get googlemap and return when onMapReady is called
-        return Observable
-                .create(new Observable.OnSubscribe<GoogleMap>() {
-                    @Override
-                    public void call(final Subscriber<? super GoogleMap> subscriber) {
-                        getGoogleMap(new OnMapReadyCallback() {
-                            @Override
-                            public void onMapReady(GoogleMap googleMap) {
-                                subscriber.onNext(googleMap);
-                            }
-                        });
-                    }
-                })
-                .subscribeOn(AndroidSchedulers.mainThread());
-    }
-
-    private void getGoogleMap(OnMapReadyCallback callback) {
-        super.getMapAsync(callback);
     }
 
     private class MapAndMarkers {
