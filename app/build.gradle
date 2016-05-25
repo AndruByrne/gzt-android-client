@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 21 //  max targetSDK for robolectric 3.0
         versionCode 2
         versionName "1.0.0-SNAPSHOT"
         applicationId "com.anthropicandroid.gzt"

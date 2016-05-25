@@ -1,4 +1,4 @@
-package com.anthropicandroid.test_utils;
+package com.anthropicandroid.gzt.test_utils;
 
 /*
  * Created by Andrew Brin on 3/22/2016.
@@ -45,6 +45,7 @@ public class RoboTestRunner extends RobolectricGradleTestRunner {
 
         // res/merged added in Android Gradle plugin 1.3-beta1
 
+        // Recognize new name for data binding layouts until later plugin version
         if (FileFsFile.from(BUILD_OUTPUT, "data-binding-layout-out").exists()) {
             res = FileFsFile.from(BUILD_OUTPUT, "data-binding-layout-out", flavor, type);
         } else if (FileFsFile.from(BUILD_OUTPUT, "res", "merged").exists()) {

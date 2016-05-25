@@ -9,9 +9,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.anthropicandroid.extranetbrowser.R;
-import com.anthropicandroid.extranetbrowser.model.ExtranetDataStore;
+import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
+import com.anthropicandroid.extranetbrowser.modules.ContextModule;
+import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewComponent;
+import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,6 +21,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -30,8 +34,11 @@ import rx.functions.Func2;
 public class ExtranetMapView extends MapView {
 
     public static final String TAG = ExtranetMapView.class.getSimpleName();
-    private ExtranetDataStore extranetDataStore;
+
+    @Inject public ExtranetOccasionProvider extranetOccasionProvider;
+
     private GoogleMap myGoogleMap;
+    private ExtranetMapViewComponent extranetMapViewComponent;
 
     public ExtranetMapView(Context context) {
         super(context);
@@ -43,50 +50,76 @@ public class ExtranetMapView extends MapView {
         initialize(context);
     }
 
-    private void initialize(Context context) {
-        inflate(context, R.layout.extranet_map_view, this);
-        extranetDataStore = new ExtranetDataStore(context.getFilesDir().getPath());
-    }
-
     public void getMapAsync(BitmapDrawable bitmapDrawable, final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
-        // save bitmap
+        // save & index bitmap
         // pass on to constructor
         getMapAsync(keysToShow, clientCallback);
     }
 
     public void getMapAsync(final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
-        returnMapToCallbackAndPopulate(clientCallback, getGoogleMapObservable(), extranetDataStore.getOccasionsSubsetObservable(keysToShow));
+        populateAndReturnMapToCallback(
+                clientCallback,
+                getGoogleMapObservable(),
+                extranetOccasionProvider.getOccasionsSubsetObservable(keysToShow));
     }
 
     @Override
     public void getMapAsync(final OnMapReadyCallback clientCallback) {
-        returnMapToCallbackAndPopulate(clientCallback, getGoogleMapObservable(), extranetDataStore.getGlobalOccasions());
+        populateAndReturnMapToCallback(
+                clientCallback,
+                getGoogleMapObservable(),
+                extranetOccasionProvider.getGlobalOccasions());
     }
 
-    private void returnMapToCallbackAndPopulate(
+    @Override
+    protected void onDetachedFromWindow() {
+        extranetMapViewComponent = null;
+        super.onDetachedFromWindow();
+    }
+
+    private void initialize(Context context) {
+        extranetMapViewComponent = DaggerExtranetMapViewComponent
+                .builder()
+                .contextModule(new ContextModule(context))
+                .build();
+        extranetMapViewComponent.inject(this);
+    }
+
+    private void populateAndReturnMapToCallback(
             final OnMapReadyCallback clientCallback,
             Observable<GoogleMap> googleMapObservable,
-            Observable<Occasion> extranetMarkersObservable) {
-
-        // On call, zip marker and map using marker thread once; add markers to map and return callback at some point
-        Func2<GoogleMap, Occasion, MarkerOptions> mapToMarkerOptions = new Func2<GoogleMap, Occasion, MarkerOptions>() {
-            @Override
-            public MarkerOptions call(GoogleMap googleMap, Occasion occasion) { //  this runs off the main thread
-                if (myGoogleMap == null)
-                    myGoogleMap = googleMap;
-                return new MarkerOptions()
-                        .position(new LatLng(occasion.getLatitude(), occasion.getLongitude()));
-            }
-        };
+            Observable<Occasion> extranetOccasionsObservable) {
 
         Observable
-                .combineLatest(googleMapObservable, extranetMarkersObservable, mapToMarkerOptions) //  wait until both obs return first onNext, then combine with function
+                .combineLatest( //  perform combining function for every emission, after both have emitted at least once
+                        googleMapObservable,
+                        extranetOccasionsObservable,
+                        // On call, combine marker and map; add markers to map and return callback at some point
+                        new Func2<GoogleMap, Occasion, MapAndMarkers>() {
+                            @Override
+                            public MapAndMarkers call(GoogleMap googleMap, Occasion occasion) {
+                                if (googleMap == null)
+                                    Log.e(TAG, "Google map view returned null googleMap");
+                                return new MapAndMarkers(
+                                        googleMap,
+                                        new MarkerOptions()
+                                                .position(new LatLng( //  copy occasion position
+                                                        occasion.getLatitude(),
+                                                        occasion.getLongitude()))
+                                        //  copy all other parameters from occasion
+                                );
+                            }
+                        })
+//                        mapToMarkerOptions) //  wait until both obs return first onNext, then combine with function
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        new Action1<MarkerOptions>() {
+                        new Action1<MapAndMarkers>() {
                             @Override
-                            public void call(MarkerOptions markerOptions) {
-                                myGoogleMap.addMarker(markerOptions);
+                            public void call(MapAndMarkers mapAndMarkers) {
+                                if (myGoogleMap == null)
+                                    myGoogleMap = mapAndMarkers.googleMap;
+                                Log.e(TAG, "using null googleMap");
+                                myGoogleMap.addMarker(mapAndMarkers.markerOptions);
                             }
                         },
                         new Action1<Throwable>() {
@@ -99,6 +132,8 @@ public class ExtranetMapView extends MapView {
                         new Action0() {
                             @Override
                             public void call() {
+                                if (myGoogleMap == null)
+                                    Log.e(TAG, "returning null googleMap, perhaps no onNextCalled");
                                 clientCallback.onMapReady(myGoogleMap); //  should be earlier
                                 Log.d(TAG, "map marker populating observable completed");
                             }
@@ -124,5 +159,15 @@ public class ExtranetMapView extends MapView {
 
     private void getGoogleMap(OnMapReadyCallback callback) {
         super.getMapAsync(callback);
+    }
+
+    private class MapAndMarkers {
+        private final GoogleMap googleMap;
+        private final MarkerOptions markerOptions;
+
+        public MapAndMarkers(GoogleMap googleMap, MarkerOptions markerOptions) {
+            this.googleMap = googleMap;
+            this.markerOptions = markerOptions;
+        }
     }
 }

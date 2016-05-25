@@ -46,7 +46,7 @@ public class GZTMapViewAdapter {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                    mapComponent.getMapViewHolder().setMapView(view);
+                    mapComponent.getMapViewHolder().setMapView(view); //  activity lifecycle accounting
                 }
             });
         }

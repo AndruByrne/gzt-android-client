@@ -1,8 +1,8 @@
 package com.anthropicandroid.gzt.activity;
 
-import com.anthropicandroid.BuildConfig;
-import com.anthropicandroid.TestZombieTrackerApplication;
-import com.anthropicandroid.test_utils.RoboTestRunner;
+import com.anthropicandroid.gzt.BuildConfig;
+import com.anthropicandroid.gzt.TestZombieTrackerApplication;
+import com.anthropicandroid.gzt.test_utils.RoboTestRunner;
 
 import org.junit.After;
 import org.junit.Before;
