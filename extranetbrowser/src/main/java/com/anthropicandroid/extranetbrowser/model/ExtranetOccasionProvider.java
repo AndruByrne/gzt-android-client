@@ -12,13 +12,13 @@ import net.rehacktive.waspdb.WaspHash;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
 
-final public class ExtranetOccasionProvider {
+public class ExtranetOccasionProvider {
+    /*
+    * class to provide observables of extranet occasions to be mapped into map markers */
 
     public static final String TAG = ExtranetOccasionProvider.class.getSimpleName();
     public static final String EXTRANET_DATABASE = "ExtranetDatabase";
@@ -36,7 +36,7 @@ final public class ExtranetOccasionProvider {
         NO_CACHED_OCCASION
     }
 
-    @Inject public ExtranetOccasionProvider(Context context, WaspHolder waspHolder) {
+    public ExtranetOccasionProvider(Context context, WaspHolder waspHolder) {
         this.context = context;
         this.waspHolder = waspHolder;
     }

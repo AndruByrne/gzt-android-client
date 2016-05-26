@@ -23,6 +23,10 @@ android {
     }
 }
 
+tasks.withType(Test) {
+    systemProperty "robolectric.logging", "stdout"
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 

@@ -1,7 +1,6 @@
 package com.anthropicandroid.extranetbrowser.modules;
 
-import android.util.Log;
-
+import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
@@ -22,20 +21,19 @@ public class MapModule {
     private GoogleMapAsyncGetter googleMapGetter;
 
     public MapModule(GoogleMapAsyncGetter googleMapGetter) {
-        Log.d(MapModule.class.getSimpleName(), "constructing MapModule; mapView null?"+Boolean.toString(googleMapGetter == null));
         this.googleMapGetter = googleMapGetter; }
 
     @Provides
     @ExtranetMapViewScope
-    Observable<GoogleMap> googleMapObservable(){
+    public Observable<ExtranetMapWrapper> googleMapObservable(){
         return Observable
-                .create(new Observable.OnSubscribe<GoogleMap>() {
+                .create(new Observable.OnSubscribe<ExtranetMapWrapper>() {
                     @Override
-                    public void call(final Subscriber<? super GoogleMap> subscriber) {
+                    public void call(final Subscriber<? super ExtranetMapWrapper> subscriber) {
                         googleMapGetter.getSuperMapViewAsync(new OnMapReadyCallback() {
                             @Override
                             public void onMapReady(GoogleMap googleMap) {
-                                subscriber.onNext(googleMap);
+                                subscriber.onNext(new ExtranetMapWrapper(googleMap));
                             }
                         });
                     }

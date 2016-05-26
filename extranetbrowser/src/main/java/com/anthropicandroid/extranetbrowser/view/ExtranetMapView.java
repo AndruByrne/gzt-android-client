@@ -15,8 +15,8 @@ import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewComponent;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
+import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.WaspModule;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -28,18 +28,19 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func2;
 
-public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsyncGetter{
+public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsyncGetter {
 
     public static final String TAG = ExtranetMapView.class.getSimpleName();
 
-    @Inject public ExtranetOccasionProvider extranetOccasionProvider;
-    @Inject public Observable<GoogleMap> googleMapObservable;
+    @Inject
+    public ExtranetOccasionProvider extranetOccasionProvider;
+    @Inject
+    public Observable<ExtranetMapWrapper> googleMapObservable;
 
-    private GoogleMap myGoogleMap;
+    private ExtranetMapWrapper mapWrapper;
 
     private ExtranetMapViewComponent extranetMapViewComponent;
 
@@ -51,6 +52,16 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
     public ExtranetMapView(Context context, AttributeSet attributes) {
         super(context, attributes);
         initialize(context);
+    }
+
+    ExtranetMapView(Context context, ExtranetMapViewComponent mapViewComponent) {
+        super(context);
+        mapViewComponent.inject(this);
+    }
+
+    ExtranetMapView(Context context, AttributeSet attributes, ExtranetMapViewComponent mapViewComponent) {
+        super(context, attributes);
+        mapViewComponent.inject(this);
     }
 
     public void getMapAsync(BitmapDrawable bitmapDrawable, final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
@@ -74,11 +85,6 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                 extranetOccasionProvider.getGlobalOccasions());
     }
 
-    void setExtranetMapViewComponent(ExtranetMapViewComponent extranetMapViewComponent) {
-        this.extranetMapViewComponent = extranetMapViewComponent;
-        extranetMapViewComponent.inject(this);
-    }
-
     public void getSuperMapViewAsync(OnMapReadyCallback callback) {
         super.getMapAsync(callback);
     }
@@ -93,15 +99,16 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         extranetMapViewComponent = DaggerExtranetMapViewComponent
                 .builder()
                 .contextModule(new ContextModule(context))
-                .waspModule(new WaspModule())
                 .mapModule(new MapModule(this))
+                .occasionProviderModule(new OccasionProviderModule())
+                .waspModule(new WaspModule())
                 .build();
         extranetMapViewComponent.inject(this);
     }
 
     private void populateAndReturnMapToCallback(
             final OnMapReadyCallback clientCallback,
-            Observable<GoogleMap> googleMapObservable,
+            Observable<ExtranetMapWrapper> googleMapObservable,
             Observable<Occasion> extranetOccasionsObservable) {
 
         Observable
@@ -109,13 +116,13 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                         googleMapObservable,
                         extranetOccasionsObservable,
                         // On call, combine marker and map; add markers to map and return callback at some point
-                        new Func2<GoogleMap, Occasion, MapAndMarkers>() {
+                        new Func2<ExtranetMapWrapper, Occasion, MapAndMarkers>() {
                             @Override
-                            public MapAndMarkers call(GoogleMap googleMap, Occasion occasion) {
-                                if (googleMap == null)
-                                    Log.e(TAG, "Google map view returned null googleMap");
+                            public MapAndMarkers call(ExtranetMapWrapper mapWrapper, Occasion occasion) {
+                                if (mapWrapper == null)
+                                    Log.e(TAG, "Google map view returned null mapWrapper");
                                 return new MapAndMarkers(
-                                        googleMap,
+                                        mapWrapper,
                                         new MarkerOptions()
                                                 .position(new LatLng( //  copy occasion position
                                                         occasion.getLatitude(),
@@ -130,10 +137,11 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                         new Action1<MapAndMarkers>() {
                             @Override
                             public void call(MapAndMarkers mapAndMarkers) {
-                                if (myGoogleMap == null)
-                                    myGoogleMap = mapAndMarkers.googleMap;
-                                Log.e(TAG, "using null googleMap");
-                                myGoogleMap.addMarker(mapAndMarkers.markerOptions);
+                                if (mapWrapper == null) {
+                                    mapWrapper = mapAndMarkers.mapWrapper; //  assign to local
+                                    clientCallback.onMapReady(mapWrapper.getGoogleMap()); //  return google map
+                                }
+                                mapWrapper.addMarker(mapAndMarkers.markerOptions);
                             }
                         },
                         new Action1<Throwable>() {
@@ -142,24 +150,15 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                                 Log.e(TAG, "Error in map marker populating observable: " + throwable.getMessage());
                                 throwable.printStackTrace();
                             }
-                        },
-                        new Action0() {
-                            @Override
-                            public void call() {
-                                if (myGoogleMap == null)
-                                    Log.e(TAG, "returning null googleMap, perhaps no onNextCalled");
-                                clientCallback.onMapReady(myGoogleMap); //  should be earlier
-                                Log.d(TAG, "map marker populating observable completed");
-                            }
                         });
     }
 
     private class MapAndMarkers {
-        private final GoogleMap googleMap;
+        private final ExtranetMapWrapper mapWrapper;
         private final MarkerOptions markerOptions;
 
-        public MapAndMarkers(GoogleMap googleMap, MarkerOptions markerOptions) {
-            this.googleMap = googleMap;
+        public MapAndMarkers(ExtranetMapWrapper mapWrapper, MarkerOptions markerOptions) {
+            this.mapWrapper = mapWrapper;
             this.markerOptions = markerOptions;
         }
     }

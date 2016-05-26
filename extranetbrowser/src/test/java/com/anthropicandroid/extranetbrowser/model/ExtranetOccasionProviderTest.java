@@ -12,6 +12,7 @@ import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestMapModule;
 import com.anthropicandroid.extranetbrowser.testUtils.TestWaspModule;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapView;
+import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
@@ -37,11 +38,12 @@ public class ExtranetOccasionProviderTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         MapViewTestActivity testContext = Robolectric.setupActivity(MapViewTestActivity.class);
+        ExtranetMapWrapper mockWrapper = Mockito.mock(ExtranetMapWrapper.class);
         ExtranetMapViewTestComponent testComponent = DaggerExtranetMapViewTestComponent
                 .builder()
                 .contextModule(new ContextModule(testContext))
                 .waspModule(new TestWaspModule())
-                .mapModule(new TestMapModule(getSuperMapViewAsyncMock()))
+                .mapModule(new TestMapModule(getSuperMapViewAsyncMock(), mockWrapper))
                 .build();
         testComponent.inject(this);
     }

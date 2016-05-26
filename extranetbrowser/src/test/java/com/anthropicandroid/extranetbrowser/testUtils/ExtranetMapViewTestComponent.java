@@ -9,6 +9,7 @@ import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewScope;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
+import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.WaspModule;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapViewTest;
 
@@ -19,6 +20,7 @@ import dagger.Component;
         modules = {
                 ContextModule.class,
                 MapModule.class,
+                OccasionProviderModule.class,
                 WaspModule.class
         })
 public interface ExtranetMapViewTestComponent extends ExtranetMapViewComponent {

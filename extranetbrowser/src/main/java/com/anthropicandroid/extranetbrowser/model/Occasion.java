@@ -6,10 +6,15 @@ package com.anthropicandroid.extranetbrowser.model;
 
 final public class Occasion {
 
-    private double latitude = 37.860d;
-    private double longitude = -122.487d;
+    private double latitude;
+    private double longitude;
 
     public Occasion(){}
+
+    public Occasion(double latitude, double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     public double getLatitude() {
         return latitude;

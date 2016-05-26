@@ -95,6 +95,8 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/reports" />
+      <excludeFolder url="file://$MODULE_DIR$/build/test-results" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
@@ -111,8 +113,8 @@
     <orderEntry type="library" exported="" name="compilerCommon-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="objenesis-2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-library-1.3" level="project" />
-    <orderEntry type="library" exported="" name="protobuf-java-2.6.1" level="project" />
     <orderEntry type="library" exported="" name="kryo-serializers-0.33" level="project" />
+    <orderEntry type="library" exported="" name="protobuf-java-2.6.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-repository-metadata-2.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="shadows-play-services-3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="bcprov-jdk16-1.46" level="project" />
@@ -124,15 +126,15 @@
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-annotations-3.0" level="project" />
     <orderEntry type="library" exported="" name="antlr4-4.5" level="project" />
     <orderEntry type="library" exported="" name="kotlin-runtime-1.0.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="wagon-http-shared-1.0-beta-6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="shadows-core-3.0" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="wagon-http-shared-1.0-beta-6" level="project" />
     <orderEntry type="library" exported="" name="baseLibrary-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="adapters-1.0-rc5" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="wagon-file-1.0-beta-6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-tree-5.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-artifact-2.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-analysis-5.0.1" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-profile-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="library-1.0-rc5" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="icu4j-53.1" level="project" />
@@ -144,8 +146,8 @@
     <orderEntry type="library" exported="" scope="TEST" name="maven-project-2.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-util-5.0.1" level="project" />
     <orderEntry type="library" exported="" name="asm-5.0.3" level="project" />
-    <orderEntry type="library" exported="" name="okio-1.5.0" level="project" />
     <orderEntry type="library" exported="" name="org.abego.treelayout.core-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="okio-1.5.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-utils-3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-artifact-manager-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="reflectasm-1.10.1" level="project" />
@@ -169,11 +171,11 @@
     <orderEntry type="library" exported="" scope="TEST" name="maven-settings-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="antlr4-runtime-4.5" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="vtd-xml-2.11" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-commons-5.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="vtd-xml-2.11" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-23.3.0" level="project" />
     <orderEntry type="library" exported="" name="minlog-1.3.0" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-23.3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="mockito-core-1.9.5" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-model-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.10" level="project" />
