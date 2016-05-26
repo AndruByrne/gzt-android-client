@@ -74,7 +74,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         populateAndReturnMapToCallback(
                 clientCallback,
                 googleMapObservable,
-                extranetOccasionProvider.getOccasionsSubsetObservable(keysToShow));
+                extranetOccasionProvider.getOccasionsSubset(keysToShow));
     }
 
     @Override

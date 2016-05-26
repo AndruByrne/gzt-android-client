@@ -41,7 +41,7 @@ public class ExtranetOccasionProvider {
         this.waspHolder = waspHolder;
     }
 
-    public Observable<Occasion> getOccasionsSubsetObservable(final List<String> keysToShow) {
+    public Observable<Occasion> getOccasionsSubset(final List<String> keysToShow) {
         waspHolder.setBulkStringList(BulkStringList.REQUESTED_KEYS, keysToShow);
         // async start serviceIntent for data downloads with preference to this method(we have requested keys, should d/l data)
         // (with download limitations passed into ExtranetMapView)

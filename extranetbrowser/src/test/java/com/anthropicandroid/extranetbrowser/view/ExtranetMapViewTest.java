@@ -80,14 +80,16 @@ public class ExtranetMapViewTest extends TestCase {
     }
 
     @Test
-    public void testGetMapAsyncOneParamPopulatesAGoogleMapAndReturnsCallback() throws Exception {
+    public void testGetMapAsyncOneParamUsesGlobalOccasionsToPopulateAGoogleMapAndReturnsCallback() throws Exception {
+        // create mocks
 
-        // create mocks for endpoints
-        List<Occasion> globalOccasions = TestingModel.getGlobalOccasions();
+        // undifferentiated occasions
+        List<Occasion> globalOccasions = TestingModel.getMockGlobalOccasions();
         Observable<Occasion> testOccasionObservable = Observable.from(globalOccasions);
         when(mockOccasionProvider.getGlobalOccasions()).thenReturn(testOccasionObservable);
+        // captor for markers added to map (wrapping object)
         ArgumentCaptor<MarkerOptions> markerToAddCaptor = ArgumentCaptor.forClass(MarkerOptions.class);
-
+        // client callback
         OnMapReadyCallback mockReadyCallback = mock(OnMapReadyCallback.class);
         ArgumentCaptor<GoogleMap> googleMapCaptor = ArgumentCaptor.forClass(GoogleMap.class);
 
@@ -98,12 +100,11 @@ public class ExtranetMapViewTest extends TestCase {
         verify(mockWrapper, times(3)).addMarker(markerToAddCaptor.capture());
         List<MarkerOptions> addedMarkers = markerToAddCaptor.getAllValues();
         assertEquals(
-                addedMarkers.get(0).getPosition().latitude,
-                globalOccasions.get(0).getLatitude());
+                globalOccasions.get(0).getLatitude(),
+                addedMarkers.get(0).getPosition().latitude);
         assertEquals(
-                addedMarkers.get(2).getPosition().longitude,
-                globalOccasions.get(2).getLongitude());
-
+                globalOccasions.get(2).getLongitude(),
+                addedMarkers.get(2).getPosition().longitude);
         // check callback received a googleMap (actually null)
         verify(mockReadyCallback).onMapReady(googleMapCaptor.capture());
         List<GoogleMap> googleMaps = googleMapCaptor.getAllValues();
@@ -111,8 +112,42 @@ public class ExtranetMapViewTest extends TestCase {
     }
 
     @Test
-    public void testGetMapAsync1() throws Exception {
+    public void testGetMapAsyncTwoParamUsesSubsetObservableToPopulateAGoogleMapWithAndReturnsCallback() throws Exception {
+        // create mocks
 
+        // differentiated occasions
+        List<Occasion> occasionsSubset = TestingModel.getMockOccasionsSubset();
+        List<String> mockRequestingKeys = TestingModel.getMockRequestingKeys();
+        ArgumentCaptor<List> requestedKeysCaptor = ArgumentCaptor.forClass(List.class);
+        when(mockOccasionProvider.getOccasionsSubset(requestedKeysCaptor.capture()))
+                .thenReturn(Observable.from(occasionsSubset));
+        // captor for markers added to map (wrapping object)
+        ArgumentCaptor<MarkerOptions> markerToAddCaptor = ArgumentCaptor.forClass(MarkerOptions.class);
+        // client callback
+        OnMapReadyCallback mockReadyCallback = mock(OnMapReadyCallback.class);
+        ArgumentCaptor<GoogleMap> googleMapCaptor = ArgumentCaptor.forClass(GoogleMap.class);
+
+        // test function
+        extranetMapView.getMapAsync(mockRequestingKeys, mockReadyCallback);
+
+        // verify occasion provider received list of keys to retrieve
+        List<String> capturedRequestedKeys = requestedKeysCaptor.getAllValues().get(0);
+        assertEquals(
+                mockRequestingKeys,
+                capturedRequestedKeys);
+        // verify googleMap had markers added to it
+        verify(mockWrapper, times(3)).addMarker(markerToAddCaptor.capture());
+        List<MarkerOptions> addedMarkers = markerToAddCaptor.getAllValues();
+        assertEquals(
+                occasionsSubset.get(0).getLatitude(),
+                addedMarkers.get(0).getPosition().latitude);
+        assertEquals(
+                occasionsSubset.get(2).getLongitude(),
+                addedMarkers.get(2).getPosition().longitude);
+        // check callback received a googleMap (actually null)
+        verify(mockReadyCallback).onMapReady(googleMapCaptor.capture());
+        List<GoogleMap> googleMaps = googleMapCaptor.getAllValues();
+        assertEquals(1, googleMaps.size());
     }
 
     @Test
