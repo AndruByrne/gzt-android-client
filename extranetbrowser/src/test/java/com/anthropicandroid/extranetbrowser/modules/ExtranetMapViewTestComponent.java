@@ -1,16 +1,10 @@
-package com.anthropicandroid.extranetbrowser.testUtils;
+package com.anthropicandroid.extranetbrowser.modules;
 
 /*
  * Created by Andrew Brin on 5/24/2016.
  */
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProviderTest;
-import com.anthropicandroid.extranetbrowser.modules.ContextModule;
-import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
-import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewScope;
-import com.anthropicandroid.extranetbrowser.modules.MapModule;
-import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
-import com.anthropicandroid.extranetbrowser.modules.WaspModule;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapViewTest;
 
 import dagger.Component;

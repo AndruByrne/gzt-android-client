@@ -1,10 +1,9 @@
-package com.anthropicandroid.extranetbrowser.testUtils;
+package com.anthropicandroid.extranetbrowser.modules;
 
 import android.content.Context;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.WaspHolder;
-import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 
 /*
  * Created by Andrew Brin on 5/25/2016.

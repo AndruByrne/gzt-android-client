@@ -18,7 +18,7 @@ import rx.schedulers.Schedulers;
  * Created by Andrew Brin on 5/24/2016.
  */
 
-final public class WaspHolder {
+public class WaspHolder {
 
     private WaspDb waspDb;
     WaspHash bulkAddedListsHash;
@@ -91,9 +91,15 @@ final public class WaspHolder {
         else erroneousOccasionsHash.put(key, deficit);
     }
 
-    public WaspHash getExtranetOccasionsHash() {
-        if (waspDb == null)
-            throw new RuntimeException("wasp db not initialized before getting hashes");
-        else return extranetOccasionsHash;
+    public Occasion getCachedOccasion(String key) {
+        // This is where the Occasion is casted
+        return extranetOccasionsHash.get(key);
     }
+
+
+//    public WaspHash getExtranetOccasionsHash() {
+//        if (waspDb == null)
+//            throw new RuntimeException("wasp db not initialized before getting hashes");
+//        else return extranetOccasionsHash;
+//    }
 }

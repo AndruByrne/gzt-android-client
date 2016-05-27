@@ -1,6 +1,5 @@
-package com.anthropicandroid.extranetbrowser.testUtils;
+package com.anthropicandroid.extranetbrowser.modules;
 
-import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

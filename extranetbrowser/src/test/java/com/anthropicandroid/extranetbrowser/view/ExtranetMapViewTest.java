@@ -3,17 +3,17 @@ package com.anthropicandroid.extranetbrowser.view;
 import android.support.annotation.NonNull;
 
 import com.anthropicandroid.extranetbrowser.BuildConfig;
-import com.anthropicandroid.extranetbrowser.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
+import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewTestComponent;
+import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewTestComponent;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
-import com.anthropicandroid.extranetbrowser.testUtils.DaggerExtranetMapViewTestComponent;
-import com.anthropicandroid.extranetbrowser.testUtils.ExtranetMapViewTestComponent;
+import com.anthropicandroid.extranetbrowser.modules.TestMapModule;
+import com.anthropicandroid.extranetbrowser.modules.TestOccasionProviderModule;
+import com.anthropicandroid.extranetbrowser.modules.TestWaspModule;
+import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
-import com.anthropicandroid.extranetbrowser.testUtils.TestMapModule;
-import com.anthropicandroid.extranetbrowser.testUtils.TestOccasionProviderModule;
-import com.anthropicandroid.extranetbrowser.testUtils.TestWaspModule;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,11 +43,9 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(RoboTestRunner.class)
-@Config(
-        constants = BuildConfig.class)
+@Config(constants = BuildConfig.class)
 public class ExtranetMapViewTest extends TestCase {
 
-    private MapViewTestActivity testContext;
     private ExtranetMapView extranetMapView;
     private ExtranetOccasionProvider mockOccasionProvider;
     private ExtranetMapWrapper mockWrapper;
@@ -55,17 +53,16 @@ public class ExtranetMapViewTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         ShadowLog.stream = System.out;
-        testContext = Robolectric.setupActivity(MapViewTestActivity.class);
+        MapViewTestActivity testContext = Robolectric.setupActivity(MapViewTestActivity.class);
         mockOccasionProvider = mock(ExtranetOccasionProvider.class);
         mockWrapper = mock(ExtranetMapWrapper.class);
         ExtranetMapViewTestComponent testComponent = DaggerExtranetMapViewTestComponent
                 .builder()
                 .contextModule(new ContextModule(testContext))
-                .occasionProviderModule(new TestOccasionProviderModule(mockOccasionProvider))
                 .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), mockWrapper))
+                .occasionProviderModule(new TestOccasionProviderModule(mockOccasionProvider))
                 .waspModule(new TestWaspModule()) //  not needed for these tests
                 .build();
-        testComponent.inject(this);
         extranetMapView = new ExtranetMapView(testContext, testComponent);
     }
 
@@ -152,6 +149,6 @@ public class ExtranetMapViewTest extends TestCase {
 
     @Test
     public void testGetMapAsync2() throws Exception {
-
+        // NYI
     }
 }

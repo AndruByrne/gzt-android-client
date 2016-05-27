@@ -6,12 +6,14 @@ package com.anthropicandroid.extranetbrowser.model;
 
 final public class Occasion {
 
+    private String key;
     private double latitude;
     private double longitude;
 
     public Occasion(){}
 
-    public Occasion(double latitude, double longitude) {
+    public Occasion(String key, double latitude, double longitude) {
+        this.key = key;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -24,4 +26,5 @@ final public class Occasion {
         return longitude;
     }
 
+    public String getKey() { return key; }
 }

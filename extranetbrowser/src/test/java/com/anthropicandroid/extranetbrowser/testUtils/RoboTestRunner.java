@@ -15,6 +15,14 @@ import org.robolectric.res.FileFsFile;
 import org.robolectric.util.Logger;
 import org.robolectric.util.ReflectionHelpers;
 
+import rx.Scheduler;
+import rx.android.plugins.RxAndroidPlugins;
+import rx.android.plugins.RxAndroidSchedulersHook;
+import rx.plugins.RxJavaPlugins;
+import rx.plugins.RxJavaSchedulersHook;
+import rx.plugins.RxJavaTestPlugins;
+import rx.schedulers.Schedulers;
+
 /**
  * Test runner customized for running unit tests either through the Gradle CLI or
  * Android Studio. The runner uses the build type and build flavor to compute the
@@ -28,6 +36,30 @@ public class RoboTestRunner extends RobolectricGradleTestRunner {
 
     public RoboTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
+        RxJavaTestPlugins.resetPlugins();
+        RxJavaPlugins.getInstance().registerSchedulersHook(new RxJavaSchedulersHook(){
+            @Override
+            public Scheduler getComputationScheduler() {
+                return Schedulers.immediate();
+            }
+
+            @Override
+            public Scheduler getIOScheduler() {
+                return Schedulers.immediate();
+            }
+
+            @Override
+            public Scheduler getNewThreadScheduler() {
+                return Schedulers.immediate();
+            }
+        });
+        RxAndroidPlugins.getInstance().reset();
+        RxAndroidPlugins.getInstance().registerSchedulersHook(new RxAndroidSchedulersHook(){
+            @Override
+            public Scheduler getMainThreadScheduler() {
+                return Schedulers.immediate();
+            }
+        });
     }
 
     @Override

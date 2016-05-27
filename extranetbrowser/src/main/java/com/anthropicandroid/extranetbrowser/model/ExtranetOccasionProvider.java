@@ -8,8 +8,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import net.rehacktive.waspdb.WaspHash;
-
 import java.util.List;
 
 import rx.Observable;
@@ -45,39 +43,40 @@ public class ExtranetOccasionProvider {
         waspHolder.setBulkStringList(BulkStringList.REQUESTED_KEYS, keysToShow);
         // async start serviceIntent for data downloads with preference to this method(we have requested keys, should d/l data)
         // (with download limitations passed into ExtranetMapView)
-        return Observable.concat(getCachedOccasionsAndRecordFailures(keysToShow), getMissingOccasions());
+        return Observable.concat(
+                getCachedOccasionsAndRecordFailures(keysToShow),
+                getMissingOccasions());
     }
 
     public Observable<Occasion> getGlobalOccasions() {
-        Log.d(TAG, "got global occasions hash call");
         return waspHolder
                 .getOccasionKeys()
                 .flatMap(new Func1<List<String>, Observable<Occasion>>() {
                     @Override
                     public Observable<Occasion> call(final List<String> occasionKeys) {
-                        waspHolder.getExtranetOccasionsHash().put("Occasion_Key", new Occasion());
                         return getCachedOccasionsAndRecordFailures(occasionKeys);
                     }
                 });
     }
 
     private Observable<Occasion> getMissingOccasions() {
+        Log.d(TAG, "getting missing occasions");
         // request Occasions from extranet server in batches, return newly populated occasions,
         // may want to use IntentService/BroadcastReceiver pattern
-        return null;
+        return Observable.empty();
     }
 
     @NonNull
     private Observable<Occasion> getCachedOccasionsAndRecordFailures(final List<String> keys) {
-        Log.d(TAG, "getting cached occasions and redording failures");
+        Log.d(TAG, "getting cached occasions and recording failures");
         return Observable.create(new Observable.OnSubscribe<Occasion>() {
             @Override
             public void call(Subscriber<? super Occasion> subscriber) {
-                WaspHash extranetOccasions = waspHolder.getExtranetOccasionsHash();
                 for (String key : keys) {
-                    Occasion occasion = extranetOccasions.get(key);
-                    if (occasion != null)
+                    Occasion occasion = waspHolder.getCachedOccasion(key);
+                    if (occasion != null){
                         subscriber.onNext(occasion);
+                    }
                     else waspHolder.addErroneousOccasion(key, OccasionDeficit.NO_CACHED_OCCASION);
                 }
                 subscriber.onCompleted();
