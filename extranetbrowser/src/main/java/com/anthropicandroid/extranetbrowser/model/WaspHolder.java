@@ -1,5 +1,7 @@
 package com.anthropicandroid.extranetbrowser.model;
 
+import android.util.Log;
+
 import net.rehacktive.waspdb.WaspDb;
 import net.rehacktive.waspdb.WaspFactory;
 import net.rehacktive.waspdb.WaspHash;
@@ -47,6 +49,7 @@ public class WaspHolder {
     }
 
     private void initHolder(WaspDb waspDb) {
+        // TODO(Andrew Brin): the db reads will generate a "Serialization Error" if the Occasion fields have changed but the program only update; may need to test and delete
         if (this.waspDb == null) { //  if waspDb null, add db and create Hashes
             this.waspDb = waspDb;
             bulkAddedListsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider.BULK_LIST_HASH);
@@ -56,14 +59,28 @@ public class WaspHolder {
     }
 
     public Observable<List<String>> getOccasionKeys() {
-        return waspDBInitObservable //  subscribing to replaying obs. field to prevent race bet. init & first get
+//        return waspDBInitObservable //  subscribing to replaying obs. field to prevent race bet. init & first get
+        return setDemoOccasion() //  subscribing to replaying obs. field to prevent race bet. init & first get
                 .map(new Func1<Boolean, List<String>>() {
                     @Override
                     public List<String> call(Boolean initSuccess) {
-                        return extranetOccasionsHash.getAllKeys();
+                        List<String> allKeys = extranetOccasionsHash.getAllKeys();
+                        Log.d(WaspHolder.class.getSimpleName(), "allKeys: "+allKeys.toString());
+                        return allKeys;
                     }
                 })
                 .take(1);
+    }
+
+    public Observable<Boolean> setDemoOccasion(){
+        return waspDBInitObservable
+                .map(new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean aBoolean) {
+                        extranetOccasionsHash.put("Demo Key 1", new Occasion("Demo Key 1", 37.85d, -122.48d));
+                        return true;
+                    }
+                });
     }
 
     public void setBulkStringList(final ExtranetOccasionProvider.BulkStringList listKey, final List<String> list) {
@@ -95,11 +112,4 @@ public class WaspHolder {
         // This is where the Occasion is casted
         return extranetOccasionsHash.get(key);
     }
-
-
-//    public WaspHash getExtranetOccasionsHash() {
-//        if (waspDb == null)
-//            throw new RuntimeException("wasp db not initialized before getting hashes");
-//        else return extranetOccasionsHash;
-//    }
 }
