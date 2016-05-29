@@ -41,4 +41,8 @@ public class TestingModel {
             add(DOMAIN_STRING+"/"+ KEY3);
         }};
     }
+
+    public static List<String> getMockGlobalKeys() {
+        return getMockRequestingKeys();
+    }
 }

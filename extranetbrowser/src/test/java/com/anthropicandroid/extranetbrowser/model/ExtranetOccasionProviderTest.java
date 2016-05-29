@@ -32,7 +32,10 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,9 +49,11 @@ import static org.mockito.Mockito.when;
 public class ExtranetOccasionProviderTest extends TestCase {
 
     public static final String TAG = ExtranetOccasionProviderTest.class.getSimpleName();
-    @Inject ExtranetOccasionProvider subject;
+    @Inject
+    ExtranetOccasionProvider subject;
 
-    @Inject WaspHolder mockWaspHolder;
+    @Inject
+    WaspHolder mockWaspHolder;
 
     @Before
     public void setUp() throws Exception {
@@ -94,8 +99,8 @@ public class ExtranetOccasionProviderTest extends TestCase {
 
         // should pass requested keys to DB holder
         assertEquals(
-                requestedKeyCaptor.getAllValues(),
-                mockRequestingKeys);
+                mockRequestingKeys,
+                requestedKeyCaptor.getAllValues());
         // requested keys should be stored exactly as is
         ArgumentCaptor<List> bulkListAddCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<ExtranetOccasionProvider.BulkStringList> bulkListTypeCaptor = ArgumentCaptor.forClass(ExtranetOccasionProvider.BulkStringList.class);
@@ -127,6 +132,43 @@ public class ExtranetOccasionProviderTest extends TestCase {
 
     @Test
     public void testGetGlobalOccasions() throws Exception {
+        // mock getCachedOccasion
+        final List<Occasion> mockOccasionsSubset = TestingModel.getMockGlobalOccasions();
+        List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
+        ArgumentCaptor<String> requestedKeyCaptor = ArgumentCaptor.forClass(String.class);
+        when(mockWaspHolder.getOccasionKeys())
+                .thenReturn(Observable.just(mockGlobalKeys));
+        when(mockWaspHolder.getCachedOccasion(requestedKeyCaptor.capture()))
+                .thenReturn(mockOccasionsSubset.get(0))
+                .thenReturn(null)
+                .thenReturn(mockOccasionsSubset.get(2));
+
+        // test method
+        Observable<Occasion> globalOccasions = subject.getGlobalOccasions();
+        TestSubscriber<Occasion> occasionTestSubscriber = new TestSubscriber<>();
+        globalOccasions.subscribe(occasionTestSubscriber);
+
+        // should pass requested keys to DB holder
+        assertEquals(
+                mockGlobalKeys,
+                requestedKeyCaptor.getAllValues());
+        // "requested" keys should not be stored
+        verify(mockWaspHolder, never()).setBulkStringList(any(ExtranetOccasionProvider.BulkStringList.class), anyListOf(String.class));
+        // erroneous key should be stored with identification
+        ArgumentCaptor<String> erroneousKeyCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<ExtranetOccasionProvider.OccasionDeficit> deficitCaptor = ArgumentCaptor.forClass(ExtranetOccasionProvider.OccasionDeficit.class);
+        verify(mockWaspHolder, times(1)).addErroneousOccasion(
+                erroneousKeyCaptor.capture(),
+                deficitCaptor.capture());
+        assertEquals(
+                mockGlobalKeys.get(1),
+                erroneousKeyCaptor.getValue());
+        // only two Occasions should be returned
+        occasionTestSubscriber.assertNoErrors();
+        occasionTestSubscriber.assertCompleted();
+        occasionTestSubscriber.assertValues(
+                mockOccasionsSubset.get(0),
+                mockOccasionsSubset.get(2));
 
     }
 }
