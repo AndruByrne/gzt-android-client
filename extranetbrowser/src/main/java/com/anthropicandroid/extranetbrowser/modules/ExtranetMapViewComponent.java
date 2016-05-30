@@ -12,6 +12,8 @@ import dagger.Component;
 @Component(
         modules = {
                 ContextModule.class,
+                ExtranetAPIModule.class,
+                LocationModule.class,
                 MapModule.class,
                 OccasionProviderModule.class,
                 WaspModule.class

@@ -5,9 +5,12 @@ import android.support.annotation.NonNull;
 import com.anthropicandroid.extranetbrowser.BuildConfig;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewTestComponent;
+import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewTestComponent;
+import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
+import com.anthropicandroid.extranetbrowser.modules.TestExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.TestMapModule;
 import com.anthropicandroid.extranetbrowser.modules.TestWaspModule;
 import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
@@ -15,6 +18,7 @@ import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
 import junit.framework.TestCase;
 
@@ -22,12 +26,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -49,20 +56,32 @@ import static org.mockito.Mockito.when;
 public class ExtranetOccasionProviderTest extends TestCase {
 
     public static final String TAG = ExtranetOccasionProviderTest.class.getSimpleName();
+
     @Inject
     ExtranetOccasionProvider subject;
 
     @Inject
     WaspHolder mockWaspHolder;
 
+    @Inject
+    ExtranetAPIModule.ExtranetAPI mockExtranetAPI;
+
+    private LocationModule testLocationModule;
+
     @Before
     public void setUp() throws Exception {
         MapViewTestActivity testContext = Robolectric.setupActivity(MapViewTestActivity.class);
-        ExtranetMapWrapper mockWrapper = mock(ExtranetMapWrapper.class);
+        ExtranetMapWrapper testWrapper = mock(ExtranetMapWrapper.class);
+        ExtranetAPIModule.ExtranetAPI testExtranetAPI = mock(ExtranetAPIModule.ExtranetAPI.class);
+        testLocationModule = Mockito.mock(LocationModule.class);
+        LatLng testCurrentLocation = new LatLng(TestingModel.centerOfTestingLatitude, TestingModel.centerOfTestingLongitude);
+        when(testLocationModule.getLocationProvider()).thenReturn(Observable.just(testCurrentLocation));
         ExtranetMapViewTestComponent testComponent = DaggerExtranetMapViewTestComponent
                 .builder()
                 .contextModule(new ContextModule(testContext))
-                .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), mockWrapper))
+                .extranetAPIModule(new TestExtranetAPIModule(testExtranetAPI))
+                .locationModule(testLocationModule)
+                .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), testWrapper))
                 .occasionProviderModule(new OccasionProviderModule()) //  provides class under test
                 .waspModule(new TestWaspModule())
                 .build();
@@ -82,7 +101,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
     @Test
     public void testGetOccasionsSubsetObservable() throws Exception {
         // mock calling parameters
-        List<String> mockRequestingKeys = TestingModel.getMockRequestingKeys();
+        final List<String> mockRequestingKeys = TestingModel.getMockRequestingKeys();
         // mock getCachedOccasion
         final List<Occasion> mockOccasionsSubset = TestingModel.getMockOccasionsSubset();
         ArgumentCaptor<String> requestedKeyCaptor = ArgumentCaptor.forClass(String.class);
@@ -90,7 +109,19 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 .thenReturn(mockOccasionsSubset.get(0))
                 .thenReturn(mockOccasionsSubset.get(1))
                 .thenReturn(null)
-                .thenReturn(mockOccasionsSubset.get(2));
+                .thenReturn(mockOccasionsSubset.get(3));
+        when(mockWaspHolder.getKeysForErroneousOccasions())
+                .thenReturn(new ArrayList<String>(){{add(mockRequestingKeys.get(2));}});
+        // mock getOccasionsFromExtranet
+        ArgumentCaptor<List> networkKeyCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Double> networkLatitudeCaptor = ArgumentCaptor.forClass(double.class);
+        ArgumentCaptor<Double> networkLongitudeCaptor = ArgumentCaptor.forClass(double.class);
+        when(mockExtranetAPI
+                .getOccasionsAtLocation(
+                        networkLatitudeCaptor.capture(),
+                        networkLongitudeCaptor.capture(),
+                        networkKeyCaptor.capture()))
+                .thenReturn(Observable.just(mockOccasionsSubset.get(2)));
 
         // test method
         Observable<Occasion> occasionsSubset = subject.getOccasionsSubset(mockRequestingKeys);
@@ -115,33 +146,58 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 mockRequestingKeys);
         // erroneous key should be stored with identification
         ArgumentCaptor<String> erroneousKeyCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<ExtranetOccasionProvider.OccasionDeficit> deficitCaptor = ArgumentCaptor.forClass(ExtranetOccasionProvider.OccasionDeficit.class);
         verify(mockWaspHolder, times(1)).addErroneousOccasion(
-                erroneousKeyCaptor.capture(),
-                deficitCaptor.capture());
+                erroneousKeyCaptor.capture());
         assertEquals(
                 mockRequestingKeys.get(2),
                 erroneousKeyCaptor.getValue());
+        // locationProvider
+        verify(testLocationModule).getLocationProvider();
+        // extranetAPI
+        verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class));
+        assertEquals(
+                mockRequestingKeys.subList(2, 3),
+                networkKeyCaptor.getValue());
+        assertEquals(
+                TestingModel.centerOfTestingLatitude,
+                networkLatitudeCaptor.getValue());
+        assertEquals(
+                TestingModel.centerOfTestingLongitude,
+                networkLongitudeCaptor.getValue());
         // only two Occasions should be returned
         occasionTestSubscriber.assertNoErrors();
         occasionTestSubscriber.assertCompleted();
         occasionTestSubscriber.assertValues(
                 mockOccasionsSubset.get(0),
-                mockOccasionsSubset.get(1));
+                mockOccasionsSubset.get(1),
+                mockOccasionsSubset.get(2));
     }
 
     @Test
     public void testGetGlobalOccasions() throws Exception {
         // mock getCachedOccasion
-        final List<Occasion> mockOccasionsSubset = TestingModel.getMockGlobalOccasions();
-        List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
+        final List<Occasion> mockGlobalOccasions = TestingModel.getMockGlobalOccasions();
+        final List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
         ArgumentCaptor<String> requestedKeyCaptor = ArgumentCaptor.forClass(String.class);
         when(mockWaspHolder.getOccasionKeys())
                 .thenReturn(Observable.just(mockGlobalKeys));
         when(mockWaspHolder.getCachedOccasion(requestedKeyCaptor.capture()))
-                .thenReturn(mockOccasionsSubset.get(0))
+                .thenReturn(mockGlobalOccasions.get(0))
                 .thenReturn(null)
-                .thenReturn(mockOccasionsSubset.get(2));
+                .thenReturn(mockGlobalOccasions.get(2))
+                .thenReturn(mockGlobalOccasions.get(3));
+        when(mockWaspHolder.getKeysForErroneousOccasions())
+                .thenReturn(new ArrayList<String>(){{add(mockGlobalKeys.get(1));}});
+        // mock getOccasionsFromExtranet
+        ArgumentCaptor<List> networkKeyCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Double> networkLatitudeCaptor = ArgumentCaptor.forClass(double.class);
+        ArgumentCaptor<Double> networkLongitudeCaptor = ArgumentCaptor.forClass(double.class);
+        when(mockExtranetAPI
+                .getOccasionsAtLocation(
+                        networkLatitudeCaptor.capture(),
+                        networkLongitudeCaptor.capture(),
+                        networkKeyCaptor.capture()))
+                .thenReturn(Observable.just(mockGlobalOccasions.get(1)));
 
         // test method
         Observable<Occasion> globalOccasions = subject.getGlobalOccasions();
@@ -156,19 +212,30 @@ public class ExtranetOccasionProviderTest extends TestCase {
         verify(mockWaspHolder, never()).setBulkStringList(any(ExtranetOccasionProvider.BulkStringList.class), anyListOf(String.class));
         // erroneous key should be stored with identification
         ArgumentCaptor<String> erroneousKeyCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<ExtranetOccasionProvider.OccasionDeficit> deficitCaptor = ArgumentCaptor.forClass(ExtranetOccasionProvider.OccasionDeficit.class);
         verify(mockWaspHolder, times(1)).addErroneousOccasion(
-                erroneousKeyCaptor.capture(),
-                deficitCaptor.capture());
+                erroneousKeyCaptor.capture());
         assertEquals(
                 mockGlobalKeys.get(1),
                 erroneousKeyCaptor.getValue());
+        // locationProvider
+        verify(testLocationModule).getLocationProvider();
+        // extranetAPI
+        verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class));
+        assertEquals(
+                mockGlobalKeys.subList(1, 2),
+                networkKeyCaptor.getValue());
+        assertEquals(
+                TestingModel.centerOfTestingLatitude,
+                networkLatitudeCaptor.getValue());
+        assertEquals(
+                TestingModel.centerOfTestingLongitude,
+                networkLongitudeCaptor.getValue());
         // only two Occasions should be returned
         occasionTestSubscriber.assertNoErrors();
         occasionTestSubscriber.assertCompleted();
         occasionTestSubscriber.assertValues(
-                mockOccasionsSubset.get(0),
-                mockOccasionsSubset.get(2));
-
+                mockGlobalOccasions.get(0),
+                mockGlobalOccasions.get(2),
+                mockGlobalOccasions.get(1));
     }
 }

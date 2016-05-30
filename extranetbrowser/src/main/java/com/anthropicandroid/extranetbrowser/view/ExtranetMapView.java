@@ -13,7 +13,9 @@ import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewComponent;
+import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
+import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.WaspModule;
@@ -99,6 +101,8 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         extranetMapViewComponent = DaggerExtranetMapViewComponent
                 .builder()
                 .contextModule(new ContextModule(context))
+                .extranetAPIModule(new ExtranetAPIModule())
+                .locationModule(new LocationModule())
                 .mapModule(new MapModule(this))
                 .occasionProviderModule(new OccasionProviderModule())
                 .waspModule(new WaspModule())

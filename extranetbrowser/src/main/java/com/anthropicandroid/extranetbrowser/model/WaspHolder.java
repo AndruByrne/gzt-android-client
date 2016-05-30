@@ -65,14 +65,14 @@ public class WaspHolder {
                     @Override
                     public List<String> call(Boolean initSuccess) {
                         List<String> allKeys = extranetOccasionsHash.getAllKeys();
-                        Log.d(WaspHolder.class.getSimpleName(), "allKeys: "+allKeys.toString());
+                        Log.d(WaspHolder.class.getSimpleName(), "allKeys: " + allKeys.toString());
                         return allKeys;
                     }
                 })
                 .take(1);
     }
 
-    public Observable<Boolean> setDemoOccasion(){
+    private Observable<Boolean> setDemoOccasion() {
         return waspDBInitObservable
                 .map(new Func1<Boolean, Boolean>() {
                     @Override
@@ -96,16 +96,27 @@ public class WaspHolder {
         else bulkAddedListsHash.put(listKey, list);
     }
 
-    public void addErroneousOccasion(final String key, final ExtranetOccasionProvider.OccasionDeficit deficit) {
+    public void addErroneousOccasion(final String key) {
         if (waspDb == null)
             waspDBInitObservable
                     .subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean aBoolean) {
-                            erroneousOccasionsHash.put(key, deficit);
+                            erroneousOccasionsHash.put(key, 0);
                         }
                     });
-        else erroneousOccasionsHash.put(key, deficit);
+        else erroneousOccasionsHash.put(key, 0);
+    }
+
+    public List<String> getKeysForErroneousOccasions() {
+        if (waspDb == null)
+            return waspDBInitObservable.map(new Func1<Boolean, List<String>>() {
+                @Override
+                public List<String> call(Boolean aBoolean) {
+                    return erroneousOccasionsHash.getAllKeys();
+                }
+            }).take(1).toBlocking().first();
+        else return extranetOccasionsHash.getAllKeys();
     }
 
     public Occasion getCachedOccasion(String key) {

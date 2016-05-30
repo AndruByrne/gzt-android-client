@@ -8,6 +8,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 import rx.Observable;
@@ -23,8 +26,10 @@ public class ExtranetOccasionProvider {
     public static final String EXTRANET_OCCASIONS_HASH = "ExtranetOccasionsHash";
     public static final String BULK_LIST_HASH = "BulkListHash";
     public static final String ERRONEOUS_OCCASION_HASH = "erroneous_occasions_hash";
-    private final Context context; //  will be used
+    private final Context context; //  may well be used
     private final WaspHolder waspHolder;
+    private ExtranetAPIModule.ExtranetAPI extranetAPI;
+    private Observable<LatLng> locationProvider;
 
     enum BulkStringList {
         REQUESTED_KEYS
@@ -34,9 +39,11 @@ public class ExtranetOccasionProvider {
         NO_CACHED_OCCASION
     }
 
-    public ExtranetOccasionProvider(Context context, WaspHolder waspHolder) {
+    public ExtranetOccasionProvider(Context context, WaspHolder waspHolder, ExtranetAPIModule.ExtranetAPI extranetAPI, Observable<LatLng> locationProvider) {
         this.context = context;
         this.waspHolder = waspHolder;
+        this.extranetAPI = extranetAPI;
+        this.locationProvider = locationProvider;
     }
 
     public Observable<Occasion> getOccasionsSubset(final List<String> keysToShow) {
@@ -54,16 +61,22 @@ public class ExtranetOccasionProvider {
                 .flatMap(new Func1<List<String>, Observable<Occasion>>() {
                     @Override
                     public Observable<Occasion> call(final List<String> occasionKeys) {
-                        return getCachedOccasionsAndRecordFailures(occasionKeys);
+                        return Observable.concat(
+                                getCachedOccasionsAndRecordFailures(occasionKeys),
+                                getMissingOccasions());
                     }
                 });
     }
 
     private Observable<Occasion> getMissingOccasions() {
-        Log.d(TAG, "getting missing occasions");
-        // request Occasions from extranet server in batches, return newly populated occasions,
-        // may want to use IntentService/BroadcastReceiver pattern
-        return Observable.empty();
+        // request Occasions from extranet server in batches, return newly populated occasions, TODO(Andrew Brin):stinkin' batches
+        return locationProvider.take(1).flatMap(new Func1<LatLng, Observable<Occasion>>() {
+            @Override
+            public Observable<Occasion> call(LatLng latLng) {
+                List<String> keysForErroneousOccasions = waspHolder.getKeysForErroneousOccasions();
+                return extranetAPI.getOccasionsAtLocation(latLng.latitude, latLng.longitude, keysForErroneousOccasions);
+            }
+        });
     }
 
     @NonNull
@@ -74,10 +87,9 @@ public class ExtranetOccasionProvider {
             public void call(Subscriber<? super Occasion> subscriber) {
                 for (String key : keys) {
                     Occasion occasion = waspHolder.getCachedOccasion(key);
-                    if (occasion != null){
+                    if (occasion != null) {
                         subscriber.onNext(occasion);
-                    }
-                    else waspHolder.addErroneousOccasion(key, OccasionDeficit.NO_CACHED_OCCASION);
+                    } else waspHolder.addErroneousOccasion(key);
                 }
                 subscriber.onCompleted();
             }
