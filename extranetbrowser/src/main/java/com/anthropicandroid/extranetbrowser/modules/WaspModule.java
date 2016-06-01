@@ -17,7 +17,7 @@ public class WaspModule {
     @Provides
     @ExtranetMapViewScope
     public WaspHolder getWaspHolder(Context context){
-        return new WaspHolder(context.getFilesDir().getPath());
+        return new WaspHolder(context);
     }
 
 }

@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
-import com.anthropicandroid.extranetbrowser.view.ExtranetMapView;
+import com.anthropicandroid.extranetbrowser.ExtranetMapView;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
 import com.anthropicandroid.gzt.databinding.PowerUpsMapHolderBinding;

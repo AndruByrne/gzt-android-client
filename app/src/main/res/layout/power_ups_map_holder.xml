@@ -9,7 +9,7 @@
             type="com.anthropicandroid.gzt.activity.UserActionHandlers" />
     </data>
 
-    <com.anthropicandroid.extranetbrowser.view.ExtranetMapView
+    <com.anthropicandroid.extranetbrowser.ExtranetMapView
         android:id="@+id/extranet_map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

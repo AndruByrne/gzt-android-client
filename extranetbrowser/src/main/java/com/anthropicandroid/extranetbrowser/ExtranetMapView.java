@@ -1,4 +1,4 @@
-package com.anthropicandroid.extranetbrowser.view;
+package com.anthropicandroid.extranetbrowser;
 
 /*
  * Created by Andrew Brin on 5/11/2016.
@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
+import com.anthropicandroid.extranetbrowser.model.WaspHolder;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewComponent;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
@@ -19,11 +20,14 @@ import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.WaspModule;
+import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
+import com.anthropicandroid.extranetbrowser.view.ExtranetRegistration;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -155,6 +159,14 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                                 throwable.printStackTrace();
                             }
                         });
+    }
+
+    public static void notifyMeOn(ExtranetRegistration registration, List<String> requestedKeys) {
+        if(registration==null) Log.e(TAG, "registration required for notification");
+        else ExtranetRegistrationService.registerAppForKeys(
+                registration,
+                requestedKeys!=null?requestedKeys:new ArrayList<String>(),
+                new WaspHolder(registration.context));
     }
 
     private class MapAndMarkers {

@@ -5,9 +5,6 @@ package com.anthropicandroid.extranetbrowser.modules;
  */
 
 import com.anthropicandroid.extranetbrowser.model.Occasion;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.List;
 
 import dagger.Module;
 import dagger.Provides;
@@ -23,7 +20,7 @@ public class ExtranetAPIModule {
     }
 
     public interface ExtranetAPI{
-        public Observable<Occasion> getOccasionsAtLocation(double latitude, double longitude, List<String>... keys);
+        public Observable<Occasion> getOccasionsAtLocation(double latitude, double longitude, String... keys);
         public Observable<Occasion> getOccasionsAtLocation(double latitude, double longitude);
     }
 }

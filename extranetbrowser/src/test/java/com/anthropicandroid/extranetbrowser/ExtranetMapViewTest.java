@@ -1,22 +1,26 @@
-package com.anthropicandroid.extranetbrowser.view;
+package com.anthropicandroid.extranetbrowser;
 
 import android.support.annotation.NonNull;
 
-import com.anthropicandroid.extranetbrowser.BuildConfig;
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewTestComponent;
+import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewTestComponent;
+import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
+import com.anthropicandroid.extranetbrowser.modules.TestExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.TestMapModule;
 import com.anthropicandroid.extranetbrowser.modules.TestOccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.TestWaspModule;
 import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
+import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import junit.framework.TestCase;
@@ -25,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
@@ -46,19 +51,27 @@ import static org.mockito.Mockito.when;
 @Config(constants = BuildConfig.class)
 public class ExtranetMapViewTest extends TestCase {
 
+    public static final String TAG = ExtranetMapView.class.getSimpleName();
     private ExtranetMapView extranetMapView;
     private ExtranetOccasionProvider mockOccasionProvider;
     private ExtranetMapWrapper mockWrapper;
+    private MapViewTestActivity testContext;
 
     @Before
     public void setUp() throws Exception {
         ShadowLog.stream = System.out;
-        MapViewTestActivity testContext = Robolectric.setupActivity(MapViewTestActivity.class);
+        testContext = Robolectric.setupActivity(MapViewTestActivity.class);
         mockOccasionProvider = mock(ExtranetOccasionProvider.class);
         mockWrapper = mock(ExtranetMapWrapper.class);
+        ExtranetAPIModule.ExtranetAPI testExtranetAPI = mock(ExtranetAPIModule.ExtranetAPI.class);
+        LocationModule testLocationModule = Mockito.mock(LocationModule.class);
+        LatLng testCurrentLocation = new LatLng(TestingModel.centerOfTestingLatitude, TestingModel.centerOfTestingLongitude);
+        when(testLocationModule.getLocationProvider()).thenReturn(Observable.just(testCurrentLocation));
         ExtranetMapViewTestComponent testComponent = DaggerExtranetMapViewTestComponent
                 .builder()
                 .contextModule(new ContextModule(testContext))
+                .extranetAPIModule(new TestExtranetAPIModule(testExtranetAPI))
+                .locationModule(testLocationModule)
                 .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), mockWrapper))
                 .occasionProviderModule(new TestOccasionProviderModule(mockOccasionProvider))
                 .waspModule(new TestWaspModule()) //  not needed for these tests
@@ -83,7 +96,8 @@ public class ExtranetMapViewTest extends TestCase {
         // undifferentiated occasions
         List<Occasion> globalOccasions = TestingModel.getMockGlobalOccasions();
         Observable<Occasion> testOccasionObservable = Observable.from(globalOccasions);
-        when(mockOccasionProvider.getGlobalOccasions()).thenReturn(testOccasionObservable);
+        when(mockOccasionProvider.getGlobalOccasions())
+                .thenReturn(testOccasionObservable.take(3));
         // captor for markers added to map (wrapping object)
         ArgumentCaptor<MarkerOptions> markerToAddCaptor = ArgumentCaptor.forClass(MarkerOptions.class);
         // client callback
@@ -117,7 +131,7 @@ public class ExtranetMapViewTest extends TestCase {
         List<String> mockRequestingKeys = TestingModel.getMockRequestingKeys();
         ArgumentCaptor<List> requestedKeysCaptor = ArgumentCaptor.forClass(List.class);
         when(mockOccasionProvider.getOccasionsSubset(requestedKeysCaptor.capture()))
-                .thenReturn(Observable.from(occasionsSubset));
+                .thenReturn(Observable.from(occasionsSubset).take(3));
         // captor for markers added to map (wrapping object)
         ArgumentCaptor<MarkerOptions> markerToAddCaptor = ArgumentCaptor.forClass(MarkerOptions.class);
         // client callback
@@ -150,5 +164,10 @@ public class ExtranetMapViewTest extends TestCase {
     @Test
     public void testGetMapAsync2() throws Exception {
         // NYI
+    }
+
+    @Test
+    public void testNotifyMeOnRegistersAppParticulars() throws Exception{
+        // not covered; the function should only call the static method in the Registration Service
     }
 }

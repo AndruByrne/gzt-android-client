@@ -4,12 +4,9 @@ package com.anthropicandroid.extranetbrowser.testUtils;
  * Created by Andrew Brin on 3/22/2016.
  */
 
-import com.google.android.gms.maps.GoogleMap;
-
 import org.junit.runners.model.InitializationError;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.internal.bytecode.InstrumentationConfiguration;
 import org.robolectric.manifest.AndroidManifest;
 import org.robolectric.res.FileFsFile;
 import org.robolectric.util.Logger;
@@ -108,13 +105,6 @@ public class RoboTestRunner extends RobolectricGradleTestRunner {
         Logger.debug("   Robolectric manifest path: " + manifest.getPath());
         Logger.debug("    Robolectric package name: " + packageName);
         return new AndroidManifest(manifest, res, assets, packageName);
-    }
-
-    @Override
-    public InstrumentationConfiguration createClassLoaderConfig(){
-        InstrumentationConfiguration.Builder builder = InstrumentationConfiguration.newBuilder();
-        builder.addInstrumentedClass(GoogleMap.class.getName());
-        return builder.build();
     }
 
     private static String getType(Config config) {

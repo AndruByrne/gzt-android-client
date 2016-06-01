@@ -31,14 +31,6 @@ public class ExtranetOccasionProvider {
     private ExtranetAPIModule.ExtranetAPI extranetAPI;
     private Observable<LatLng> locationProvider;
 
-    enum BulkStringList {
-        REQUESTED_KEYS
-    }
-
-    enum OccasionDeficit {
-        NO_CACHED_OCCASION
-    }
-
     public ExtranetOccasionProvider(Context context, WaspHolder waspHolder, ExtranetAPIModule.ExtranetAPI extranetAPI, Observable<LatLng> locationProvider) {
         this.context = context;
         this.waspHolder = waspHolder;
@@ -47,7 +39,7 @@ public class ExtranetOccasionProvider {
     }
 
     public Observable<Occasion> getOccasionsSubset(final List<String> keysToShow) {
-        waspHolder.setBulkStringList(BulkStringList.REQUESTED_KEYS, keysToShow);
+        waspHolder.setBulkStringList(WaspHolder.BulkStringList.REQUESTED_KEYS, keysToShow);
         // async start serviceIntent for data downloads with preference to this method(we have requested keys, should d/l data)
         // (with download limitations passed into ExtranetMapView)
         return Observable.concat(
@@ -74,7 +66,12 @@ public class ExtranetOccasionProvider {
             @Override
             public Observable<Occasion> call(LatLng latLng) {
                 List<String> keysForErroneousOccasions = waspHolder.getKeysForErroneousOccasions();
-                return extranetAPI.getOccasionsAtLocation(latLng.latitude, latLng.longitude, keysForErroneousOccasions);
+                String[] keys = keysForErroneousOccasions.toArray(new String[keysForErroneousOccasions.size()]);
+                Log.d(TAG, "key array lengtrh: "+keys.length);
+                return extranetAPI.getOccasionsAtLocation(
+                        latLng.latitude,
+                        latLng.longitude,
+                        keys);
             }
         });
     }

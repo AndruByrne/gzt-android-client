@@ -9,7 +9,7 @@ import android.databinding.BindingAdapter;
 import android.os.Bundle;
 import android.view.View;
 
-import com.anthropicandroid.extranetbrowser.view.ExtranetMapView;
+import com.anthropicandroid.extranetbrowser.ExtranetMapView;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.modules.GZTMapComponent;
 import com.google.android.gms.maps.GoogleMap;

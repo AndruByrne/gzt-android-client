@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -113,7 +112,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
         when(mockWaspHolder.getKeysForErroneousOccasions())
                 .thenReturn(new ArrayList<String>(){{add(mockRequestingKeys.get(2));}});
         // mock getOccasionsFromExtranet
-        ArgumentCaptor<List> networkKeyCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<String> networkKeyCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Double> networkLatitudeCaptor = ArgumentCaptor.forClass(double.class);
         ArgumentCaptor<Double> networkLongitudeCaptor = ArgumentCaptor.forClass(double.class);
         when(mockExtranetAPI
@@ -134,13 +133,13 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 requestedKeyCaptor.getAllValues());
         // requested keys should be stored exactly as is
         ArgumentCaptor<List> bulkListAddCaptor = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<ExtranetOccasionProvider.BulkStringList> bulkListTypeCaptor = ArgumentCaptor.forClass(ExtranetOccasionProvider.BulkStringList.class);
+        ArgumentCaptor<WaspHolder.BulkStringList> bulkListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
         verify(mockWaspHolder).setBulkStringList(
                 bulkListTypeCaptor.capture(),
                 bulkListAddCaptor.capture());
         assertEquals(
                 bulkListTypeCaptor.getValue(),
-                ExtranetOccasionProvider.BulkStringList.REQUESTED_KEYS);
+                WaspHolder.BulkStringList.REQUESTED_KEYS);
         assertEquals(
                 bulkListAddCaptor.getValue(),
                 mockRequestingKeys);
@@ -157,7 +156,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
         verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class));
         assertEquals(
                 mockRequestingKeys.subList(2, 3),
-                networkKeyCaptor.getValue());
+                networkKeyCaptor.getAllValues()); // must handle list of erroneous keys as well
         assertEquals(
                 TestingModel.centerOfTestingLatitude,
                 networkLatitudeCaptor.getValue());
@@ -187,9 +186,12 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 .thenReturn(mockGlobalOccasions.get(2))
                 .thenReturn(mockGlobalOccasions.get(3));
         when(mockWaspHolder.getKeysForErroneousOccasions())
-                .thenReturn(new ArrayList<String>(){{add(mockGlobalKeys.get(1));}});
+                .thenReturn((List<String>) new ArrayList<String>(){{
+                    add(mockGlobalKeys.get(1));
+                    add(mockGlobalKeys.get(2));
+                }});
         // mock getOccasionsFromExtranet
-        ArgumentCaptor<List> networkKeyCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<String> networkKeyCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Double> networkLatitudeCaptor = ArgumentCaptor.forClass(double.class);
         ArgumentCaptor<Double> networkLongitudeCaptor = ArgumentCaptor.forClass(double.class);
         when(mockExtranetAPI
@@ -209,7 +211,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 mockGlobalKeys,
                 requestedKeyCaptor.getAllValues());
         // "requested" keys should not be stored
-        verify(mockWaspHolder, never()).setBulkStringList(any(ExtranetOccasionProvider.BulkStringList.class), anyListOf(String.class));
+        verify(mockWaspHolder, never()).setBulkStringList(any(WaspHolder.BulkStringList.class), anyListOf(String.class));
         // erroneous key should be stored with identification
         ArgumentCaptor<String> erroneousKeyCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockWaspHolder, times(1)).addErroneousOccasion(
@@ -219,18 +221,19 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 erroneousKeyCaptor.getValue());
         // locationProvider
         verify(testLocationModule).getLocationProvider();
-        // extranetAPI
+        // extranetAPI called with erroneous keys
         verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class));
+//        verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class), any(String.class));
         assertEquals(
-                mockGlobalKeys.subList(1, 2),
-                networkKeyCaptor.getValue());
+                mockGlobalKeys.subList(1, 3),
+                networkKeyCaptor.getAllValues());
         assertEquals(
                 TestingModel.centerOfTestingLatitude,
                 networkLatitudeCaptor.getValue());
         assertEquals(
                 TestingModel.centerOfTestingLongitude,
                 networkLongitudeCaptor.getValue());
-        // only two Occasions should be returned
+        // only three Occasions should be returned
         occasionTestSubscriber.assertNoErrors();
         occasionTestSubscriber.assertCompleted();
         occasionTestSubscriber.assertValues(

@@ -4,7 +4,7 @@ package com.anthropicandroid.extranetbrowser.modules;
  * Created by Andrew Brin on 5/24/2016.
  */
 
-import com.anthropicandroid.extranetbrowser.view.ExtranetMapView;
+import com.anthropicandroid.extranetbrowser.ExtranetMapView;
 
 import dagger.Component;
 

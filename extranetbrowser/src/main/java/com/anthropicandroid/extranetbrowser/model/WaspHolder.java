@@ -1,5 +1,6 @@
 package com.anthropicandroid.extranetbrowser.model;
 
+import android.content.Context;
 import android.util.Log;
 
 import net.rehacktive.waspdb.WaspDb;
@@ -22,17 +23,19 @@ import rx.schedulers.Schedulers;
 
 public class WaspHolder {
 
+    public static final String TAG = WaspHolder.class.getSimpleName();
     private WaspDb waspDb;
     WaspHash bulkAddedListsHash;
     WaspHash extranetOccasionsHash;
     WaspHash erroneousOccasionsHash;
     private final ConnectableObservable<Boolean> waspDBInitObservable;
 
-    public WaspHolder(final String path) {
+    public WaspHolder(final Context context) {
         waspDBInitObservable = Observable
                 .create(new Observable.OnSubscribe<Boolean>() {
                     @Override
                     public void call(final Subscriber<? super Boolean> subscriber) {
+                        String path = context.getFilesDir().getPath(); //  TODO(Andrew Brin): extend path for specific directory
                         WaspFactory.openOrCreateDatabase(path, ExtranetOccasionProvider.EXTRANET_DATABASE, "password", new WaspListener<WaspDb>() {
                             @Override
                             public void onDone(WaspDb waspDb) {
@@ -60,13 +63,11 @@ public class WaspHolder {
 
     public Observable<List<String>> getOccasionKeys() {
 //        return waspDBInitObservable //  subscribing to replaying obs. field to prevent race bet. init & first get
-        return setDemoOccasion() //  subscribing to replaying obs. field to prevent race bet. init & first get
+        return setDemoOccasion() //  wait for demo occasion to be inserted
                 .map(new Func1<Boolean, List<String>>() {
                     @Override
                     public List<String> call(Boolean initSuccess) {
-                        List<String> allKeys = extranetOccasionsHash.getAllKeys();
-                        Log.d(WaspHolder.class.getSimpleName(), "allKeys: " + allKeys.toString());
-                        return allKeys;
+                        return extranetOccasionsHash.getAllKeys();
                     }
                 })
                 .take(1);
@@ -83,7 +84,7 @@ public class WaspHolder {
                 });
     }
 
-    public void setBulkStringList(final ExtranetOccasionProvider.BulkStringList listKey, final List<String> list) {
+    public void setBulkStringList(final BulkStringList listKey, final List<String> list) {
         if (waspDb == null)
             waspDBInitObservable
                     .subscribe(
@@ -122,5 +123,26 @@ public class WaspHolder {
     public Occasion getCachedOccasion(String key) {
         // This is where the Occasion is casted
         return extranetOccasionsHash.get(key);
+    }
+
+    public List<String> getBulkStringList(final BulkStringList listKey) {
+        Log.d(TAG, "getting bulk List");
+        if (waspDb == null){
+            Log.d(TAG, "waspdb null, observing");
+            return waspDBInitObservable.map(new Func1<Boolean, List<String>>() {
+                @Override
+                public List<String> call(Boolean aBoolean) {
+                    Log.d(TAG, "waspdb init is true");
+                    return bulkAddedListsHash.get(listKey);
+                }
+            }).take(1).toBlocking().first();}
+        else {
+            Log.d(TAG, "waspdb not null");
+            return bulkAddedListsHash.get(listKey);
+        }
+    }
+
+    public enum BulkStringList {
+        REQUESTED_KEYS
     }
 }
