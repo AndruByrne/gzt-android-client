@@ -1,7 +1,6 @@
 package com.anthropicandroid.extranetbrowser;
 
 import android.app.IntentService;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -54,7 +53,5 @@ public class ExtranetRegistrationService extends IntentService {
         if (bundle == null || bundle.getString(
                 PACKAGE_NAME_EXTRA) == null) return;
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification.Builder(this).setSmallIcon(R.drawable.common_google_signin_btn_icon_dark).build();
-        notificationManager.notify(0, notification);
     }
 }
