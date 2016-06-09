@@ -1,7 +1,6 @@
 package com.anthropicandroid.extranetbrowser.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 
 /*
  * Created by Andrew Brin on 5/30/2016.
@@ -9,25 +8,27 @@ import android.graphics.Bitmap;
 public class ExtranetRegistration {
 
     public final String packageName;
-    public final Bitmap titleIconBitmap;
     public final String notificationText;
-    public final Bitmap defaultMapIcon;
     public final Context context;
+    public final int resIdNotificationIcon;
+    public final int resIdDefaultMapIcon;
 
     public static class Builder {
+        // required
         private final Context context;
         private final String packageName;
-        private Bitmap titleIconBitmap = null;
+        // optional fields
         private String notificationText = "";
-        private Bitmap defaultMapIcon = null;
+        private int resIdNotificationIcon = 0;
+        private int resIdDefaultMapIcon = 0;
 
         public Builder(Context context) {
             this.context = context;
             this.packageName = context.getPackageName();
         }
 
-        public Builder addTitleIcon(Bitmap bitmap){ // TODO: should just be reference to R. in client project
-            titleIconBitmap = bitmap;
+        public Builder addNotificationIcon(int resId){
+            this.resIdNotificationIcon = resId;
             return this;
         }
 
@@ -36,8 +37,8 @@ public class ExtranetRegistration {
             return this;
         }
 
-        public Builder addDefaultMapIcon(Bitmap bitmap){
-            defaultMapIcon = bitmap;
+        public Builder addDefaultMapIcon(int resId){
+            this.resIdDefaultMapIcon = resId;
             return this;
         }
 
@@ -49,8 +50,8 @@ public class ExtranetRegistration {
     private ExtranetRegistration(Builder builder) {
         packageName = builder.packageName;
         context = builder.context;
-        defaultMapIcon = builder.defaultMapIcon;
-        titleIconBitmap = builder.titleIconBitmap;
+        resIdDefaultMapIcon = builder.resIdDefaultMapIcon;
+        resIdNotificationIcon = builder.resIdNotificationIcon;
         notificationText = builder.notificationText;
     }
 }

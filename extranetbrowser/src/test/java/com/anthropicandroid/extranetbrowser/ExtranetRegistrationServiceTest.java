@@ -1,6 +1,8 @@
 package com.anthropicandroid.extranetbrowser;
 
+import android.app.NotificationManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 
 import com.anthropicandroid.extranetbrowser.model.WaspHolder;
@@ -16,9 +18,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.robolectric.Robolectric;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.internal.ShadowExtractor;
 import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowNotificationManager;
+import org.robolectric.util.ServiceController;
 
 import java.util.List;
 
@@ -34,20 +39,22 @@ import static org.mockito.Mockito.verify;
 public class ExtranetRegistrationServiceTest extends TestCase {
 
     public static final String TAG = ExtranetRegistrationServiceTest.class.getSimpleName();
-    private MapViewTestActivity testContext;
+    public static final int MOCK_NOTIFICATION_ICON_RES_ID = 234;
+    public static final int MOCK_DEFAULT_ICON_RES_ID = 654;
 
     @Before
-    public void setUp() throws Exception{
-        testContext = Robolectric.setupActivity(MapViewTestActivity.class);
-//        ExtranetRegistrationService registrationService = Robolectric.setupService(ExtranetRegistrationService.class);
+    public void setUp() throws Exception {
     }
 
     @Test
     public void testRegisterAppForKeys() throws Exception {
+        MapViewTestActivity testContext = Robolectric.setupActivity(MapViewTestActivity.class);
         String notificationText = "Notification Text";
         ExtranetRegistration.Builder builder = new ExtranetRegistration
                 .Builder(testContext)
-                .addNotificationText(notificationText);
+                .addNotificationText(notificationText)
+                .addNotificationIcon(MOCK_NOTIFICATION_ICON_RES_ID)
+                .addDefaultMapIcon(MOCK_DEFAULT_ICON_RES_ID);
         ExtranetRegistration registration = builder.build();
         List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
 
@@ -80,11 +87,64 @@ public class ExtranetRegistrationServiceTest extends TestCase {
                 notificationText,
                 startedServiceIntent.getStringExtra(
                         ExtranetRegistrationService.NOTIFICATION_TEXT_EXTRA));
+        assertEquals(
+                MOCK_NOTIFICATION_ICON_RES_ID,
+                startedServiceIntent.getIntExtra(
+                        ExtranetRegistrationService.NOTIFICATION_ICON_RES_ID, 0));
+        assertEquals(MOCK_DEFAULT_ICON_RES_ID,
+                startedServiceIntent.getIntExtra(
+                        ExtranetRegistrationService.DEFAULT_MAP_ICON_RES_ID, 0));
     }
 
+    @Test
+    public void testNoBundleOrBundleWithoutPackageNameDoesNothing(){
+        ServiceController<ExtranetRegistrationService> serviceController = Robolectric.buildService(ExtranetRegistrationService.class);
+        serviceController.attach();
+        serviceController.create();
+        ExtranetRegistrationService extranetRegistrationService = serviceController.get();
+        NotificationManager notificationManager = (NotificationManager) RuntimeEnvironment.application.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent blankIntent = new Intent(RuntimeEnvironment.application, ExtranetRegistrationService.class);
+        extranetRegistrationService.onHandleIntent(blankIntent);
+
+        blankIntent.putExtra(ExtranetRegistrationService.NOTIFICATION_TEXT_EXTRA, "packageName");
+        extranetRegistrationService.onHandleIntent(blankIntent);
+
+        assertEquals(0, ((ShadowNotificationManager) ShadowExtractor.extract(notificationManager)).size());
+    }
 
     @Test
-    public void testOnHandleIntent() throws Exception {
+    public void testOnHandleIntentDeterminesKeysToDownloadAndRegistersTheirGeofences() throws Exception {
+        ServiceController<ExtranetRegistrationService> serviceController = Robolectric.buildService(ExtranetRegistrationService.class);
+        serviceController.attach();
+        serviceController.create();
+        ExtranetRegistrationService extranetRegistrationService = serviceController.get();
+        NotificationManager notificationManager = (NotificationManager) RuntimeEnvironment.application.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        Intent blankIntent = new Intent(RuntimeEnvironment.application, ExtranetRegistrationService.class);
+        extranetRegistrationService.onHandleIntent(blankIntent);
+
+
+//        ExtranetRegistration.Builder builder = new ExtranetRegistration.Builder();
+
+        // service test
+        // should determine which keys need occasions
+        // should ask network for needed occasions
+        // should register geofences for first 80 occasions with valid lat/long
+        // should note occasions with invalid lat/long
+        // could limit return to occasions nearest to square location
+
+
+    }
+
+    private class SolutionParameters {
+        private final int[] ints;
+        private final int intValue;
+
+        public SolutionParameters(int[] ints, Integer intValue) {
+
+            this.ints = ints;
+            this.intValue = intValue;
+        }
     }
 }

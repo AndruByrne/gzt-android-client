@@ -6,7 +6,6 @@ package com.anthropicandroid.extranetbrowser.model;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.google.android.gms.maps.model.LatLng;
@@ -65,20 +64,17 @@ public class ExtranetOccasionProvider {
         return locationProvider.take(1).flatMap(new Func1<LatLng, Observable<Occasion>>() {
             @Override
             public Observable<Occasion> call(LatLng latLng) {
-                List<String> keysForErroneousOccasions = waspHolder.getKeysForErroneousOccasions();
-                String[] keys = keysForErroneousOccasions.toArray(new String[keysForErroneousOccasions.size()]);
-                Log.d(TAG, "key array lengtrh: "+keys.length);
+                List<String> erroneousOccasions = waspHolder.getKeysForErroneousOccasions();
                 return extranetAPI.getOccasionsAtLocation(
                         latLng.latitude,
                         latLng.longitude,
-                        keys);
+                        erroneousOccasions.toArray(new String[erroneousOccasions.size()]));
             }
         });
     }
 
     @NonNull
     private Observable<Occasion> getCachedOccasionsAndRecordFailures(final List<String> keys) {
-        Log.d(TAG, "getting cached occasions and recording failures");
         return Observable.create(new Observable.OnSubscribe<Occasion>() {
             @Override
             public void call(Subscriber<? super Occasion> subscriber) {
