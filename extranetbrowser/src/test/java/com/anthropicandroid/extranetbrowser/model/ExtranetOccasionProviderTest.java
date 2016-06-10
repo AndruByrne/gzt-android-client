@@ -91,7 +91,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
     private MapModule.GoogleMapAsyncGetter getGoogleMapAsyncGetter() {
         return new MapModule.GoogleMapAsyncGetter() {
             @Override
-            public void getSuperMapViewAsync(OnMapReadyCallback callback) {
+            public void getGoogleMapViewAsync(OnMapReadyCallback callback) {
                 callback.onMapReady(null); //  value not used
             }
         };
@@ -139,7 +139,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 bulkListAddCaptor.capture());
         assertEquals(
                 bulkListTypeCaptor.getValue(),
-                WaspHolder.BulkStringList.REQUESTED_KEYS);
+                WaspHolder.BulkStringList.RECENTLY_DISPLAYED_KEYS);
         assertEquals(
                 bulkListAddCaptor.getValue(),
                 mockRequestingKeys);

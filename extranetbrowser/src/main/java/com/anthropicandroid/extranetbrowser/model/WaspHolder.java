@@ -143,6 +143,6 @@ public class WaspHolder {
     }
 
     public enum BulkStringList {
-        REQUESTED_KEYS
+        REQUESTED_BROADCAST_KEYS, RECENTLY_DISPLAYED_KEYS
     }
 }

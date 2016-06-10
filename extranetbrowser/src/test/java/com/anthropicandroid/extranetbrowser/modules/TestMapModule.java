@@ -28,7 +28,7 @@ public class TestMapModule extends MapModule {
                 .create(new Observable.OnSubscribe<ExtranetMapWrapper>() {
                     @Override
                     public void call(final Subscriber<? super ExtranetMapWrapper> subscriber) {
-                        googleMapGetter.getSuperMapViewAsync(new OnMapReadyCallback() {
+                        googleMapGetter.getGoogleMapViewAsync(new OnMapReadyCallback() {
                             @Override
                             public void onMapReady(GoogleMap googleMap) {
                                 subscriber.onNext(mockWrapper);

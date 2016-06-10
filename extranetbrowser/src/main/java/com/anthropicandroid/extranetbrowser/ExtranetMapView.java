@@ -5,23 +5,21 @@ package com.anthropicandroid.extranetbrowser;
  */
 
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
-import com.anthropicandroid.extranetbrowser.model.WaspHolder;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
 import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewComponent;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewComponent;
+import com.anthropicandroid.extranetbrowser.modules.ExtranetRegistrationModule;
 import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.WaspModule;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
-import com.anthropicandroid.extranetbrowser.view.ExtranetRegistration;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,10 +39,9 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
 
     public static final String TAG = ExtranetMapView.class.getSimpleName();
 
-    @Inject
-    public ExtranetOccasionProvider extranetOccasionProvider;
-    @Inject
-    public Observable<ExtranetMapWrapper> googleMapObservable;
+    @Inject public ExtranetOccasionProvider extranetOccasionProvider;
+    @Inject public Observable<ExtranetMapWrapper> googleMapObservable;
+    @Inject public ExtranetRegistration extranetRegistration;
 
     private ExtranetMapWrapper mapWrapper;
 
@@ -65,15 +62,11 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         mapViewComponent.inject(this);
     }
 
-    ExtranetMapView(Context context, AttributeSet attributes, ExtranetMapViewComponent mapViewComponent) {
-        super(context, attributes);
-        mapViewComponent.inject(this);
-    }
-
-    public void getMapAsync(BitmapDrawable bitmapDrawable, final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
-        // save & index bitmap
-        // pass on to constructor
-        getMapAsync(keysToShow, clientCallback);
+    public void broadcastToMeOnOccasions(ExtranetRegistration.Registration registration, List<String> requestedKeys) {
+        if(registration==null) Log.e(TAG, "registration required for notification");
+        else extranetRegistration.registerAppForKeys(
+                registration,
+                requestedKeys!=null?requestedKeys:new ArrayList<String>());
     }
 
     public void getMapAsync(final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
@@ -91,7 +84,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                 extranetOccasionProvider.getGlobalOccasions());
     }
 
-    public void getSuperMapViewAsync(OnMapReadyCallback callback) {
+    public void getGoogleMapViewAsync(OnMapReadyCallback callback) {
         super.getMapAsync(callback);
     }
 
@@ -106,6 +99,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                 .builder()
                 .contextModule(new ContextModule(context))
                 .extranetAPIModule(new ExtranetAPIModule())
+                .extranetRegistrationModule(new ExtranetRegistrationModule())
                 .locationModule(new LocationModule())
                 .mapModule(new MapModule(this))
                 .occasionProviderModule(new OccasionProviderModule())
@@ -118,7 +112,6 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
             final OnMapReadyCallback clientCallback,
             Observable<ExtranetMapWrapper> googleMapObservable,
             Observable<Occasion> extranetOccasionsObservable) {
-
         Observable
                 .combineLatest( //  perform combining function for every emission, after both have emitted at least once
                         googleMapObservable,
@@ -159,14 +152,6 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                                 throwable.printStackTrace();
                             }
                         });
-    }
-
-    public static void notifyMeOn(ExtranetRegistration registration, List<String> requestedKeys) {
-        if(registration==null) Log.e(TAG, "registration required for notification");
-        else ExtranetRegistrationService.registerAppForKeys(
-                registration,
-                requestedKeys!=null?requestedKeys:new ArrayList<String>(),
-                new WaspHolder(registration.context));
     }
 
     private class MapAndMarkers {

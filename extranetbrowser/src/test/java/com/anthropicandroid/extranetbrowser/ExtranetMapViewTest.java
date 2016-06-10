@@ -11,6 +11,7 @@ import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewTestComponent
 import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.TestExtranetAPIModule;
+import com.anthropicandroid.extranetbrowser.modules.TestExtranetRegistrationModule;
 import com.anthropicandroid.extranetbrowser.modules.TestMapModule;
 import com.anthropicandroid.extranetbrowser.modules.TestOccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.TestWaspModule;
@@ -38,7 +39,9 @@ import java.util.List;
 
 import rx.Observable;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,10 +55,15 @@ import static org.mockito.Mockito.when;
 public class ExtranetMapViewTest extends TestCase {
 
     public static final String TAG = ExtranetMapView.class.getSimpleName();
-    private ExtranetMapView extranetMapView;
+    public static final int MOCK_NOTIFICATION_ICON_RES_ID = 234;
+    public static final int MOCK_DEFAULT_ICON_RES_ID = 654;
+    public static final String MOCK_NOTIFICATION_TEXT = "Notification Text";
+
+    private ExtranetMapView subject;
     private ExtranetOccasionProvider mockOccasionProvider;
     private ExtranetMapWrapper mockWrapper;
     private MapViewTestActivity testContext;
+    private ExtranetRegistration mockRegistrar;
 
     @Before
     public void setUp() throws Exception {
@@ -63,6 +71,7 @@ public class ExtranetMapViewTest extends TestCase {
         testContext = Robolectric.setupActivity(MapViewTestActivity.class);
         mockOccasionProvider = mock(ExtranetOccasionProvider.class);
         mockWrapper = mock(ExtranetMapWrapper.class);
+        mockRegistrar = Mockito.mock(ExtranetRegistration.class);
         ExtranetAPIModule.ExtranetAPI testExtranetAPI = mock(ExtranetAPIModule.ExtranetAPI.class);
         LocationModule testLocationModule = Mockito.mock(LocationModule.class);
         LatLng testCurrentLocation = new LatLng(TestingModel.centerOfTestingLatitude, TestingModel.centerOfTestingLongitude);
@@ -71,19 +80,20 @@ public class ExtranetMapViewTest extends TestCase {
                 .builder()
                 .contextModule(new ContextModule(testContext))
                 .extranetAPIModule(new TestExtranetAPIModule(testExtranetAPI))
+                .extranetRegistrationModule(new TestExtranetRegistrationModule(mockRegistrar))
                 .locationModule(testLocationModule)
                 .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), mockWrapper))
                 .occasionProviderModule(new TestOccasionProviderModule(mockOccasionProvider))
                 .waspModule(new TestWaspModule()) //  not needed for these tests
                 .build();
-        extranetMapView = new ExtranetMapView(testContext, testComponent);
+        subject = new ExtranetMapView(testContext, testComponent);
     }
 
     @NonNull
     private MapModule.GoogleMapAsyncGetter getGoogleMapAsyncGetter() {
         return new MapModule.GoogleMapAsyncGetter() {
             @Override
-            public void getSuperMapViewAsync(OnMapReadyCallback callback) {
+            public void getGoogleMapViewAsync(OnMapReadyCallback callback) {
                 callback.onMapReady(null); //  value not used
             }
         };
@@ -105,7 +115,7 @@ public class ExtranetMapViewTest extends TestCase {
         ArgumentCaptor<GoogleMap> googleMapCaptor = ArgumentCaptor.forClass(GoogleMap.class);
 
         // test function
-        extranetMapView.getMapAsync(mockReadyCallback);
+        subject.getMapAsync(mockReadyCallback);
 
         // verify googleMap had markers added to it
         verify(mockWrapper, times(3)).addMarker(markerToAddCaptor.capture());
@@ -120,6 +130,7 @@ public class ExtranetMapViewTest extends TestCase {
         verify(mockReadyCallback).onMapReady(googleMapCaptor.capture());
         List<GoogleMap> googleMaps = googleMapCaptor.getAllValues();
         assertEquals(1, googleMaps.size());
+        verify(mockRegistrar, never()).registerAppForKeys(any(ExtranetRegistration.Registration.class), any(List.class));
     }
 
     @Test
@@ -139,7 +150,7 @@ public class ExtranetMapViewTest extends TestCase {
         ArgumentCaptor<GoogleMap> googleMapCaptor = ArgumentCaptor.forClass(GoogleMap.class);
 
         // test function
-        extranetMapView.getMapAsync(mockRequestingKeys, mockReadyCallback);
+        subject.getMapAsync(mockRequestingKeys, mockReadyCallback);
 
         // verify occasion provider received list of keys to retrieve
         List<String> capturedRequestedKeys = requestedKeysCaptor.getAllValues().get(0);
@@ -159,15 +170,36 @@ public class ExtranetMapViewTest extends TestCase {
         verify(mockReadyCallback).onMapReady(googleMapCaptor.capture());
         List<GoogleMap> googleMaps = googleMapCaptor.getAllValues();
         assertEquals(1, googleMaps.size());
+        verify(mockRegistrar, never()).registerAppForKeys(any(ExtranetRegistration.Registration.class), any(List.class));
     }
 
     @Test
-    public void testGetMapAsync2() throws Exception {
-        // NYI
-    }
+    public void testBroadcastToMePassesAlongAppParticulars() throws Exception {
+        // set up function inputs
+        List<String> mockRequestingKeys = TestingModel.getMockRequestingKeys();
+        ExtranetRegistration.Registration.Builder builder = new ExtranetRegistration.Registration
+                .Builder(testContext)
+                .addNotificationText(MOCK_NOTIFICATION_TEXT)
+                .addNotificationIcon(MOCK_NOTIFICATION_ICON_RES_ID)
+                .addDefaultMapIcon(MOCK_DEFAULT_ICON_RES_ID);
+        ExtranetRegistration.Registration testRegistration = builder.build();
 
-    @Test
-    public void testNotifyMeOnRegistersAppParticulars() throws Exception{
-        // not covered; the function should only call the static method in the Registration Service
+        // mocks
+//        subject.broadcastToMeOnOccasions();
+        ArgumentCaptor<ExtranetRegistration.Registration> registrationCaptor = ArgumentCaptor.forClass(ExtranetRegistration.Registration.class);
+        ArgumentCaptor<List> requestedKeysCaptor = ArgumentCaptor.forClass(List.class);
+
+        // test function
+        subject.broadcastToMeOnOccasions(testRegistration, mockRequestingKeys);
+
+        verify(mockRegistrar).registerAppForKeys(registrationCaptor.capture(), requestedKeysCaptor.capture());
+        List<String> capturedRequestedKeys = requestedKeysCaptor.getAllValues().get(0);
+        assertEquals(
+                testRegistration,
+                registrationCaptor.getValue());
+        assertEquals(
+                mockRequestingKeys,
+                capturedRequestedKeys);
+
     }
 }

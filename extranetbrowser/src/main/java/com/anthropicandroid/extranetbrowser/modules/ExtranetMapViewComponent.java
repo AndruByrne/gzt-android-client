@@ -13,6 +13,7 @@ import dagger.Component;
         modules = {
                 ContextModule.class,
                 ExtranetAPIModule.class,
+                ExtranetRegistrationModule.class,
                 LocationModule.class,
                 MapModule.class,
                 OccasionProviderModule.class,

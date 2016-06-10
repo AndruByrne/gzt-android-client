@@ -30,7 +30,7 @@ public class MapModule {
                 .create(new Observable.OnSubscribe<ExtranetMapWrapper>() {
                     @Override
                     public void call(final Subscriber<? super ExtranetMapWrapper> subscriber) {
-                        googleMapGetter.getSuperMapViewAsync(new OnMapReadyCallback() {
+                        googleMapGetter.getGoogleMapViewAsync(new OnMapReadyCallback() {
                             @Override
                             public void onMapReady(GoogleMap googleMap) {
                                 subscriber.onNext(new ExtranetMapWrapper(googleMap));
@@ -42,6 +42,6 @@ public class MapModule {
     }
 
     public interface GoogleMapAsyncGetter {
-        void getSuperMapViewAsync(OnMapReadyCallback callback);
+        void getGoogleMapViewAsync(OnMapReadyCallback callback);
     }
 }
