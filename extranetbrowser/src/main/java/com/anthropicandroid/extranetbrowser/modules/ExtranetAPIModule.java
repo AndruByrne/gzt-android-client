@@ -20,7 +20,7 @@ public class ExtranetAPIModule {
     }
 
     public interface ExtranetAPI{
-        public Observable<Occasion> getOccasionsAtLocation(double latitude, double longitude, String... keys);
-        public Observable<Occasion> getOccasionsAtLocation(double latitude, double longitude);
+        public Observable<Occasion> getOccasionsFromLocation(double latitude, double longitude, String... keys);
+        public Observable<Occasion> getOccasionsFromLocation(double latitude, double longitude);
     }
 }

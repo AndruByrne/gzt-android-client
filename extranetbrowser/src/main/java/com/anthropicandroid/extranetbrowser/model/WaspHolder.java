@@ -1,7 +1,6 @@
 package com.anthropicandroid.extranetbrowser.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import net.rehacktive.waspdb.WaspDb;
 import net.rehacktive.waspdb.WaspFactory;
@@ -78,7 +77,7 @@ public class WaspHolder {
                 .map(new Func1<Boolean, Boolean>() {
                     @Override
                     public Boolean call(Boolean aBoolean) {
-                        extranetOccasionsHash.put("Demo Key 1", new Occasion("Demo Key 1", 37.85d, -122.48d));
+                        extranetOccasionsHash.put("Demo Key 1", new Occasion("Demo Key 1", 37.85d, -122.48d, 5));
                         return true;
                     }
                 });
@@ -126,19 +125,29 @@ public class WaspHolder {
     }
 
     public List<String> getBulkStringList(final BulkStringList listKey) {
-        Log.d(TAG, "getting bulk List");
         if (waspDb == null){
-            Log.d(TAG, "waspdb null, observing");
             return waspDBInitObservable.map(new Func1<Boolean, List<String>>() {
                 @Override
                 public List<String> call(Boolean aBoolean) {
-                    Log.d(TAG, "waspdb init is true");
                     return bulkAddedListsHash.get(listKey);
                 }
             }).take(1).toBlocking().first();}
         else {
-            Log.d(TAG, "waspdb not null");
             return bulkAddedListsHash.get(listKey);
+        }
+    }
+
+    public void clearBulkStringList(BulkStringList listKey) {
+        bulkAddedListsHash.remove(listKey);
+    }
+
+    public void addToBulkStringList(BulkStringList listKey, List<String> occasionKeys) {
+        List<String> bulkStringList = getBulkStringList(listKey);
+        if(bulkStringList==null)
+            bulkAddedListsHash.put(listKey, occasionKeys);
+        else {
+            bulkStringList.addAll(occasionKeys);
+            bulkAddedListsHash.put(listKey, bulkStringList);
         }
     }
 

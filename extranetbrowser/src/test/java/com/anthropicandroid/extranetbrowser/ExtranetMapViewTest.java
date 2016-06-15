@@ -1,6 +1,9 @@
 package com.anthropicandroid.extranetbrowser;
 
+import android.app.PendingIntent;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
@@ -19,6 +22,8 @@ import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.GeofencingApi;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -76,6 +81,12 @@ public class ExtranetMapViewTest extends TestCase {
         LocationModule testLocationModule = Mockito.mock(LocationModule.class);
         LatLng testCurrentLocation = new LatLng(TestingModel.centerOfTestingLatitude, TestingModel.centerOfTestingLongitude);
         when(testLocationModule.getLocationProvider()).thenReturn(Observable.just(testCurrentLocation));
+        GeofencingApi testGeofencingApi = Mockito.mock(GeofencingApi.class);
+        when(testLocationModule.getGeofencingApi()).thenReturn(testGeofencingApi);
+        GoogleApiClient testGoogleApiClient = Mockito.mock(GoogleApiClient.class);
+        when(testLocationModule.getGoogleApiClient(any(Context.class))).thenReturn(Observable.just(testGoogleApiClient));
+        PendingIntent testPendingIntent = Mockito.mock(PendingIntent.class);
+        when(testLocationModule.getPendingIntent(any(Context.class))).thenReturn(testPendingIntent);
         ExtranetMapViewTestComponent testComponent = DaggerExtranetMapViewTestComponent
                 .builder()
                 .contextModule(new ContextModule(testContext))
@@ -106,7 +117,7 @@ public class ExtranetMapViewTest extends TestCase {
         // undifferentiated occasions
         List<Occasion> globalOccasions = TestingModel.getMockGlobalOccasions();
         Observable<Occasion> testOccasionObservable = Observable.from(globalOccasions);
-        when(mockOccasionProvider.getGlobalOccasions())
+        when(mockOccasionProvider.getContinuousGlobalOccasions())
                 .thenReturn(testOccasionObservable.take(3));
         // captor for markers added to map (wrapping object)
         ArgumentCaptor<MarkerOptions> markerToAddCaptor = ArgumentCaptor.forClass(MarkerOptions.class);
@@ -141,7 +152,7 @@ public class ExtranetMapViewTest extends TestCase {
         List<Occasion> occasionsSubset = TestingModel.getMockOccasionsSubset();
         List<String> mockRequestingKeys = TestingModel.getMockRequestingKeys();
         ArgumentCaptor<List> requestedKeysCaptor = ArgumentCaptor.forClass(List.class);
-        when(mockOccasionProvider.getOccasionsSubset(requestedKeysCaptor.capture()))
+        when(mockOccasionProvider.getContinuousOccasionsSubset(requestedKeysCaptor.capture()))
                 .thenReturn(Observable.from(occasionsSubset).take(3));
         // captor for markers added to map (wrapping object)
         ArgumentCaptor<MarkerOptions> markerToAddCaptor = ArgumentCaptor.forClass(MarkerOptions.class);
@@ -157,6 +168,8 @@ public class ExtranetMapViewTest extends TestCase {
         assertEquals(
                 mockRequestingKeys,
                 capturedRequestedKeys);
+        Log.d(TAG, "mockReqKeys: "+mockRequestingKeys.toString());
+        Log.d(TAG, "capturedReqKEys: "+capturedRequestedKeys.toString());
         // verify googleMap had markers added to it
         verify(mockWrapper, times(3)).addMarker(markerToAddCaptor.capture());
         List<MarkerOptions> addedMarkers = markerToAddCaptor.getAllValues();

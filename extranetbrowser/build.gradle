@@ -33,6 +33,7 @@ dependencies {
     // Android libraries
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
 
     // Dagger and viz
     apt 'com.google.dagger:dagger-compiler:2.2'

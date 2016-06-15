@@ -116,14 +116,14 @@ public class ExtranetOccasionProviderTest extends TestCase {
         ArgumentCaptor<Double> networkLatitudeCaptor = ArgumentCaptor.forClass(double.class);
         ArgumentCaptor<Double> networkLongitudeCaptor = ArgumentCaptor.forClass(double.class);
         when(mockExtranetAPI
-                .getOccasionsAtLocation(
+                .getOccasionsFromLocation(
                         networkLatitudeCaptor.capture(),
                         networkLongitudeCaptor.capture(),
                         networkKeyCaptor.capture()))
                 .thenReturn(Observable.just(mockOccasionsSubset.get(2)));
 
         // test method
-        Observable<Occasion> occasionsSubset = subject.getOccasionsSubset(mockRequestingKeys);
+        Observable<Occasion> occasionsSubset = subject.getContinuousOccasionsSubset(mockRequestingKeys);
         TestSubscriber<Occasion> occasionTestSubscriber = new TestSubscriber<>();
         occasionsSubset.subscribe(occasionTestSubscriber);
 
@@ -153,7 +153,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
         // locationProvider
         verify(testLocationModule).getLocationProvider();
         // extranetAPI
-        verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class));
+        verify(mockExtranetAPI, never()).getOccasionsFromLocation(any(double.class), any(double.class));
         assertEquals(
                 mockRequestingKeys.subList(2, 3),
                 networkKeyCaptor.getAllValues()); // must handle list of erroneous keys as well
@@ -195,14 +195,14 @@ public class ExtranetOccasionProviderTest extends TestCase {
         ArgumentCaptor<Double> networkLatitudeCaptor = ArgumentCaptor.forClass(double.class);
         ArgumentCaptor<Double> networkLongitudeCaptor = ArgumentCaptor.forClass(double.class);
         when(mockExtranetAPI
-                .getOccasionsAtLocation(
+                .getOccasionsFromLocation(
                         networkLatitudeCaptor.capture(),
                         networkLongitudeCaptor.capture(),
                         networkKeyCaptor.capture()))
                 .thenReturn(Observable.just(mockGlobalOccasions.get(1)));
 
         // test method
-        Observable<Occasion> globalOccasions = subject.getGlobalOccasions();
+        Observable<Occasion> globalOccasions = subject.getContinuousGlobalOccasions();
         TestSubscriber<Occasion> occasionTestSubscriber = new TestSubscriber<>();
         globalOccasions.subscribe(occasionTestSubscriber);
 
@@ -222,8 +222,8 @@ public class ExtranetOccasionProviderTest extends TestCase {
         // locationProvider
         verify(testLocationModule).getLocationProvider();
         // extranetAPI called with erroneous keys
-        verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class));
-//        verify(mockExtranetAPI, never()).getOccasionsAtLocation(any(double.class), any(double.class), any(String.class));
+        verify(mockExtranetAPI, never()).getOccasionsFromLocation(any(double.class), any(double.class));
+//        verify(mockExtranetAPI, never()).getOccasionsFromLocation(any(double.class), any(double.class), any(String.class));
         assertEquals(
                 mockGlobalKeys.subList(1, 3),
                 networkKeyCaptor.getAllValues());

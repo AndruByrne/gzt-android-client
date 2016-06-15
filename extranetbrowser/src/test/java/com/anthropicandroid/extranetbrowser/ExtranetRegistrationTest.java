@@ -1,13 +1,22 @@
 package com.anthropicandroid.extranetbrowser;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
+import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
+import com.anthropicandroid.extranetbrowser.model.Occasion;
 import com.anthropicandroid.extranetbrowser.model.WaspHolder;
 import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.GeofencingApi;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.common.collect.Lists;
 
 import junit.framework.TestCase;
 
@@ -23,9 +32,15 @@ import org.robolectric.internal.ShadowExtractor;
 import org.robolectric.shadows.ShadowLog;
 import org.robolectric.shadows.ShadowNotificationManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /*
  * Created by Andrew Brin on 5/31/2016.
@@ -41,16 +56,30 @@ public class ExtranetRegistrationTest extends TestCase {
     public static final String MOCK_NOTIFICATION_TEXT = "Notification Text";
     private ExtranetRegistration subject;
     private WaspHolder mockWaspHolder;
+    private GeofencingApi mockGeofencingApi;
+    private ExtranetOccasionProvider mockOccasionProvider;
+    private PendingIntent mockPendingIntent;
+    private GoogleApiClient mockApiClient;
 
     @Before
     public void setUp() throws Exception {
         ShadowLog.stream = System.out;
         mockWaspHolder = Mockito.mock(WaspHolder.class);
-        subject = new ExtranetRegistration(mockWaspHolder);
+        mockGeofencingApi = Mockito.mock(LocationServices.GeofencingApi.getClass());
+        mockApiClient = Mockito.mock(GoogleApiClient.class);
+        mockOccasionProvider = Mockito.mock(ExtranetOccasionProvider.class);
+        mockPendingIntent = Mockito.mock(PendingIntent.class);
+        subject = new ExtranetRegistration(
+                Observable.just(mockApiClient),
+                mockOccasionProvider,
+                mockGeofencingApi,
+                mockPendingIntent,
+                mockWaspHolder);
     }
 
     @Test
     public void testRegisterAppForKeys() throws Exception {
+        // mock
         MapViewTestActivity testContext = Robolectric.setupActivity(MapViewTestActivity.class);
         ExtranetRegistration.Registration.Builder builder = new ExtranetRegistration.Registration
                 .Builder(testContext)
@@ -58,26 +87,84 @@ public class ExtranetRegistrationTest extends TestCase {
                 .addNotificationIcon(MOCK_NOTIFICATION_ICON_RES_ID)
                 .addDefaultMapIcon(MOCK_DEFAULT_ICON_RES_ID);
         ExtranetRegistration.Registration registration = builder.build();
+        final List<Occasion> occasionsSubset = TestingModel.getMockOccasionsSubset();
         List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
+        ArgumentCaptor<GeofencingRequest> geofencingAddRequestCaptor = ArgumentCaptor.forClass(GeofencingRequest.class);
+        ArgumentCaptor<PendingIntent> pendingAddIntentCaptor = ArgumentCaptor.forClass(PendingIntent.class);
+        ArgumentCaptor<GoogleApiClient> apiClientCaptor = ArgumentCaptor.forClass(GoogleApiClient.class);
+        ArgumentCaptor<PendingIntent> pendingRemoveIntentCaptor = ArgumentCaptor.forClass(PendingIntent.class);
+        ArgumentCaptor<List> requestedWaspKeysCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> requestedEOPKeysCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<WaspHolder.BulkStringList> bulkStringListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
+        ArgumentCaptor<WaspHolder.BulkStringList> addBulkStringListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
+
+        ArgumentCaptor<Integer> maxReturnCaptor = ArgumentCaptor.forClass(int.class);
+        when(mockOccasionProvider.getSegmentedOccasionsSubsetNoMoreThan(
+                requestedEOPKeysCaptor.capture(),
+                maxReturnCaptor.capture()))
+                .thenReturn(Observable.just(
+                        (List<Occasion>)new ArrayList<Occasion>() {{
+                            add(occasionsSubset.get(0));
+                            add(occasionsSubset.get(1));
+                            add(occasionsSubset.get(2));
+                        }},
+                        Lists.<Occasion>newArrayList())); //  the network returns second
 
         // test function
+        Log.d(TAG, "getting globalkeys: " + mockGlobalKeys.toString());
         subject.registerAppForKeys(registration, mockGlobalKeys);
 
-        // Should write to DB
-        ArgumentCaptor<WaspHolder.BulkStringList> bulkStringListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
-        ArgumentCaptor<List> requestedKeysCaptor = ArgumentCaptor.forClass(List.class);
-        verify(mockWaspHolder).setBulkStringList(bulkStringListTypeCaptor.capture(), requestedKeysCaptor.capture());
+        // Should remove old keys from geofencing registry once (empty network return)
+        verify(mockGeofencingApi, times(1)).removeGeofences(
+                any(GoogleApiClient.class),
+                pendingRemoveIntentCaptor.capture());
+        assertTrue(
+                pendingRemoveIntentCaptor.getValue().equals(mockPendingIntent));
+
+        // Should write request keys to DB
+        verify(mockWaspHolder).clearBulkStringList(addBulkStringListTypeCaptor.capture());
+        verify(mockWaspHolder).addToBulkStringList(
+                bulkStringListTypeCaptor.capture(),
+                requestedWaspKeysCaptor.capture());
         assertEquals(
                 WaspHolder.BulkStringList.REQUESTED_BROADCAST_KEYS,
                 bulkStringListTypeCaptor.getValue());
+        List<String> requestedWaspKeys = requestedWaspKeysCaptor.getAllValues().get(0);
+        Log.d(TAG, "mockReqKeys: " + mockGlobalKeys.toString());
+        Log.d(TAG, "capturedReqKEys: " + requestedWaspKeys.toString());
         assertEquals(
                 mockGlobalKeys,
-                requestedKeysCaptor.getValue());
+                requestedWaspKeys);
+
+
+        // Should write request App to DB
+
+        // should ask occasion provider for occasions
+        assertEquals(
+                mockGlobalKeys,
+                requestedEOPKeysCaptor.getValue());
+        assertEquals(
+                80,
+                (int) maxReturnCaptor.getValue());
+
         // should register geofences for first 80 occasions with valid lat/long
-        // should note occasions with invalid lat/long
-        // THEN should call network for missing/invalid keys
+        verify(mockGeofencingApi, times(1)).addGeofences(
+                apiClientCaptor.capture(),
+                geofencingAddRequestCaptor.capture(),
+                pendingAddIntentCaptor.capture());
+
+        assertEquals(
+                mockApiClient,
+                apiClientCaptor.getValue());
+
+        assertEquals(
+                mockGlobalKeys.get(0),
+                geofencingAddRequestCaptor.getValue().getGeofences().get(0).getRequestId());
+
+        assertTrue(pendingAddIntentCaptor.getValue().equals(mockPendingIntent));
+
+
         // THEN add missing (not invalid) keys to geofence registration, if needed
-        // THEN should start async service to ask for missing keys again
         // AND should start async service to download data for valid registered keys
         // could limit return to occasions nearest to square location
 //        Intent startedServiceIntent = ((ShadowActivity) ShadowExtractor.extract(testContext))
@@ -104,7 +191,7 @@ public class ExtranetRegistrationTest extends TestCase {
     }
 
     @Test
-    public void testNoBundleOrBundleWithoutPackageNameDoesNothing(){
+    public void testNoBundleOrBundleWithoutPackageNameDoesNothing() {
 //        ServiceController<ExtranetRegistration> serviceController = Robolectric.buildService(ExtranetRegistration.class);
 //        serviceController.attach();
 //        serviceController.create();

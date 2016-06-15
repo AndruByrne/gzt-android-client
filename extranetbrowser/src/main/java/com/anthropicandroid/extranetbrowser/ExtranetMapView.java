@@ -73,7 +73,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         populateAndReturnMapToCallback(
                 clientCallback,
                 googleMapObservable,
-                extranetOccasionProvider.getOccasionsSubset(keysToShow));
+                extranetOccasionProvider.getContinuousOccasionsSubset(keysToShow));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         populateAndReturnMapToCallback(
                 clientCallback,
                 googleMapObservable,
-                extranetOccasionProvider.getGlobalOccasions());
+                extranetOccasionProvider.getContinuousGlobalOccasions());
     }
 
     public void getGoogleMapViewAsync(OnMapReadyCallback callback) {
@@ -152,6 +152,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                                 throwable.printStackTrace();
                             }
                         });
+        // TODO(Andrew Brin): publish and make a second obs that takes elementAtOrDefault
     }
 
     private class MapAndMarkers {

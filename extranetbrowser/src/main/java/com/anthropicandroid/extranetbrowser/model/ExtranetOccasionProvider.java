@@ -37,16 +37,17 @@ public class ExtranetOccasionProvider {
         this.locationProvider = locationProvider;
     }
 
-    public Observable<Occasion> getOccasionsSubset(final List<String> keysToShow) {
+    public Observable<Occasion> getContinuousOccasionsSubset(final List<String> keysToShow) {
+        // may want to remove this write
         waspHolder.setBulkStringList(WaspHolder.BulkStringList.RECENTLY_DISPLAYED_KEYS, keysToShow);
         // async start serviceIntent for data downloads with preference to this method(we have requested keys, should d/l data)
         // (with download limitations passed into ExtranetMapView)
         return Observable.concat(
                 getCachedOccasionsAndRecordFailures(keysToShow),
-                getMissingOccasions());
+                getAndSaveMissingOccasions());
     }
 
-    public Observable<Occasion> getGlobalOccasions() {
+    public Observable<Occasion> getContinuousGlobalOccasions() {
         return waspHolder
                 .getOccasionKeys()
                 .flatMap(new Func1<List<String>, Observable<Occasion>>() {
@@ -54,18 +55,19 @@ public class ExtranetOccasionProvider {
                     public Observable<Occasion> call(final List<String> occasionKeys) {
                         return Observable.concat(
                                 getCachedOccasionsAndRecordFailures(occasionKeys),
-                                getMissingOccasions());
+                                getAndSaveMissingOccasions());
                     }
                 });
     }
 
-    private Observable<Occasion> getMissingOccasions() {
+    private Observable<Occasion> getAndSaveMissingOccasions() { //  TODO(Andrew Brin): add saving of occasions and updating of errouneous list
         // request Occasions from extranet server in batches, return newly populated occasions, TODO(Andrew Brin):stinkin' batches
+        // THEN should start async service to ask for missing keys again
         return locationProvider.take(1).flatMap(new Func1<LatLng, Observable<Occasion>>() {
             @Override
             public Observable<Occasion> call(LatLng latLng) {
                 List<String> erroneousOccasions = waspHolder.getKeysForErroneousOccasions();
-                return extranetAPI.getOccasionsAtLocation(
+                return extranetAPI.getOccasionsFromLocation(
                         latLng.latitude,
                         latLng.longitude,
                         erroneousOccasions.toArray(new String[erroneousOccasions.size()]));
@@ -89,4 +91,7 @@ public class ExtranetOccasionProvider {
         });
     }
 
+    public Observable<List<Occasion>> getSegmentedOccasionsSubsetNoMoreThan(List<String> keysToRegister, int maxReturn) {
+        return null;
+    }
 }
