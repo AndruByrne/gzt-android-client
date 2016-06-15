@@ -9,5 +9,5 @@ public class TestExtranetAPIModule extends ExtranetAPIModule{
 
     public TestExtranetAPIModule(ExtranetAPI testExtranetAPI) { this.testExtranetAPI = testExtranetAPI; }
 
-    public ExtranetAPI getTestExtranetAPI() { return testExtranetAPI; }
+    public ExtranetAPI getExtranetAPI() { return testExtranetAPI; }
 }
