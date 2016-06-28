@@ -20,9 +20,9 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.Stack;
 
-public class GZTAnimator {
+public class GZTZoomAnimator {
 
-    public static final String TAG = GZTAnimator.class.getSimpleName();
+    public static final String TAG = GZTZoomAnimator.class.getSimpleName();
     public static final int UNZOOM_SPEED = 500;
     public static final int ZOOM_SPEED = 700;
 
@@ -31,7 +31,7 @@ public class GZTAnimator {
 
     private final SparseArray<AnimationPrecursor> animationPrecursors = new SparseArray<>();
 
-    public GZTAnimator() {
+    public GZTZoomAnimator() {
     }
 
     public void addViewAndPrepareToZoom(View targetView, View beginningView, View viewToMatch) {
@@ -49,7 +49,7 @@ public class GZTAnimator {
         targetView.bringToFront(); //  bring to front for systems without elevation
     }
 
-    public void zoomToView(final View viewToZoomTo) { //  will eventually be animateView
+    public void zoomToView(final View viewToZoomTo) {
         if (currentAnimatorSet != null) currentAnimatorSet.cancel();
         AnimationPrecursor precursor = animationPrecursors.get(viewToZoomTo.getId());
         if (precursor == null)
@@ -92,7 +92,6 @@ public class GZTAnimator {
     @NonNull
     private AnimatorSet getZoomAnimatorSet(final AnimationPrecursor precursor) {
         AnimatorSet animatorSet = new AnimatorSet();
-        Log.d(TAG, "startbounds top: " + precursor.startBounds.top + " bottom: " + precursor.startBounds.bottom);
         animatorSet //  assign location and scaling values with precursor as beginning
                 .play(ObjectAnimator.ofFloat(precursor.targetView, View.Y, precursor.startBounds.top, precursor.finalBounds.top))
                 .with(ObjectAnimator.ofFloat(precursor.targetView, View.X, precursor.startBounds.left, precursor.finalBounds.left))

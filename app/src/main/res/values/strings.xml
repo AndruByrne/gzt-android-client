@@ -12,4 +12,6 @@
     <string name="healthy_status_label">Uninfected</string>
     <string name="bitten_status_label">Bitten</string>
     <string name="zombie_status_label">Zombie</string>
+    <string name="inventory_card_title">Inventory</string>
+    <string name="slain_zombies_label">Slain Zombies</string>
 </resources>

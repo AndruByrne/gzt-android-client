@@ -5,13 +5,14 @@ import android.databinding.DataBindingUtil;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 
-import com.anthropicandroid.extranetbrowser.ExtranetMapView;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
+import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
 import com.anthropicandroid.gzt.databinding.PowerUpsMapHolderBinding;
+import com.anthropicandroid.gzt.databinding.StatsViewBinding;
 import com.anthropicandroid.gzt.modules.GZTMapComponent;
+import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -23,10 +24,35 @@ final public class UserActionHandlers {
 
     public static final String TAG = UserActionHandlers.class.getSimpleName();
 
-    private GZTAnimator zoomAnimator;
+    private GZTZoomAnimator zoomAnimator;
+    private GZTOverlayAnimator gztOverlayAnimator;
 
-    public UserActionHandlers(GZTAnimator zoomAnimator) {
+    public UserActionHandlers(GZTZoomAnimator zoomAnimator, GZTOverlayAnimator gztOverlayAnimator) {
         this.zoomAnimator = zoomAnimator;
+        this.gztOverlayAnimator = gztOverlayAnimator;
+    }
+
+    public void showStats(View view) {
+        Activity context = (Activity) view.getContext();
+        ZombieTrackerApplication application = (ZombieTrackerApplication) context.getApplication();
+        GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
+        SansUserSettingsAdapterComponent settingsAdapterComponent = application.createOrGetSansUserSettingsAdapterComponent();
+        StatsViewBinding statsViewBinding = StatsViewBinding.inflate(context.getLayoutInflater(), settingsAdapterComponent);
+        gztOverlayAnimator.replaceFrameContentsWith(activityBinding.gztSettingsContentFrame, statsViewBinding.statsRootView);
+    }
+
+    public void showInventory(View view) {
+        Activity context = (Activity) view.getContext();
+        ZombieTrackerApplication application = (ZombieTrackerApplication) context.getApplication();
+        GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
+        SansUserSettingsAdapterComponent settingsAdapterComponent = application.createOrGetSansUserSettingsAdapterComponent();
+        InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(context.getLayoutInflater(), settingsAdapterComponent);
+        gztOverlayAnimator.replaceFrameContentsWith(activityBinding.gztSettingsContentFrame, inventoryViewBinding.inventoryRootView);
+    }
+
+    public void showMap(View view) {
+        return;
+//        gztOverlayAnimator.replaceFrameContentsWith();
     }
 
     public void muteNotifications(View view) {
@@ -63,11 +89,12 @@ final public class UserActionHandlers {
             mapHolderBinding.setUserActionHandlers(this); //  assign touch handlers to map view
 
 //            View viewToMatch = activityBinding.aCardView; //  get view to fill
-            LinearLayout viewToMatch = activityBinding.gztSettingsRootView; //  get view to fill
-            ExtranetMapView extranetMapView = mapHolderBinding.extranetMapView; //  get map view
-            zoomAnimator.addViewAndPrepareToZoom(extranetMapView, view, viewToMatch); //  store necessary variables for animation and launch view with binding adapter with zoom
+//            LinearLayout viewToMatch = activityBinding.gztSettingsRootView; //  get view to fill
+//            ExtranetMapView extranetMapView = mapHolderBinding.extranetMapView; //  get map view
+//            zoomAnimator.addViewAndPrepareToZoom(extranetMapView, view, viewToMatch); //  store necessary variables for animation and launch view with binding adapter with zoom
         }
     }
+
     public void purchaseMolotovs(View view) {
         Log.d(TAG, "recieved request to purchase molotovs");
     }

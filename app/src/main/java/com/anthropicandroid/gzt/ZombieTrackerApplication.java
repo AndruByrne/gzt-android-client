@@ -33,7 +33,7 @@ public class ZombieTrackerApplication extends Application {
     }
 
     public GZTMapComponent createMapComponent() {
-        if (mapComponent==null) {
+        if (mapComponent == null) {
             mapComponent = DaggerGZTMapComponent
                     .builder()
                     .sansUserSettingsAdapterComponent(sansUserSettingsAdapterComponent)
@@ -50,11 +50,12 @@ public class ZombieTrackerApplication extends Application {
         return userComponent;
     }
 
-    public SansUserSettingsAdapterComponent createSansUserAdapterComponent() {
-        sansUserSettingsAdapterComponent = DaggerSansUserSettingsAdapterComponent
-                .builder()
-                .applicationComponent(applicationComponent)
-                .build();
+    public SansUserSettingsAdapterComponent createOrGetSansUserSettingsAdapterComponent() {
+        if (sansUserSettingsAdapterComponent == null)
+            sansUserSettingsAdapterComponent = DaggerSansUserSettingsAdapterComponent
+                    .builder()
+                    .applicationComponent(applicationComponent)
+                    .build();
         return sansUserSettingsAdapterComponent;
     }
 
@@ -74,7 +75,9 @@ public class ZombieTrackerApplication extends Application {
         userComponent = null;
     }
 
-    public void releaseSansUserAdapterComponent() { sansUserSettingsAdapterComponent = null; }
+    public void releaseSansUserAdapterComponent() {
+        sansUserSettingsAdapterComponent = null;
+    }
 
     public void releaseMapComponent() { mapComponent = null; }
 }

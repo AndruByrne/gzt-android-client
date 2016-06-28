@@ -6,7 +6,7 @@ package com.anthropicandroid.gzt.modules;
 
 import android.databinding.DataBindingComponent;
 
-import com.anthropicandroid.gzt.activity.GZTAnimator;
+import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
 import com.anthropicandroid.gzt.activity.MapViewLifecycleHolder;
 
 import dagger.Component;
@@ -16,6 +16,6 @@ import dagger.Component;
         dependencies = SansUserSettingsAdapterComponent.class
 )
 public interface GZTMapComponent extends DataBindingComponent{
-    GZTAnimator getGZTZoomAnimator();
+    GZTZoomAnimator getGZTZoomAnimator();
     MapViewLifecycleHolder getMapViewHolder();
 }
