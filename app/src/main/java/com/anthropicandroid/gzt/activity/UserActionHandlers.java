@@ -9,7 +9,7 @@ import android.widget.CheckBox;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
-import com.anthropicandroid.gzt.databinding.PowerUpsMapHolderBinding;
+import com.anthropicandroid.gzt.databinding.PowerUpsMapBinding;
 import com.anthropicandroid.gzt.databinding.StatsViewBinding;
 import com.anthropicandroid.gzt.modules.GZTMapComponent;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
@@ -38,6 +38,7 @@ final public class UserActionHandlers {
         GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
         SansUserSettingsAdapterComponent settingsAdapterComponent = application.createOrGetSansUserSettingsAdapterComponent();
         StatsViewBinding statsViewBinding = StatsViewBinding.inflate(context.getLayoutInflater(), settingsAdapterComponent);
+        statsViewBinding.setUserActionHandlers(this);
         gztOverlayAnimator.replaceFrameContentsWith(activityBinding.gztSettingsContentFrame, statsViewBinding.statsRootView);
     }
 
@@ -47,12 +48,23 @@ final public class UserActionHandlers {
         GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
         SansUserSettingsAdapterComponent settingsAdapterComponent = application.createOrGetSansUserSettingsAdapterComponent();
         InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(context.getLayoutInflater(), settingsAdapterComponent);
+        inventoryViewBinding.setUserActionHandlers(this);
         gztOverlayAnimator.replaceFrameContentsWith(activityBinding.gztSettingsContentFrame, inventoryViewBinding.inventoryRootView);
     }
 
     public void showMap(View view) {
-        return;
-//        gztOverlayAnimator.replaceFrameContentsWith();
+        Activity context = (Activity) view.getContext();
+        ZombieTrackerApplication application = (ZombieTrackerApplication) context.getApplication();
+        GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
+        GoogleApiAvailability instance = GoogleApiAvailability.getInstance();
+        if (instance.isGooglePlayServicesAvailable(view.getContext()) != ConnectionResult.SUCCESS) {
+            Log.e(TAG, "google play services not available");
+        } else {
+            Log.d(TAG, "google play services available");
+            GZTMapComponent mapComponent = application.createMapComponent(); //  create map component and assign it to the map view
+            PowerUpsMapBinding mapBinding = PowerUpsMapBinding.inflate(context.getLayoutInflater(), mapComponent);
+            gztOverlayAnimator.replaceFrameContentsWith(activityBinding.gztSettingsContentFrame, mapBinding.extranetMapView);
+        }
     }
 
     public void muteNotifications(View view) {
@@ -68,30 +80,6 @@ final public class UserActionHandlers {
         {
             boolean checked = !preferenceStorage.setPreference(ApplicationPreferences.Preferences.MUTE_NOTIFICATIONS, 0);
             checkBox.setChecked(checked);
-        }
-    }
-
-    public void show_powerups(View view) {
-        Activity context = (Activity) view.getContext();
-        ZombieTrackerApplication application = (ZombieTrackerApplication) context.getApplication();
-        GztSettingsActivityBinding activityBinding = DataBindingUtil.findBinding(view);
-
-        GoogleApiAvailability instance = GoogleApiAvailability.getInstance();
-        if (instance.isGooglePlayServicesAvailable(view.getContext()) != ConnectionResult.SUCCESS) {
-            Log.e(TAG, "google play services not available");
-        } else {
-            Log.d(TAG, "google play services available");
-            GZTMapComponent mapComponent = application.createMapComponent(); //  create map component and assign it to the map view
-            PowerUpsMapHolderBinding mapHolderBinding = PowerUpsMapHolderBinding.inflate(
-                    context.getLayoutInflater(),
-                    mapComponent);
-
-            mapHolderBinding.setUserActionHandlers(this); //  assign touch handlers to map view
-
-//            View viewToMatch = activityBinding.aCardView; //  get view to fill
-//            LinearLayout viewToMatch = activityBinding.gztSettingsRootView; //  get view to fill
-//            ExtranetMapView extranetMapView = mapHolderBinding.extranetMapView; //  get map view
-//            zoomAnimator.addViewAndPrepareToZoom(extranetMapView, view, viewToMatch); //  store necessary variables for animation and launch view with binding adapter with zoom
         }
     }
 

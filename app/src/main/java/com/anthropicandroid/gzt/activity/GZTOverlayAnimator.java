@@ -12,10 +12,9 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 public class GZTOverlayAnimator {
-    public void replaceFrameContentsWith(final FrameLayout contentFrame, LinearLayout activeView) {
+    public void replaceFrameContentsWith(final FrameLayout contentFrame, View activeView) {
         Rect finalBounds = new Rect();
         Point globalOffset = new Point();
         contentFrame.getGlobalVisibleRect(finalBounds, globalOffset);
