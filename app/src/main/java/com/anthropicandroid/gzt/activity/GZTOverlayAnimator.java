@@ -9,60 +9,81 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
 public class GZTOverlayAnimator {
-    public void replaceFrameContentsWith(final FrameLayout contentFrame, View activeView) {
+
+    public static final String TAG = GZTOverlayAnimator.class.getSimpleName();
+
+    public boolean recoverView(UserActionHandlers.BottomNav activeViewType, FrameLayout contentFrame) {
+        View cachedView = contentFrame.getChildAt(activeViewType.ordinal());
+        return cachedView != null &&
+                (cachedView.getVisibility() == View.VISIBLE ||
+                        updateVisibleChildWith(contentFrame, cachedView));
+    }
+
+    public void replaceFrameContentsWith(final FrameLayout contentFrame, View activeView, UserActionHandlers.BottomNav screenType) {
+        AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
+        contentFrame.addView(activeView, screenType.ordinal());
+        animatorSet.start();
+    }
+
+    private boolean updateVisibleChildWith(final FrameLayout contentFrame, View activeView) {
+        try {
+            AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
+            animatorSet.start();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "error updating to existing child: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @NonNull
+    private AnimatorSet getAnimatorSet(final FrameLayout contentFrame, final View activeView) {
         Rect finalBounds = new Rect();
         Point globalOffset = new Point();
+        AnimatorSet animatorSet = new AnimatorSet();
+
+        final View visibleView = getVisibleWithin(contentFrame);
         contentFrame.getGlobalVisibleRect(finalBounds, globalOffset);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);
-        AnimatorSet animatorSet = new AnimatorSet();
-        final View possibleChild = contentFrame.getChildAt(0);
-        if (possibleChild == null)
-            animatorSet
-                    .play(getActiveYPosAnim(activeView, finalBounds))
-                    .with(getActiveYScaleAnim(activeView));
-        else {
-            ObjectAnimator leavingYScaleAnim = getLeavingYScaleAnim(possibleChild);
+        if (visibleView == null) {
             animatorSet
                     .play(getActiveYPosAnim(activeView, finalBounds))
                     .with(getActiveYScaleAnim(activeView))
-                    .with(getLeavingTransAnim(possibleChild))
-                    .with(getLeavingXScaleAnim(possibleChild))
+                    .with(getActiveXScaleAnim(activeView));
+        } else {
+            ObjectAnimator leavingYScaleAnim = getLeavingYScaleAnim(visibleView);
+            ObjectAnimator activeYScaleAnim = getActiveYScaleAnim(activeView);
+            animatorSet
+                    .play(getActiveYPosAnim(activeView, finalBounds))
+                    .with(activeYScaleAnim)
+                    .with(getActiveXScaleAnim(activeView))
+                    .with(getLeavingXScaleAnim(visibleView))
                     .with(leavingYScaleAnim);
-            leavingYScaleAnim.addListener(new Animator.AnimatorListener() {
+            activeYScaleAnim.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    // no op
+                    activeView.setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    contentFrame.removeView(possibleChild);
+                    visibleView.setVisibility(View.GONE);
                 }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    // no op
-                }
+                @Override public void onAnimationCancel(Animator animation) { }
 
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                    // no op
-                }
+                @Override public void onAnimationRepeat(Animator animation) { }
             });
         }
         animatorSet.setInterpolator(new DecelerateInterpolator());
-        contentFrame.addView(activeView);
-        animatorSet.start();
-
-    }
-
-    private ObjectAnimator getLeavingTransAnim(View leavingView) {
-        return ObjectAnimator.ofFloat(leavingView, View.ALPHA, 1f, 0f);
+        return animatorSet;
     }
 
     private ObjectAnimator getLeavingYScaleAnim(View leavingView) {
@@ -77,11 +98,26 @@ public class GZTOverlayAnimator {
         return ObjectAnimator.ofFloat(activeView, View.SCALE_Y, 0f, 1f);
     }
 
+    private ObjectAnimator getActiveXScaleAnim(View activeView) {
+        return ObjectAnimator.ofFloat(activeView, View.SCALE_X, 0f, 1f);
+    }
+
     private ObjectAnimator getActiveYPosAnim(View activeView, Rect finalBounds) {
         return ObjectAnimator.ofFloat(
                 activeView,
                 View.Y,
                 finalBounds.bottom,
                 finalBounds.top);
+    }
+
+    private static View getVisibleWithin(FrameLayout contentFrame) {
+        int childCount = contentFrame.getChildCount();
+        View childView;
+        for (int i = 0; i < childCount; i++) {
+            childView = contentFrame.getChildAt(i);
+            if (childView.getVisibility() == View.VISIBLE)
+                return childView;
+        }
+        return null;
     }
 }
