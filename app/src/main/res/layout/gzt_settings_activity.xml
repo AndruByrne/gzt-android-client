@@ -14,26 +14,17 @@
     </data>
 
 
-    <FrameLayout
-        android:id="@+id/gzt_settings_root_view"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/pure_white"
-        android:orientation="vertical">
-
-        <FrameLayout
-            android:id="@+id/gzt_settings_content_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top">
-        </FrameLayout>
+        android:background="@color/pure_white">
 
         <LinearLayout
             android:id="@+id/bottom_nav_bar"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_height="72dp">
+            android:layout_height="72dp"
+            android:layout_alignParentBottom="true">
             <Button
                 android:id="@+id/stats_nav_button"
                 android:layout_width="0dp"
@@ -62,5 +53,11 @@
                 android:onClick="@{user_action_handlers::showMap}"
                 style="?android:attr/borderlessButtonStyle"/>
         </LinearLayout>
-     </FrameLayout>
+        <FrameLayout
+            android:id="@+id/gzt_settings_content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottom_nav_bar">
+        </FrameLayout>
+    </RelativeLayout>
 </layout>

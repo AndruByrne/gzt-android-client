@@ -14,8 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="@dimen/powerup_map_view_elevation"
-        app:get_extranet_map="@{Boolean.valueOf(true)}"
-        app:zoom_in="@{Boolean.valueOf(true)}"/>
+        app:get_extranet_map="@{Boolean.valueOf(true)}"/>
 
 
 </layout>

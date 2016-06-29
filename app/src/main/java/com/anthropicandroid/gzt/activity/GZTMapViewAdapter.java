@@ -19,10 +19,20 @@ public class GZTMapViewAdapter {
 
     public static final String TAG = GZTMapViewAdapter.class.getSimpleName();
 
-    @BindingAdapter("zoom_in")
-    public static void zoomIn(GZTMapComponent mapComponent, View view, boolean shouldAnimate) {
-        if (shouldAnimate)
-            mapComponent.getGZTZoomAnimator().zoomToView(view);
+    @BindingAdapter("get_extranet_map")
+    public static void getExtranetMap(final GZTMapComponent mapComponent, final ExtranetMapView view, boolean shouldGetMap) {
+        if (shouldGetMap) {
+            view.onCreate(new Bundle());
+            view.onResume();
+            view.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    mapComponent.getMapViewHolder().setMapView(view); //  activity lifecycle accounting
+                }
+            });
+
+        }
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) {
@@ -36,20 +46,4 @@ public class GZTMapViewAdapter {
             }
         });
     }
-
-    @BindingAdapter("get_extranet_map")
-    public static void getExtranetMap(final GZTMapComponent mapComponent, final ExtranetMapView view, boolean shouldGetMap) {
-        if (shouldGetMap) {
-            view.onCreate(new Bundle());
-            view.onResume();
-            view.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                    mapComponent.getMapViewHolder().setMapView(view); //  activity lifecycle accounting
-                }
-            });
-        }
-    }
-
 }
