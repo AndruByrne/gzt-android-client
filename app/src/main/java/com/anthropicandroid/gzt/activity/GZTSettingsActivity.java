@@ -36,6 +36,7 @@ final public class GZTSettingsActivity extends Activity {
         mapViewHolder.onCreate(savedInstanceState);
         // assign user action handlers
         gztSettingsActivityBinding.setUserActionHandlers(userActionHandlers);
+        userActionHandlers.showStats(gztSettingsActivityBinding.statsNavButton);
     }
 
     @Override
