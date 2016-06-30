@@ -18,19 +18,21 @@ public class TouchHandlersModule {
 
     @Provides
     @Singleton
-    UserActionHandlers getTouchHandlers(GZTZoomAnimator gztZoomAnimator, GZTOverlayAnimator gztOverlayAnimator){
+    UserActionHandlers getTouchHandlers(
+            GZTZoomAnimator gztZoomAnimator,
+            GZTOverlayAnimator gztOverlayAnimator) {
         return new UserActionHandlers(gztZoomAnimator, gztOverlayAnimator);
     }
 
     @Provides
     @Singleton
-    GZTZoomAnimator getGZTAnimatorSetRepository(){
+    GZTZoomAnimator getGZTAnimatorSetRepository() {
         return new GZTZoomAnimator();
     }
 
     @Provides
     @Singleton
-    GZTOverlayAnimator getGZTOverlayAnimator(){
+    GZTOverlayAnimator getGZTOverlayAnimator() {
         return new GZTOverlayAnimator();
     }
 }

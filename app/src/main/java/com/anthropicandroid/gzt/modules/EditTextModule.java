@@ -13,7 +13,7 @@ import dagger.Provides;
 public class EditTextModule {
 
     @Provides
-    LoopingEditTextAdapter getEditTextLooper(){
+    LoopingEditTextAdapter getEditTextLooper() {
         return new LoopingEditTextAdapter();
     }
 }

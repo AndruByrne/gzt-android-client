@@ -14,7 +14,7 @@ public class MapViewLifecycleHolderModule {
 
     @Provides
     @SansUserSettingsAdapterScope
-    MapViewLifecycleHolder getMapViewLifecycleHolder(){
+    MapViewLifecycleHolder getMapViewLifecycleHolder() {
         return new MapViewLifecycleHolder();
     }
 }

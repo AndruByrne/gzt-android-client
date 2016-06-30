@@ -6,7 +6,7 @@ import android.content.Intent;
 /*
  * Created by AndrewBrin on 6/14/2016.
  */
-public class GeofencingOccasionService extends IntentService{
+public class GeofencingOccasionService extends IntentService {
 
     public GeofencingOccasionService() {
         super(GeofencingOccasionService.class.getSimpleName());

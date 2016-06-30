@@ -20,7 +20,10 @@ public class GZTMapViewAdapter {
     public static final String TAG = GZTMapViewAdapter.class.getSimpleName();
 
     @BindingAdapter("get_extranet_map")
-    public static void getExtranetMap(final GZTMapComponent mapComponent, final ExtranetMapView view, boolean shouldGetMap) {
+    public static void getExtranetMap(
+            final GZTMapComponent mapComponent,
+            final ExtranetMapView view,
+            boolean shouldGetMap) {
         if (shouldGetMap) {
             view.onCreate(new Bundle());
             view.onResume();
@@ -28,22 +31,23 @@ public class GZTMapViewAdapter {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                    mapComponent.getMapViewHolder().setMapView(view); //  activity lifecycle accounting
+                    mapComponent.getMapViewHolder().setMapView(view); //  activity lifecycle
+                    // accounting
                 }
             });
+            view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    // no op
+                }
 
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    // remove dagger component
+                    ((ZombieTrackerApplication) ((Activity) v.getContext()).getApplication())
+                            .releaseMapComponent();
+                }
+            });
         }
-        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-                // no op
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                // remove dagger component
-                ((ZombieTrackerApplication) ((Activity) v.getContext()).getApplication()).releaseMapComponent();
-            }
-        });
     }
 }

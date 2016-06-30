@@ -18,7 +18,7 @@ public class PreferenceStorageModule {
 
     @Provides
     @Singleton
-    ApplicationPreferences getPreferenceStorage(Application application){
+    ApplicationPreferences getPreferenceStorage(Application application) {
         return new ApplicationPreferences(application);
     }
 }

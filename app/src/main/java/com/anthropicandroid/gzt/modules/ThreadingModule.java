@@ -11,10 +11,10 @@ import rx.schedulers.Schedulers;
 
 @Module
 public class ThreadingModule {
-    public ThreadingModule(){}
+    public ThreadingModule() {}
 
     @Provides
-    public Scheduler providesScheduler(){
+    public Scheduler providesScheduler() {
         return Schedulers.newThread();
     }
 }

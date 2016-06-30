@@ -12,12 +12,16 @@ import android.widget.EditText;
  */
 final public class LoopingEditTextAdapter {
     @BindingAdapter("bind_edit_text")
-    public static void addTextChangedListener(EditText view, final int variable){
+    public static void addTextChangedListener(EditText view, final int variable) {
         final ViewDataBinding binding = DataBindingUtil.findBinding(view);
         view.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { /* no op*/ }
+            public void beforeTextChanged(
+                    CharSequence s,
+                    int start,
+                    int count,
+                    int after) { /* no op*/ }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {

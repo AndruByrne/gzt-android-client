@@ -25,13 +25,15 @@ final public class GZTSettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
         // Inflate and Bind
         ZombieTrackerApplication application = (ZombieTrackerApplication) getApplication();
-        SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent = application.createOrGetSansUserSettingsAdapterComponent();
+        SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent = application
+                .createOrGetSansUserSettingsAdapterComponent();
         // bootstrap into dagger graph
         sansUserSettingsAdapterComponent.inject(this);
-        final GztSettingsActivityBinding gztSettingsActivityBinding = DataBindingUtil.setContentView(
-                this,
-                R.layout.gzt_settings_activity,
-                sansUserSettingsAdapterComponent);
+        final GztSettingsActivityBinding gztSettingsActivityBinding = DataBindingUtil
+                .setContentView(
+                        this,
+                        R.layout.gzt_settings_activity,
+                        sansUserSettingsAdapterComponent);
 
         mapViewHolder.onCreate(savedInstanceState);
         // assign user action handlers

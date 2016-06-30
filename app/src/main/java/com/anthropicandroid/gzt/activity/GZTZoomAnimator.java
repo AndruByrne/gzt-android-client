@@ -35,7 +35,8 @@ public class GZTZoomAnimator {
     }
 
     public void addViewAndPrepareToZoom(View targetView, View beginningView, View viewToMatch) {
-        // get stand and end bounds as well as global offset; build an animation precursor with those params and add to map
+        // get stand and end bounds as well as global offset; build an animation precursor with
+        // those params and add to map
         Log.d(TAG, "initializing animation set");
         View rootView = beginningView.getRootView();
         //  index by id of targetView
@@ -93,10 +94,26 @@ public class GZTZoomAnimator {
     private AnimatorSet getZoomAnimatorSet(final AnimationPrecursor precursor) {
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet //  assign location and scaling values with precursor as beginning
-                .play(ObjectAnimator.ofFloat(precursor.targetView, View.Y, precursor.startBounds.top, precursor.finalBounds.top))
-                .with(ObjectAnimator.ofFloat(precursor.targetView, View.X, precursor.startBounds.left, precursor.finalBounds.left))
-                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_X, precursor.startScale, 1f))
-                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_Y, precursor.startScale, 1f));
+                .play(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.Y,
+                        precursor.startBounds.top,
+                        precursor.finalBounds.top))
+                .with(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.X,
+                        precursor.startBounds.left,
+                        precursor.finalBounds.left))
+                .with(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.SCALE_X,
+                        precursor.startScale,
+                        1f))
+                .with(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.SCALE_Y,
+                        precursor.startScale,
+                        1f));
         animatorSet.setDuration(ZOOM_SPEED);
         animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
         animatorSet.addListener(new AnimatorListenerAdapter() {
@@ -119,24 +136,38 @@ public class GZTZoomAnimator {
     private AnimatorSet getUnZoomAnimatorSet(final AnimationPrecursor precursor) {
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet //  assign location and scaling values with precursor as target
-                .play(ObjectAnimator.ofFloat(precursor.targetView, View.X, precursor.startBounds.left))
-                .with(ObjectAnimator.ofFloat(precursor.targetView, View.Y, precursor.startBounds.top))
-                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_X, precursor.startScale))
-                .with(ObjectAnimator.ofFloat(precursor.targetView, View.SCALE_Y, precursor.startScale));
+                .play(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.X,
+                        precursor.startBounds.left))
+                .with(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.Y,
+                        precursor.startBounds.top))
+                .with(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.SCALE_X,
+                        precursor.startScale))
+                .with(ObjectAnimator.ofFloat(
+                        precursor.targetView,
+                        View.SCALE_Y,
+                        precursor.startScale));
         animatorSet
                 .setDuration(UNZOOM_SPEED)
                 .setInterpolator(new DecelerateInterpolator());
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationCancel(Animator animation) {
-                ((ViewGroup) precursor.rootView).removeView(precursor.targetView); //  remove zooming view from layout
+                ((ViewGroup) precursor.rootView).removeView(precursor.targetView); //  remove
+                // zooming view from layout
                 precursor.beginningView.setAlpha(1f); //  restore old view's opacity
                 currentAnimatorSet = null; //  remove animation
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                ((ViewGroup) precursor.rootView).removeView(precursor.targetView); //  remove zooming view from layout
+                ((ViewGroup) precursor.rootView).removeView(precursor.targetView); //  remove
+                // zooming view from layout
                 precursor.beginningView.setAlpha(1f); //  restore old view's opacity
                 currentAnimatorSet = null; //  remove animation
             }
@@ -166,7 +197,8 @@ public class GZTZoomAnimator {
 //            startBounds.offset(-globalOffset.x, -globalOffset.y);
             finalBounds.offset(-globalOffset.x, -globalOffset.y);
             // set starting bounds to same aspect ratio as final bounds
-            if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width() / startBounds.height()) {
+            if ((float) finalBounds.width() / finalBounds.height() > (float) startBounds.width()
+                    / startBounds.height()) {
                 //  extend start bounds horizontally
                 startScale = (float) startBounds.height() / finalBounds.height();
                 float startWidth = startScale * finalBounds.width();

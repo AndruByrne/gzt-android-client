@@ -14,7 +14,7 @@ public class PacketMapModule {
 
     @Provides
     @UserScope
-    TreeMap<Integer,byte[]> getPacketTreeMap(){
+    TreeMap<Integer, byte[]> getPacketTreeMap() {
         return new TreeMap<>();
     }
 }

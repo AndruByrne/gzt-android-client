@@ -11,7 +11,7 @@ final public class Occasion {
     private double longitude;
     private float radius;
 
-    public Occasion(){}
+    public Occasion() {}
 
     public Occasion(String key, double latitude, double longitude, float radius) {
         this.key = key;

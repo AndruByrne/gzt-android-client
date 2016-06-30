@@ -17,19 +17,23 @@ public class ExtranetAPIModule {
 
     @Provides
     @ExtranetMapViewScope
-    public ExtranetAPI getExtranetAPI(Retrofit retrofit){
+    public ExtranetAPI getExtranetAPI(Retrofit retrofit) {
         return retrofit.create(ExtranetAPI.class);
     }
 
-    public interface ExtranetAPI{
+    public interface ExtranetAPI {
         @GET("extranet")
-        public Observable<Occasion> getOccasionsFromLocation(double latitude, double longitude, String... keys);
+        public Observable<Occasion> getOccasionsFromLocation(
+                double latitude,
+                double longitude,
+                String... keys);
+
         public Observable<Occasion> getOccasionsFromLocation(double latitude, double longitude);
     }
 
     @Provides
     @ExtranetMapViewScope
-    public Retrofit getRetrofit(){
+    public Retrofit getRetrofit() {
         return new Retrofit.Builder()
                 .baseUrl("http://gzt.com")
                 .build();

@@ -78,10 +78,12 @@ public class LocationModule {
                         subscriber.onError(new RuntimeException("APIClient connection suspended"));
                     }
                 });
-                client.registerConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                client.registerConnectionFailedListener(new GoogleApiClient
+                        .OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        subscriber.onError(new RuntimeException("APIClient connection failed: " + connectionResult.getErrorMessage()));
+                        subscriber.onError(new RuntimeException("APIClient connection failed: " +
+                                connectionResult.getErrorMessage()));
                         // nothing, will retry
                     }
                 });

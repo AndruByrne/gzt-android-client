@@ -34,14 +34,19 @@ public class WaspHolder {
                 .create(new Observable.OnSubscribe<Boolean>() {
                     @Override
                     public void call(final Subscriber<? super Boolean> subscriber) {
-                        String path = context.getFilesDir().getPath(); //  TODO(Andrew Brin): extend path for specific directory
-                        WaspFactory.openOrCreateDatabase(path, ExtranetOccasionProvider.EXTRANET_DATABASE, "password", new WaspListener<WaspDb>() {
-                            @Override
-                            public void onDone(WaspDb waspDb) {
-                                initHolder(waspDb); //  this ordering important
-                                subscriber.onNext(true);
-                            }
-                        });
+                        String path = context.getFilesDir().getPath(); //  TODO(Andrew Brin):
+                        // extend path for specific directory
+                        WaspFactory.openOrCreateDatabase(
+                                path,
+                                ExtranetOccasionProvider.EXTRANET_DATABASE,
+                                "password",
+                                new WaspListener<WaspDb>() {
+                                    @Override
+                                    public void onDone(WaspDb waspDb) {
+                                        initHolder(waspDb); //  this ordering important
+                                        subscriber.onNext(true);
+                                    }
+                                });
                     }
                 })
                 .take(1) //  do once
@@ -51,17 +56,21 @@ public class WaspHolder {
     }
 
     private void initHolder(WaspDb waspDb) {
-        // TODO(Andrew Brin): the db reads will generate a "Serialization Error" if the Occasion fields have changed but the program only update; may need to test and delete
+        // TODO(Andrew Brin): the db reads will generate a "Serialization Error" if the Occasion
+        // fields have changed but the program only update; may need to test and delete
         if (this.waspDb == null) { //  if waspDb null, add db and create Hashes
             this.waspDb = waspDb;
             bulkAddedListsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider.BULK_LIST_HASH);
-            extranetOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider.EXTRANET_OCCASIONS_HASH);
-            erroneousOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider.ERRONEOUS_OCCASION_HASH);
+            extranetOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider
+                    .EXTRANET_OCCASIONS_HASH);
+            erroneousOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider
+                    .ERRONEOUS_OCCASION_HASH);
         }
     }
 
     public Observable<List<String>> getOccasionKeys() {
-//        return waspDBInitObservable //  subscribing to replaying obs. field to prevent race bet. init & first get
+//        return waspDBInitObservable //  subscribing to replaying obs. field to prevent race bet
+// . init & first get
         return setDemoOccasion() //  wait for demo occasion to be inserted
                 .map(new Func1<Boolean, List<String>>() {
                     @Override
@@ -77,7 +86,9 @@ public class WaspHolder {
                 .map(new Func1<Boolean, Boolean>() {
                     @Override
                     public Boolean call(Boolean aBoolean) {
-                        extranetOccasionsHash.put("Demo Key 1", new Occasion("Demo Key 1", 37.85d, -122.48d, 5));
+                        extranetOccasionsHash.put(
+                                "Demo Key 1",
+                                new Occasion("Demo Key 1", 37.85d, -122.48d, 5));
                         return true;
                     }
                 });
@@ -125,14 +136,14 @@ public class WaspHolder {
     }
 
     public List<String> getBulkStringList(final BulkStringList listKey) {
-        if (waspDb == null){
+        if (waspDb == null) {
             return waspDBInitObservable.map(new Func1<Boolean, List<String>>() {
                 @Override
                 public List<String> call(Boolean aBoolean) {
                     return bulkAddedListsHash.get(listKey);
                 }
-            }).take(1).toBlocking().first();}
-        else {
+            }).take(1).toBlocking().first();
+        } else {
             return bulkAddedListsHash.get(listKey);
         }
     }
@@ -143,7 +154,7 @@ public class WaspHolder {
 
     public void addToBulkStringList(BulkStringList listKey, List<String> occasionKeys) {
         List<String> bulkStringList = getBulkStringList(listKey);
-        if(bulkStringList==null)
+        if (bulkStringList == null)
             bulkAddedListsHash.put(listKey, occasionKeys);
         else {
             bulkStringList.addAll(occasionKeys);
@@ -152,6 +163,7 @@ public class WaspHolder {
     }
 
     public enum BulkStringList {
-        REQUESTED_BROADCAST_KEYS, RECENTLY_DISPLAYED_KEYS
+        REQUESTED_BROADCAST_KEYS,
+        RECENTLY_DISPLAYED_KEYS
     }
 }

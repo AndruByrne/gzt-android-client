@@ -30,7 +30,11 @@ public class ExtranetOccasionProvider {
     private ExtranetAPIModule.ExtranetAPI extranetAPI;
     private Observable<LatLng> locationProvider;
 
-    public ExtranetOccasionProvider(Context context, WaspHolder waspHolder, ExtranetAPIModule.ExtranetAPI extranetAPI, Observable<LatLng> locationProvider) {
+    public ExtranetOccasionProvider(
+            Context context,
+            WaspHolder waspHolder,
+            ExtranetAPIModule.ExtranetAPI extranetAPI,
+            Observable<LatLng> locationProvider) {
         this.context = context;
         this.waspHolder = waspHolder;
         this.extranetAPI = extranetAPI;
@@ -40,7 +44,8 @@ public class ExtranetOccasionProvider {
     public Observable<Occasion> getContinuousOccasionsSubset(final List<String> keysToShow) {
         // may want to remove this write
         waspHolder.setBulkStringList(WaspHolder.BulkStringList.RECENTLY_DISPLAYED_KEYS, keysToShow);
-        // async start serviceIntent for data downloads with preference to this method(we have requested keys, should d/l data)
+        // async start serviceIntent for data downloads with preference to this method(we have
+        // requested keys, should d/l data)
         // (with download limitations passed into ExtranetMapView)
         return Observable.concat(
                 getCachedOccasionsAndRecordFailures(keysToShow),
@@ -60,8 +65,10 @@ public class ExtranetOccasionProvider {
                 });
     }
 
-    private Observable<Occasion> getAndSaveMissingOccasions() { //  TODO(Andrew Brin): add saving of occasions and updating of errouneous list
-        // request Occasions from extranet server in batches, return newly populated occasions, TODO(Andrew Brin):stinkin' batches
+    private Observable<Occasion> getAndSaveMissingOccasions() { //  TODO(Andrew Brin): add saving
+        // of occasions and updating of errouneous list
+        // request Occasions from extranet server in batches, return newly populated occasions,
+        // TODO(Andrew Brin):stinkin' batches
         // THEN should start async service to ask for missing keys again
         return locationProvider.take(1).flatMap(new Func1<LatLng, Observable<Occasion>>() {
             @Override
@@ -91,7 +98,9 @@ public class ExtranetOccasionProvider {
         });
     }
 
-    public Observable<List<Occasion>> getSegmentedOccasionsSubsetNoMoreThan(List<String> keysToRegister, int maxReturn) {
+    public Observable<List<Occasion>> getSegmentedOccasionsSubsetNoMoreThan(
+            List<String> keysToRegister,
+            int maxReturn) {
         return null;
     }
 }

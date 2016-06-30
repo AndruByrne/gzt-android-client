@@ -48,7 +48,9 @@ public class ApplicationPreferences {
             editor.apply();
             result = true;
         } catch (Throwable t) {
-            Log.e(ZombieTrackerApplication.TAG, "unable to write to preferences: "+t.getMessage());
+            Log.e(
+                    ZombieTrackerApplication.TAG,
+                    "unable to write to preferences: " + t.getMessage());
             result = false;
         }
         return result;

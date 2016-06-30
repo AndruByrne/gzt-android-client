@@ -25,7 +25,7 @@ public class OccasionProviderModule {
             Context context,
             WaspHolder waspHolder,
             ExtranetAPIModule.ExtranetAPI extranetAPI,
-            @Named("LocationProvider")Observable<LatLng> locationProvider){
+            @Named("LocationProvider") Observable<LatLng> locationProvider) {
         return new ExtranetOccasionProvider(context, waspHolder, extranetAPI, locationProvider);
     }
 }

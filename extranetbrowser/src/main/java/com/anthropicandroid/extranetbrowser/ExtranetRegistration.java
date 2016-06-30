@@ -68,7 +68,9 @@ public class ExtranetRegistration {
                 // Combining function
                 new Func2<GoogleApiClient, List<Occasion>, List<Occasion>>() {
                     @Override
-                    public List<Occasion> call(GoogleApiClient googleApiClient, List<Occasion> occasions) {
+                    public List<Occasion> call(
+                            GoogleApiClient googleApiClient,
+                            List<Occasion> occasions) {
                         if (occasions.size() == 0) return Lists.newArrayList();
                         try {
                             removeCurrentFences();
@@ -95,7 +97,8 @@ public class ExtranetRegistration {
                                                     occasion.getLongitude(),
                                                     occasion.getRadius())
                                             .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                            .setNotificationResponsiveness(GEOFENCE_RESPONSIVENESS_IN_MILLISECONDS)
+                                            .setNotificationResponsiveness(
+                                                    GEOFENCE_RESPONSIVENESS_IN_MILLISECONDS)
                                             .setRequestId(occasion.getKey())
                                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                                             .build());
@@ -117,7 +120,9 @@ public class ExtranetRegistration {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Log.e(TAG, "Error registering geofence with api: " + throwable.getMessage());
+                        Log.e(
+                                TAG,
+                                "Error registering geofence with api: " + throwable.getMessage());
                     }
                 });
     }

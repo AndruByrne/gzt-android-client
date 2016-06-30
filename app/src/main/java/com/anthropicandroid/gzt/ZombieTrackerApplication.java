@@ -28,7 +28,8 @@ public class ZombieTrackerApplication extends Application {
         instance = this;
         applicationComponent = DaggerApplicationComponent.builder()
                 .appModule(new AppModule(this))
-                .threadingModule(getThreadingModule()) //  getting for overriding with mocks in testing
+                .threadingModule(getThreadingModule()) //  getting for overriding with mocks in
+                // testing
                 .build();
     }
 

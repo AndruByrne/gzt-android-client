@@ -15,7 +15,8 @@ import dagger.Component;
 @Component(
         dependencies = SansUserSettingsAdapterComponent.class
 )
-public interface GZTMapComponent extends DataBindingComponent{
+public interface GZTMapComponent extends DataBindingComponent {
     GZTZoomAnimator getGZTZoomAnimator();
+
     MapViewLifecycleHolder getMapViewHolder();
 }

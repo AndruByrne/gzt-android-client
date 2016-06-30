@@ -21,11 +21,12 @@ public class MapModule {
     private GoogleMapAsyncGetter googleMapGetter;
 
     public MapModule(GoogleMapAsyncGetter googleMapGetter) {
-        this.googleMapGetter = googleMapGetter; }
+        this.googleMapGetter = googleMapGetter;
+    }
 
     @Provides
     @ExtranetMapViewScope
-    public Observable<ExtranetMapWrapper> googleMapObservable(){
+    public Observable<ExtranetMapWrapper> googleMapObservable() {
         return Observable
                 .create(new Observable.OnSubscribe<ExtranetMapWrapper>() {
                     @Override

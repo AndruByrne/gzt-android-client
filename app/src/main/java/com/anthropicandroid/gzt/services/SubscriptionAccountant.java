@@ -12,7 +12,6 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 public class SubscriptionAccountant {
 
-
     private Subscription downloadSubscription;
 
     private ArrayList<Subscription> audioSubscriptions;

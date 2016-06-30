@@ -62,14 +62,18 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
         mapViewComponent.inject(this);
     }
 
-    public void broadcastToMeOnOccasions(ExtranetRegistration.Registration registration, List<String> requestedKeys) {
-        if(registration==null) Log.e(TAG, "registration required for notification");
+    public void broadcastToMeOnOccasions(
+            ExtranetRegistration.Registration registration,
+            List<String> requestedKeys) {
+        if (registration == null) Log.e(TAG, "registration required for notification");
         else extranetRegistration.registerAppForKeys(
                 registration,
-                requestedKeys!=null?requestedKeys:new ArrayList<String>());
+                requestedKeys != null ? requestedKeys : new ArrayList<String>());
     }
 
-    public void getMapAsync(final List<String> keysToShow, final OnMapReadyCallback clientCallback) {
+    public void getMapAsync(
+            final List<String> keysToShow,
+            final OnMapReadyCallback clientCallback) {
         populateAndReturnMapToCallback(
                 clientCallback,
                 googleMapObservable,
@@ -113,13 +117,18 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
             Observable<ExtranetMapWrapper> googleMapObservable,
             Observable<Occasion> extranetOccasionsObservable) {
         Observable
-                .combineLatest( //  perform combining function for every emission, after both have emitted at least once
+                .combineLatest(
+                        //  perform combining function for every emission, after both have
+                        // emitted at least once
                         googleMapObservable,
                         extranetOccasionsObservable,
-                        // On call, combine marker and map; add markers to map and return callback at some point
+                        // On call, combine marker and map; add markers to map and return
+                        // callback at some point
                         new Func2<ExtranetMapWrapper, Occasion, MapAndMarkers>() {
                             @Override
-                            public MapAndMarkers call(ExtranetMapWrapper mapWrapper, Occasion occasion) {
+                            public MapAndMarkers call(
+                                    ExtranetMapWrapper mapWrapper,
+                                    Occasion occasion) {
                                 if (mapWrapper == null)
                                     Log.e(TAG, "Google map view returned null mapWrapper");
                                 return new MapAndMarkers(
@@ -132,7 +141,8 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                                 );
                             }
                         })
-//                        mapToMarkerOptions) //  wait until both obs return first onNext, then combine with function
+//                        mapToMarkerOptions) //  wait until both obs return first onNext, then
+// combine with function
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         new Action1<MapAndMarkers>() {
@@ -140,7 +150,8 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                             public void call(MapAndMarkers mapAndMarkers) {
                                 if (mapWrapper == null) {
                                     mapWrapper = mapAndMarkers.mapWrapper; //  assign to local
-                                    clientCallback.onMapReady(mapWrapper.getGoogleMap()); //  return google map
+                                    clientCallback.onMapReady(mapWrapper.getGoogleMap()); //
+                                    // return google map
                                 }
                                 mapWrapper.addMarker(mapAndMarkers.markerOptions);
                             }
@@ -148,7 +159,10 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                         new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
-                                Log.e(TAG, "Error in map marker populating observable: " + throwable.getMessage());
+                                Log.e(
+                                        TAG,
+                                        "Error in map marker populating observable: " + throwable
+                                                .getMessage());
                                 throwable.printStackTrace();
                             }
                         });

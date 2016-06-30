@@ -28,7 +28,7 @@ public class ExtranetRegistrationModule {
             ExtranetOccasionProvider extranetOccasionProvider,
             GeofencingApi geofencingApi,
             @Named("GeofencePendingIntent") PendingIntent pendingIntent,
-            WaspHolder waspHolder){
+            WaspHolder waspHolder) {
         return new ExtranetRegistration(
                 apiClientObservable,
                 extranetOccasionProvider, geofencingApi,

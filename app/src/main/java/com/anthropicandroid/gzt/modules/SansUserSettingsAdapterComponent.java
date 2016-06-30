@@ -24,8 +24,11 @@ import dagger.Component;
 
 public interface SansUserSettingsAdapterComponent extends DataBindingComponent {
     UserActionHandlers getUserActionHandlers();
+
     ApplicationPreferences getPreferenceStorage();
+
     MapViewLifecycleHolder getMapViewHolder();
+
     GZTZoomAnimator getGZTZoomAnimator();
 
     void inject(GZTSettingsActivity gztSettingsActivity);

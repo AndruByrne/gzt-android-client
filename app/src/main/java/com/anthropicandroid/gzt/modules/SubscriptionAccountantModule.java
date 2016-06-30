@@ -15,7 +15,7 @@ public class SubscriptionAccountantModule {
 
     @Provides
     @Singleton
-    SubscriptionAccountant getSubscriptionAccountant(){
+    SubscriptionAccountant getSubscriptionAccountant() {
         return new SubscriptionAccountant();
     }
 }

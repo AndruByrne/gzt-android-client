@@ -19,14 +19,19 @@ public class GZTOverlayAnimator {
 
     public static final String TAG = GZTOverlayAnimator.class.getSimpleName();
 
-    public boolean recoverView(UserActionHandlers.BottomNav activeViewType, FrameLayout contentFrame) {
+    public boolean recoverView(
+            UserActionHandlers.BottomNav activeViewType,
+            FrameLayout contentFrame) {
         View cachedView = contentFrame.getChildAt(activeViewType.ordinal());
         return cachedView != null &&
                 (cachedView.getVisibility() == View.VISIBLE ||
                         updateVisibleChildWith(contentFrame, cachedView));
     }
 
-    public void replaceFrameContentsWith(final FrameLayout contentFrame, View activeView, UserActionHandlers.BottomNav screenType) {
+    public void replaceFrameContentsWith(
+            final FrameLayout contentFrame,
+            View activeView,
+            UserActionHandlers.BottomNav screenType) {
         AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
         contentFrame.addView(activeView, screenType.ordinal());
         animatorSet.start();
@@ -77,9 +82,11 @@ public class GZTOverlayAnimator {
                     visibleView.setVisibility(View.GONE);
                 }
 
-                @Override public void onAnimationCancel(Animator animation) { }
+                @Override
+                public void onAnimationCancel(Animator animation) { }
 
-                @Override public void onAnimationRepeat(Animator animation) { }
+                @Override
+                public void onAnimationRepeat(Animator animation) { }
             });
         }
         animatorSet.setInterpolator(new DecelerateInterpolator());

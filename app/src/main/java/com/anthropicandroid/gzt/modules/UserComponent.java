@@ -13,7 +13,7 @@ import dagger.Component;
         dependencies = ApplicationComponent.class,
         modules = {
                 PacketMapModule.class,
-                })
+        })
 public interface UserComponent {
 
     //  expose methods for downstream adapters

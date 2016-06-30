@@ -15,20 +15,34 @@ import com.anthropicandroid.gzt.services.ApplicationPreferences;
 public class SettingsAdapter {
 
     @BindingAdapter("checked_settings_value")
-    public static void getChecked(SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent, CheckBox checkbox, ApplicationPreferences.Preferences preference) {
-        ApplicationPreferences applicationPreferences = sansUserSettingsAdapterComponent.getPreferenceStorage();
+    public static void getChecked(
+            SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent,
+            CheckBox checkbox,
+            ApplicationPreferences.Preferences preference) {
+        ApplicationPreferences applicationPreferences = sansUserSettingsAdapterComponent
+                .getPreferenceStorage();
+        // set checkbox
         checkbox.setChecked(0 != applicationPreferences.getPreference(preference));
     }
 
     @BindingAdapter("settings_value")
-    public static void getSettingsValue(SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent, TextView textView, ApplicationPreferences.Preferences preference) {
-        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent.getPreferenceStorage();
+    public static void getSettingsValue(
+            SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent,
+            TextView textView,
+            ApplicationPreferences.Preferences preference) {
+        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent
+                .getPreferenceStorage();
+        // set string value
         textView.setText(Integer.toString(preferenceStorage.getPreference(preference)));
     }
 
     @BindingAdapter("settings_warning_value")
-    public static void getSettingsWarningValue(SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent, TextView textView, ApplicationPreferences.Preferences preference) {
-        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent.getPreferenceStorage();
+    public static void getSettingsWarningValue(
+            SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent,
+            TextView textView,
+            ApplicationPreferences.Preferences preference) {
+        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent
+                .getPreferenceStorage();
         Integer userPreference = preferenceStorage.getPreference(preference);
         if (userPreference == 0)
             textView.setTextColor(textView.getResources().getColor(R.color.stop_red));
@@ -39,8 +53,12 @@ public class SettingsAdapter {
     }
 
     @BindingAdapter("purchased_settings_value")
-    public static void getPurchasedSettingsValue(SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent, Button button, ApplicationPreferences.Preferences preference) {
-        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent.getPreferenceStorage();
+    public static void getPurchasedSettingsValue(
+            SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent,
+            Button button,
+            ApplicationPreferences.Preferences preference) {
+        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent
+                .getPreferenceStorage();
         Integer userPreference = preferenceStorage.getPreference(preference);
         if (userPreference == 0)
             button.setTextColor(button.getResources().getColor(R.color.trans_red));
@@ -51,8 +69,12 @@ public class SettingsAdapter {
     }
 
     @BindingAdapter("settings_health_value")
-    public static void getSettingsHealthValue(SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent, TextView textView, ApplicationPreferences.Preferences preference) {
-        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent.getPreferenceStorage();
+    public static void getSettingsHealthValue(
+            SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent,
+            TextView textView,
+            ApplicationPreferences.Preferences preference) {
+        ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent
+                .getPreferenceStorage();
         Integer userPreference = preferenceStorage.getPreference(preference);
         if (userPreference == 0) {
             textView.setText(R.string.healthy_status_label);

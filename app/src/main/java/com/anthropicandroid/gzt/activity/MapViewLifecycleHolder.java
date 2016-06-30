@@ -11,27 +11,27 @@ public class MapViewLifecycleHolder {
 
     private MapView mapView;
 
-    public void setMapView(MapView mapView){
+    public void setMapView(MapView mapView) {
         this.mapView = mapView;
     }
 
     protected void onCreate(Bundle savedInstanceState) {
-        if(mapView != null)
+        if (mapView != null)
             mapView.onCreate(savedInstanceState);
     }
 
     protected void onResume() {
-        if(mapView != null)
+        if (mapView != null)
             mapView.onResume();
     }
 
     protected void onPause() {
-        if(mapView != null)
+        if (mapView != null)
             mapView.onPause();
     }
 
     protected void onDestroy() {
-        if(mapView != null)
+        if (mapView != null)
             mapView.onDestroy();
     }
 }
