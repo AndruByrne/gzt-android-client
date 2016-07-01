@@ -2,8 +2,8 @@ package com.anthropicandroid.gzt.modules;
 
 import android.app.Application;
 
+import com.anthropicandroid.gzt.activity.BottomNavControllers;
 import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
-import com.anthropicandroid.gzt.activity.UserActionHandlers;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 import com.anthropicandroid.gzt.services.SubscriptionAccountant;
 
@@ -20,7 +20,7 @@ import dagger.Component;
         AppModule.class,
         PreferenceStorageModule.class,
         SubscriptionAccountantModule.class,
-        TouchHandlersModule.class,
+        ActionHandlersModule.class,
         ThreadingModule.class})
 public interface ApplicationComponent {
 
@@ -32,6 +32,6 @@ public interface ApplicationComponent {
 
     SubscriptionAccountant getSubscriptionAccountant();
 
-    UserActionHandlers getUserActionHandlers(); //  for the first View Model
+    BottomNavControllers getBottomNavHandlers(); //  for the first View Model
 
 }

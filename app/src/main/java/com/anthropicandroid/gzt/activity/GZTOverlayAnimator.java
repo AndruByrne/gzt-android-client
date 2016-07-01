@@ -19,25 +19,15 @@ public class GZTOverlayAnimator {
 
     public static final String TAG = GZTOverlayAnimator.class.getSimpleName();
 
-    public boolean recoverView(
-            UserActionHandlers.BottomNav activeViewType,
-            FrameLayout contentFrame) {
-        View cachedView = contentFrame.getChildAt(activeViewType.ordinal());
-        return cachedView != null &&
-                (cachedView.getVisibility() == View.VISIBLE ||
-                        updateVisibleChildWith(contentFrame, cachedView));
-    }
-
     public void replaceFrameContentsWith(
             final FrameLayout contentFrame,
-            View activeView,
-            UserActionHandlers.BottomNav screenType) {
+            View activeView) {
         AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
-        contentFrame.addView(activeView, screenType.ordinal());
+        contentFrame.addView(activeView);
         animatorSet.start();
     }
 
-    private boolean updateVisibleChildWith(final FrameLayout contentFrame, View activeView) {
+    public boolean updateVisibleChildWith(final FrameLayout contentFrame, View activeView) {
         try {
             AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
             animatorSet.start();
@@ -63,18 +53,17 @@ public class GZTOverlayAnimator {
                     .with(getActiveYScaleAnim(activeView))
                     .with(getActiveXScaleAnim(activeView));
         } else {
-            ObjectAnimator leavingYScaleAnim = getLeavingYScaleAnim(visibleView);
             ObjectAnimator activeYScaleAnim = getActiveYScaleAnim(activeView);
             animatorSet
                     .play(getActiveYPosAnim(activeView, finalBounds))
                     .with(activeYScaleAnim)
                     .with(getActiveXScaleAnim(activeView))
-                    .with(getLeavingXScaleAnim(visibleView))
-                    .with(leavingYScaleAnim);
+                    .with(getLeavingAlphaAnim(visibleView));
             activeYScaleAnim.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
                     activeView.setVisibility(View.VISIBLE);
+                    activeView.setAlpha(1f);
                 }
 
                 @Override
@@ -91,6 +80,10 @@ public class GZTOverlayAnimator {
         }
         animatorSet.setInterpolator(new DecelerateInterpolator());
         return animatorSet;
+    }
+
+    private ObjectAnimator getLeavingAlphaAnim(View leavingView) {
+        return ObjectAnimator.ofFloat(leavingView, View.ALPHA, 1f, 0f);
     }
 
     private ObjectAnimator getLeavingYScaleAnim(View leavingView) {

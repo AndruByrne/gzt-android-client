@@ -14,11 +14,9 @@ import javax.inject.Inject;
 final public class GZTSettingsActivity extends Activity {
 
     public static final String TAG = GZTSettingsActivity.class.getSimpleName();
-    @Inject
-    public MapViewLifecycleHolder mapViewHolder;
-    @Inject
-    public UserActionHandlers userActionHandlers;
-    //  need an onbackpressed handler
+
+    @Inject public MapViewLifecycleHolder mapViewHolder;
+    @Inject public BottomNavControllers bottomNavControllers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +35,8 @@ final public class GZTSettingsActivity extends Activity {
 
         mapViewHolder.onCreate(savedInstanceState);
         // assign user action handlers
-        gztSettingsActivityBinding.setUserActionHandlers(userActionHandlers);
-        userActionHandlers.showStats(gztSettingsActivityBinding.statsNavButton);
+        gztSettingsActivityBinding.setBottomNavControllers(bottomNavControllers);
+        bottomNavControllers.showStats(gztSettingsActivityBinding.statsNavButton);
     }
 
     @Override
@@ -61,7 +59,7 @@ final public class GZTSettingsActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (!userActionHandlers.backPressedConsumed())
+        if (!bottomNavControllers.backPressedConsumed())
             super.onBackPressed();
     }
 }

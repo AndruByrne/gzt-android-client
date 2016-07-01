@@ -3,8 +3,8 @@
     <string name="email_label">Email:</string>
     <string name="go_button_label">GO</string>
     <string name="no_email_toast">please enter your email</string>
-    <string name="molotov_count_title">Number of Molotovs on hand:</string>
-    <string name="number_of_garlic_cloves_label">Number of Garlic Cloves</string>
+    <string name="molotov_count_title">Molotovs on hand:</string>
+    <string name="number_of_garlic_cloves_label">Garlic Cloves</string>
     <string name="inventory_title">Inventory</string>
     <string name="local_powerups_button_label">View local powerups</string>
     <string name="status_card_label">Status</string>

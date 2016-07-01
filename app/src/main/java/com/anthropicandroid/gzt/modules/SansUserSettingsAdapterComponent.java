@@ -6,10 +6,10 @@ package com.anthropicandroid.gzt.modules;
 
 import android.databinding.DataBindingComponent;
 
+import com.anthropicandroid.gzt.activity.BottomNavControllers;
 import com.anthropicandroid.gzt.activity.GZTSettingsActivity;
 import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
 import com.anthropicandroid.gzt.activity.MapViewLifecycleHolder;
-import com.anthropicandroid.gzt.activity.UserActionHandlers;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 
 import dagger.Component;
@@ -23,7 +23,7 @@ import dagger.Component;
         })
 
 public interface SansUserSettingsAdapterComponent extends DataBindingComponent {
-    UserActionHandlers getUserActionHandlers();
+    BottomNavControllers getBottomNavHandlers();
 
     ApplicationPreferences getPreferenceStorage();
 

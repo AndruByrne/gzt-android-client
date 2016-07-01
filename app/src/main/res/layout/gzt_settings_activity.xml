@@ -8,9 +8,9 @@
         <import type="com.anthropicandroid.gzt.services.ApplicationPreferences.Preferences" />
 
         <variable
-            name="user_action_handlers"
-            type="com.anthropicandroid.gzt.activity.UserActionHandlers" />
-
+            name="bottom_nav_controllers"
+            type="com.anthropicandroid.gzt.activity.BottomNavControllers" />
+        
     </data>
 
 
@@ -24,7 +24,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentBottom="true"
+            android:background="@color/light_purpley_gray">
             <Button
                 android:id="@+id/stats_nav_button"
                 android:layout_width="0dp"
@@ -32,7 +33,7 @@
                 android:layout_weight="1"
                 android:text="Stats"
                 android:drawableTop="@drawable/ic_favorite"
-                android:onClick="@{user_action_handlers::showStats}"
+                android:onClick="@{bottom_nav_controllers::showStats}"
                 style="?android:attr/borderlessButtonStyle"/>
             <Button
                 android:id="@+id/inventory_nav_button"
@@ -41,7 +42,7 @@
                 android:layout_weight="1"
                 android:text="Inventory"
                 android:drawableTop="@drawable/ic_local_pharmacy"
-                android:onClick="@{user_action_handlers::showInventory}"
+                android:onClick="@{bottom_nav_controllers::showInventory}"
                 style="?android:attr/borderlessButtonStyle"/>
             <Button
                 android:id="@+id/map_nav_button"
@@ -50,7 +51,7 @@
                 android:layout_weight="1"
                 android:text="Map"
                 android:drawableTop="@drawable/ic_explore"
-                android:onClick="@{user_action_handlers::showMap}"
+                android:onClick="@{bottom_nav_controllers::showMap}"
                 style="?android:attr/borderlessButtonStyle"/>
         </LinearLayout>
         <FrameLayout
