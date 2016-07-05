@@ -19,17 +19,23 @@ public class GZTOverlayAnimator {
 
     public static final String TAG = GZTOverlayAnimator.class.getSimpleName();
 
-    public void replaceFrameContentsWith(
+    public void replaceFrameContentsAt(
             final FrameLayout contentFrame,
-            View activeView) {
-        AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
+            View activeView,
+            float xOrigin) {
+        AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView, xOrigin);
         contentFrame.addView(activeView);
         animatorSet.start();
     }
 
-    public boolean updateVisibleChildWith(final FrameLayout contentFrame, View activeView) {
+    public boolean updateVisibleChildAt(
+            final FrameLayout contentFrame,
+            View activeView,
+            float xOrigin) {
         try {
-            AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView);
+            Rect readerRect = new Rect();
+            activeView.getGlobalVisibleRect(readerRect);
+            AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView, xOrigin);
             animatorSet.start();
             return true;
         } catch (Exception e) {
@@ -39,7 +45,10 @@ public class GZTOverlayAnimator {
     }
 
     @NonNull
-    private AnimatorSet getAnimatorSet(final FrameLayout contentFrame, final View activeView) {
+    private AnimatorSet getAnimatorSet(
+            final FrameLayout contentFrame,
+            final View activeView,
+            float xOrigin) {
         Rect finalBounds = new Rect();
         Point globalOffset = new Point();
         AnimatorSet animatorSet = new AnimatorSet();
@@ -47,51 +56,84 @@ public class GZTOverlayAnimator {
         final View visibleView = getVisibleWithin(contentFrame);
         contentFrame.getGlobalVisibleRect(finalBounds, globalOffset);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);
+        ObjectAnimator activeYPosAnim = getActiveYPosAnim(activeView, finalBounds);
+        ObjectAnimator activeYScaleAnim = getActiveYScaleAnim(activeView);
+        ObjectAnimator activeXPosAnim = getActiveXPosAnim(activeView, finalBounds, xOrigin);
+        ObjectAnimator activeXScaleAnim = getActiveXScaleAnim(activeView);
+
         if (visibleView == null) {
             animatorSet
-                    .play(getActiveYPosAnim(activeView, finalBounds))
-                    .with(getActiveYScaleAnim(activeView))
-                    .with(getActiveXScaleAnim(activeView));
-        } else {
-            ObjectAnimator activeYScaleAnim = getActiveYScaleAnim(activeView);
-            animatorSet
-                    .play(getActiveYPosAnim(activeView, finalBounds))
+                    .play(activeYPosAnim)
                     .with(activeYScaleAnim)
-                    .with(getActiveXScaleAnim(activeView))
+                    .with(activeXPosAnim)
+                    .with(activeXScaleAnim);
+        } else {
+            activeYScaleAnim.addListener(getAnimationReset(activeView, visibleView));
+//            activeXScaleAnim.addListener(getLoggingListener(activeView));
+            animatorSet
+                    .play(activeYPosAnim)
+                    .with(activeYScaleAnim)
+                    .with(activeXPosAnim)
+                    .with(activeXScaleAnim)
                     .with(getLeavingAlphaAnim(visibleView));
-            activeYScaleAnim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    activeView.setVisibility(View.VISIBLE);
-                    activeView.setAlpha(1f);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    visibleView.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) { }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) { }
-            });
         }
         animatorSet.setInterpolator(new DecelerateInterpolator());
         return animatorSet;
     }
 
+    @NonNull
+    private Animator.AnimatorListener getLoggingListener(final View activeView) {
+        return new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                Rect readerRect = new Rect();
+                activeView.getGlobalVisibleRect(readerRect);
+                Log.d(TAG, "active view X top: " + readerRect.top + " bottom: " + readerRect
+                        .bottom + " right: " + readerRect.right + " left: " + readerRect.left);
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        };
+    }
+
+    @NonNull
+    private static Animator.AnimatorListener getAnimationReset(
+            final View activeView,
+            final View visibleView) {
+        return new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                activeView.setVisibility(View.VISIBLE);
+                activeView.setAlpha(1f);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) { visibleView.setVisibility(View.GONE); }
+
+            @Override
+            public void onAnimationCancel(Animator animation) { }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) { }
+        };
+    }
+
     private ObjectAnimator getLeavingAlphaAnim(View leavingView) {
         return ObjectAnimator.ofFloat(leavingView, View.ALPHA, 1f, 0f);
-    }
-
-    private ObjectAnimator getLeavingYScaleAnim(View leavingView) {
-        return ObjectAnimator.ofFloat(leavingView, View.SCALE_Y, 1f, 0f);
-    }
-
-    private ObjectAnimator getLeavingXScaleAnim(View leavingView) {
-        return ObjectAnimator.ofFloat(leavingView, View.SCALE_X, 1f, 0f);
     }
 
     private ObjectAnimator getActiveYScaleAnim(View activeView) {
@@ -108,6 +150,15 @@ public class GZTOverlayAnimator {
                 View.Y,
                 finalBounds.bottom,
                 finalBounds.top);
+    }
+
+    private ObjectAnimator getActiveXPosAnim(View activeView, Rect finalBounds, float origin) {
+        return ObjectAnimator.ofFloat(
+                activeView,
+                View.X,
+                origin - finalBounds.right / 2,
+//                0,
+                finalBounds.left);
     }
 
     private static View getVisibleWithin(FrameLayout contentFrame) {

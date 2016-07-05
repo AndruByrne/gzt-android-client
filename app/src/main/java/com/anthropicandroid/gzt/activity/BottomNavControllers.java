@@ -3,6 +3,7 @@ package com.anthropicandroid.gzt.activity;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -45,7 +46,7 @@ public class BottomNavControllers {
         this.gztOverlayAnimator = gztOverlayAnimator;
     }
 
-    public void showStats(View view) {
+    public boolean showStats(View view, MotionEvent event) {
         BottomNav navigation = BottomNav.STATS;
         Activity activity = (Activity) view.getContext();
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
@@ -61,26 +62,29 @@ public class BottomNavControllers {
             StatsViewBinding statsViewBinding = StatsViewBinding.inflate(
                     activity.getLayoutInflater(),
                     settingsAdapterComponent);
+            // set handlers, animate to the view and remember this
             statsViewBinding.setUserActionHandlers(upperActionHandlers);
-            gztOverlayAnimator.replaceFrameContentsWith(
+            gztOverlayAnimator.replaceFrameContentsAt(
                     contentFrame,
-                    statsViewBinding.statsRootView);
+                    statsViewBinding.statsRootView,
+                    view.getLeft() + event.getX());
             childrenIndices.put(navigation, childrenIndices.size());
+            return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
-            if (activeView.getVisibility() != View.VISIBLE)
-                gztOverlayAnimator.updateVisibleChildWith(
-                        contentFrame,
-                        activeView);
+            if (activeView.getVisibility() == View.VISIBLE) return false;
+            gztOverlayAnimator.updateVisibleChildAt(
+                    contentFrame,
+                    activeView,
+                    view.getLeft() + event.getX());
+            return true;
         }
     }
 
-    public void showInventory(View view) {
+    public boolean showInventory(View view, MotionEvent event) {
         Activity activity = (Activity) view.getContext();
         BottomNav navigation = BottomNav.INVENTORY;
-        FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
-                .findBinding(
-                        view))
+        FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil.findBinding(view))
                 .gztSettingsContentFrame;
         Integer childIndex = childrenIndices.get(navigation);
         if (childIndex == null) {
@@ -91,21 +95,26 @@ public class BottomNavControllers {
             InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(
                     activity.getLayoutInflater(),
                     settingsAdapterComponent);
+            // set handlers, animate to the view and remember this
             inventoryViewBinding.setUserActionHandlers(upperActionHandlers);
-            gztOverlayAnimator.replaceFrameContentsWith(
+            gztOverlayAnimator.replaceFrameContentsAt(
                     contentFrame,
-                    inventoryViewBinding.inventoryRootView);
+                    inventoryViewBinding.inventoryRootView,
+                    view.getLeft() + event.getX());
             childrenIndices.put(navigation, childrenIndices.size());
+            return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
-            if (activeView.getVisibility() != View.VISIBLE)
-                gztOverlayAnimator.updateVisibleChildWith(
-                        contentFrame,
-                        activeView);
+            if (activeView.getVisibility() == View.VISIBLE) return false;
+            gztOverlayAnimator.updateVisibleChildAt(
+                    contentFrame,
+                    activeView,
+                    view.getLeft() + event.getX());
+            return true;
         }
     }
 
-    public void showMap(View view) {
+    public boolean showMap(View view, MotionEvent event) {
         BottomNav navigation = BottomNav.MAP;
         Activity activity = (Activity) view.getContext();
         Integer childIndex = childrenIndices.get(navigation);
@@ -124,18 +133,24 @@ public class BottomNavControllers {
                 PowerUpsMapViewBinding powerUpsMapViewBinding = PowerUpsMapViewBinding.inflate(
                         activity.getLayoutInflater(),
                         mapComponent);
+                // set handlers, animate to the view and remember this
                 powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
-                gztOverlayAnimator.replaceFrameContentsWith(
+                gztOverlayAnimator.replaceFrameContentsAt(
                         contentFrame,
-                        powerUpsMapViewBinding.extranetMapView);
+                        powerUpsMapViewBinding.extranetMapView,
+                        view.getLeft() + event.getX());
                 childrenIndices.put(navigation, childrenIndices.size());
+                return true;
             }
+            return false;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
-            if (activeView.getVisibility() != View.VISIBLE)
-                gztOverlayAnimator.updateVisibleChildWith(
-                        contentFrame,
-                        activeView);
+            if (activeView.getVisibility() == View.VISIBLE) return false;
+            gztOverlayAnimator.updateVisibleChildAt(
+                    contentFrame,
+                    activeView,
+                    view.getLeft() + event.getX());
+            return true;
         }
     }
 }

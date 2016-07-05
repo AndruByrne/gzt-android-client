@@ -3,6 +3,8 @@ package com.anthropicandroid.gzt.activity;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.view.MotionEvent;
 
 import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
@@ -36,7 +38,22 @@ final public class GZTSettingsActivity extends Activity {
         mapViewHolder.onCreate(savedInstanceState);
         // assign user action handlers
         gztSettingsActivityBinding.setBottomNavControllers(bottomNavControllers);
-        bottomNavControllers.showStats(gztSettingsActivityBinding.statsNavButton);
+        bottomNavControllers.showStats(
+                gztSettingsActivityBinding.statsNavButton,
+                MotionEvent.obtain(
+                        SystemClock.uptimeMillis(), //  downtime
+                        SystemClock.uptimeMillis(), //  eventTime
+                        MotionEvent.ACTION_DOWN, //  action
+                        (float) getResources().getConfiguration().screenWidthDp / 6, // 3 button x
+                        0f, //  y
+                        1f, //  pressure
+                        .5f, //  size
+                        0, //  metaState
+                        1f, //  xPrecision
+                        1f, //  yPrecision
+                        0, //  deviceId
+                        0 //  edgeFlags
+                ));
     }
 
     @Override

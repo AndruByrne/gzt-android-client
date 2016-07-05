@@ -33,7 +33,7 @@
                 android:layout_weight="1"
                 android:text="Stats"
                 android:drawableTop="@drawable/ic_favorite"
-                android:onClick="@{bottom_nav_controllers::showStats}"
+                android:onTouch="@{bottom_nav_controllers::showStats}"
                 style="?android:attr/borderlessButtonStyle"/>
             <Button
                 android:id="@+id/inventory_nav_button"
@@ -42,7 +42,7 @@
                 android:layout_weight="1"
                 android:text="Inventory"
                 android:drawableTop="@drawable/ic_local_pharmacy"
-                android:onClick="@{bottom_nav_controllers::showInventory}"
+                android:onTouch="@{bottom_nav_controllers::showInventory}"
                 style="?android:attr/borderlessButtonStyle"/>
             <Button
                 android:id="@+id/map_nav_button"
@@ -51,7 +51,7 @@
                 android:layout_weight="1"
                 android:text="Map"
                 android:drawableTop="@drawable/ic_explore"
-                android:onClick="@{bottom_nav_controllers::showMap}"
+                android:onTouch="@{bottom_nav_controllers::showMap}"
                 style="?android:attr/borderlessButtonStyle"/>
         </LinearLayout>
         <FrameLayout
