@@ -30,16 +30,6 @@ public class BottomNavControllers {
     private GZTOverlayAnimator gztOverlayAnimator;
     private HashMap<BottomNav, Integer> childrenIndices = new HashMap<>();
 
-    public boolean backPressedConsumed() {
-        return upperActionHandlers.backPressedConsumed();
-    }
-
-    enum BottomNav {
-        STATS,
-        INVENTORY,
-        MAP
-    }
-
     public BottomNavControllers(
             UpperActionHandlers upperActionHandlers,
             GZTOverlayAnimator gztOverlayAnimator) {
@@ -47,33 +37,29 @@ public class BottomNavControllers {
         this.gztOverlayAnimator = gztOverlayAnimator;
     }
 
+    public boolean backPressedConsumed() {
+        return upperActionHandlers.backPressedConsumed();
+    }
+
     public boolean showStats(View view, MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
         BottomNav navigation = BottomNav.STATS;
-        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
-                .getBaseContext());
+        Integer childIndex = childrenIndices.get(navigation);
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
                 .findBinding(
                         view))
                 .gztSettingsContentFrame;
-        Integer childIndex = childrenIndices.get(navigation);
         if (childIndex == null) {
-            ZombieTrackerApplication application = (ZombieTrackerApplication) activity
-                    .getApplication();
-            SansUserSettingsAdapterComponent settingsAdapterComponent = application
-                    .createOrGetSansUserSettingsAdapterComponent();
-            StatsViewBinding statsViewBinding = StatsViewBinding.inflate(
-                    activity.getLayoutInflater(),
-                    settingsAdapterComponent);
-            // set handlers, animate to the view and remember this
-            statsViewBinding.setUserActionHandlers(upperActionHandlers);
-            gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
-                    contentFrame,
-                    statsViewBinding.statsRootView,
-                    view.getLeft() + event.getX());
-            childrenIndices.put(navigation, contentFrame.getChildCount()-1); //  so -1 here
+            replaceStatsViewAt(contentFrame, view, event); //  view added here
+            childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
             return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
+            if (activeView == null) {
+                replaceStatsViewAt(contentFrame, view, event); //  view added here
+                childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
+                return true;
+            }
             if (activeView.getVisibility() == View.VISIBLE) return false;
             gztOverlayAnimator.updateVisibleChildAt(
                     contentFrame,
@@ -81,33 +67,43 @@ public class BottomNavControllers {
                     view.getLeft() + event.getX());
             return true;
         }
+    }
+
+    private void replaceStatsViewAt(FrameLayout contentFrame, View view, MotionEvent event) {
+        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
+                .getBaseContext());
+        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
+                .getApplication();
+        SansUserSettingsAdapterComponent settingsAdapterComponent = application
+                .createOrGetSansUserSettingsAdapterComponent();
+        StatsViewBinding statsViewBinding = StatsViewBinding.inflate(
+                activity.getLayoutInflater(),
+                settingsAdapterComponent);
+        // set handlers, animate to the view and remember this
+        statsViewBinding.setUserActionHandlers(upperActionHandlers);
+        gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
+                contentFrame,
+                statsViewBinding.statsRootView,
+                view.getLeft() + event.getX());
     }
 
     public boolean showInventory(View view, MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
         BottomNav navigation = BottomNav.INVENTORY;
-        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
-                .getBaseContext());
+        Integer childIndex = childrenIndices.get(navigation);
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil.findBinding(view))
                 .gztSettingsContentFrame;
-        Integer childIndex = childrenIndices.get(navigation);
         if (childIndex == null) {
-            ZombieTrackerApplication application = (ZombieTrackerApplication) activity
-                    .getApplication();
-            SansUserSettingsAdapterComponent settingsAdapterComponent = application
-                    .createOrGetSansUserSettingsAdapterComponent();
-            InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(
-                    activity.getLayoutInflater(),
-                    settingsAdapterComponent);
-            // set handlers, animate to the view and remember this
-            inventoryViewBinding.setUserActionHandlers(upperActionHandlers);
-            gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
-                    contentFrame,
-                    inventoryViewBinding.inventoryRootView,
-                    view.getLeft() + event.getX());
-            childrenIndices.put(navigation, contentFrame.getChildCount()-1); //  so -1 here
+            replaceInventoryViewAt(contentFrame, view, event); //  view added here
+            childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
             return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
+            if (activeView == null) {
+                replaceInventoryViewAt(contentFrame, view, event); //  view added here
+                childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
+                return true;
+            }
             if (activeView.getVisibility() == View.VISIBLE) return false;
             gztOverlayAnimator.updateVisibleChildAt(
                     contentFrame,
@@ -117,38 +113,54 @@ public class BottomNavControllers {
         }
     }
 
-    public boolean showMap(View view, MotionEvent event) {
-        BottomNav navigation = BottomNav.MAP;
+    private void replaceInventoryViewAt(
+            FrameLayout contentFrame,
+            View view,
+            MotionEvent event) {
         AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
                 .getBaseContext());
+        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
+                .getApplication();
+        SansUserSettingsAdapterComponent settingsAdapterComponent = application
+                .createOrGetSansUserSettingsAdapterComponent();
+        InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(
+                activity.getLayoutInflater(),
+                settingsAdapterComponent);
+        // set handlers, animate to the view and remember this
+        inventoryViewBinding.setUserActionHandlers(upperActionHandlers);
+        gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
+                contentFrame,
+                inventoryViewBinding.inventoryRootView,
+                view.getLeft() + event.getX());
+    }
+
+    public boolean showMap(View view, MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
+        BottomNav navigation = BottomNav.MAP;
         Integer childIndex = childrenIndices.get(navigation);
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
                 .findBinding(
                         view))
                 .gztSettingsContentFrame;
+        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
+                .getBaseContext());
         if (childIndex == null) {
-            if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(view.getContext())
+            if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
                     != ConnectionResult.SUCCESS) {
                 Log.e(TAG, "google play services not available");
             } else {
-                ZombieTrackerApplication application = (ZombieTrackerApplication) activity
-                        .getApplication();
-                GZTMapComponent mapComponent = application.createMapComponent();
-                PowerUpsMapViewBinding powerUpsMapViewBinding = PowerUpsMapViewBinding.inflate(
-                        activity.getLayoutInflater(),
-                        mapComponent);
-                // set handlers, animate to the view and remember this
-                powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
-                gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
-                        contentFrame,
-                        powerUpsMapViewBinding.extranetMapView,
-                        view.getLeft() + event.getX());
-                childrenIndices.put(navigation, contentFrame.getChildCount()-1);
+                replaceWithMapViewAt(view, event, contentFrame, activity);
+                childrenIndices.put(navigation, contentFrame.getChildCount() - 1);
                 return true;
             }
             return false;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
+            if (activeView == null) {
+                replaceWithMapViewAt(view, event, contentFrame, activity);
+                childrenIndices.put(navigation, contentFrame.getChildCount() - 1);
+                return true;
+            }
             if (activeView.getVisibility() == View.VISIBLE) return false;
             gztOverlayAnimator.updateVisibleChildAt(
                     contentFrame,
@@ -156,5 +168,30 @@ public class BottomNavControllers {
                     view.getLeft() + event.getX());
             return true;
         }
+    }
+
+    private void replaceWithMapViewAt(
+            View view,
+            MotionEvent event,
+            FrameLayout contentFrame,
+            AppCompatActivity activity) {
+        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
+                .getApplication();
+        GZTMapComponent mapComponent = application.createMapComponent();
+        PowerUpsMapViewBinding powerUpsMapViewBinding = PowerUpsMapViewBinding.inflate(
+                activity.getLayoutInflater(),
+                mapComponent);
+        // set handlers, animate to the view and remember this
+        powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
+        gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
+                contentFrame,
+                powerUpsMapViewBinding.extranetMapView,
+                view.getLeft() + event.getX());
+    }
+
+    enum BottomNav {
+        STATS,
+        INVENTORY,
+        MAP
     }
 }
