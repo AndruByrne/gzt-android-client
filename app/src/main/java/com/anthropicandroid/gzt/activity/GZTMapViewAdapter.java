@@ -4,9 +4,9 @@ package com.anthropicandroid.gzt.activity;
  * Created by Andrew Brin on 5/10/2016.
  */
 
-import android.app.Activity;
 import android.databinding.BindingAdapter;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.anthropicandroid.extranetbrowser.ExtranetMapView;
@@ -44,7 +44,7 @@ public class GZTMapViewAdapter {
                 @Override
                 public void onViewDetachedFromWindow(View v) {
                     // remove dagger component
-                    ((ZombieTrackerApplication) ((Activity) v.getContext()).getApplication())
+                    ((ZombieTrackerApplication) ((AppCompatActivity) v.getContext()).getApplication())
                             .releaseMapComponent();
                 }
             });

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="GZTTheme"
-        parent="android:Theme.Material">
-        <item name="android:colorPrimary">@color/pure_black</item>
-        <item name="android:colorAccent">@color/dark_green</item>
+        parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/pure_black</item>
+        <item name="colorAccent">@color/dark_green</item>
         <item name="android:textColor">@color/bright_green</item>
     </style>
 </resources>

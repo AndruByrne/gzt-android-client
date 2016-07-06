@@ -1,9 +1,9 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
 import com.anthropicandroid.gzt.R;
@@ -13,7 +13,7 @@ import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 
 import javax.inject.Inject;
 
-final public class GZTSettingsActivity extends Activity {
+final public class GZTSettingsActivity extends AppCompatActivity {
 
     public static final String TAG = GZTSettingsActivity.class.getSimpleName();
 

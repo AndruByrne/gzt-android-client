@@ -1,7 +1,8 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.app.Activity;
+import android.content.ContextWrapper;
 import android.databinding.DataBindingUtil;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,7 +49,8 @@ public class BottomNavControllers {
 
     public boolean showStats(View view, MotionEvent event) {
         BottomNav navigation = BottomNav.STATS;
-        Activity activity = (Activity) view.getContext();
+        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
+                .getBaseContext());
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
                 .findBinding(
                         view))
@@ -64,11 +66,11 @@ public class BottomNavControllers {
                     settingsAdapterComponent);
             // set handlers, animate to the view and remember this
             statsViewBinding.setUserActionHandlers(upperActionHandlers);
-            gztOverlayAnimator.replaceFrameContentsAt(
+            gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
                     contentFrame,
                     statsViewBinding.statsRootView,
                     view.getLeft() + event.getX());
-            childrenIndices.put(navigation, childrenIndices.size());
+            childrenIndices.put(navigation, contentFrame.getChildCount()-1); //  so -1 here
             return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
@@ -82,8 +84,9 @@ public class BottomNavControllers {
     }
 
     public boolean showInventory(View view, MotionEvent event) {
-        Activity activity = (Activity) view.getContext();
         BottomNav navigation = BottomNav.INVENTORY;
+        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
+                .getBaseContext());
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil.findBinding(view))
                 .gztSettingsContentFrame;
         Integer childIndex = childrenIndices.get(navigation);
@@ -97,11 +100,11 @@ public class BottomNavControllers {
                     settingsAdapterComponent);
             // set handlers, animate to the view and remember this
             inventoryViewBinding.setUserActionHandlers(upperActionHandlers);
-            gztOverlayAnimator.replaceFrameContentsAt(
+            gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
                     contentFrame,
                     inventoryViewBinding.inventoryRootView,
                     view.getLeft() + event.getX());
-            childrenIndices.put(navigation, childrenIndices.size());
+            childrenIndices.put(navigation, contentFrame.getChildCount()-1); //  so -1 here
             return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
@@ -116,7 +119,8 @@ public class BottomNavControllers {
 
     public boolean showMap(View view, MotionEvent event) {
         BottomNav navigation = BottomNav.MAP;
-        Activity activity = (Activity) view.getContext();
+        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
+                .getBaseContext());
         Integer childIndex = childrenIndices.get(navigation);
         FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
                 .findBinding(
@@ -135,11 +139,11 @@ public class BottomNavControllers {
                         mapComponent);
                 // set handlers, animate to the view and remember this
                 powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
-                gztOverlayAnimator.replaceFrameContentsAt(
+                gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
                         contentFrame,
                         powerUpsMapViewBinding.extranetMapView,
                         view.getLeft() + event.getX());
-                childrenIndices.put(navigation, childrenIndices.size());
+                childrenIndices.put(navigation, contentFrame.getChildCount()-1);
                 return true;
             }
             return false;

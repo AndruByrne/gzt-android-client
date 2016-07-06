@@ -1,6 +1,6 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -24,7 +24,7 @@ final public class UpperActionHandlers {
 
     public void muteNotifications(View view) {
         CheckBox checkBox = (CheckBox) view;
-        ApplicationPreferences preferenceStorage = ((ZombieTrackerApplication) ((Activity)
+        ApplicationPreferences preferenceStorage = ((ZombieTrackerApplication) ((AppCompatActivity)
                 checkBox.getContext()).getApplication())
                 .getApplicationComponent().getPreferenceStorage();
         checkBox.setChecked(
