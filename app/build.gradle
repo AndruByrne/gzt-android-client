@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "24.0.0"
 
     buildTypes {
         debug {

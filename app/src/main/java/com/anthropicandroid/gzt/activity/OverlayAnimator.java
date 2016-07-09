@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
-public class GZTOverlayAnimator {
+public class OverlayAnimator {
 
-    public static final String TAG = GZTOverlayAnimator.class.getSimpleName();
+    public static final String TAG = OverlayAnimator.class.getSimpleName();
 
     public void replaceFrameContentsAt(
             final FrameLayout contentFrame,

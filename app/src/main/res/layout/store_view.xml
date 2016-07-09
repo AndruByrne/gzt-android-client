@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+    </data>
+
+    <FrameLayout
+        android:id="@+id/store_root_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/dark_green"
+        android:padding="15dp"
+        >
+        <RelativeLayout
+            android:id="@+id/store_view_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/light_purpley_gray">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="top text"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:text="bottom text"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+</layout>

@@ -1,11 +1,16 @@
 package com.anthropicandroid.gzt.activity;
 
+import android.content.ContextWrapper;
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.RelativeLayout;
 
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
+import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
+import com.anthropicandroid.gzt.databinding.StoreViewBinding;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 
 /*
@@ -14,11 +19,10 @@ import com.anthropicandroid.gzt.services.ApplicationPreferences;
 final public class UpperActionHandlers {
 
     public static final String TAG = UpperActionHandlers.class.getSimpleName();
+    private OpenStoreAnimator openStoreAnimator;
 
-    private GZTZoomAnimator zoomAnimator;
-
-    public UpperActionHandlers(GZTZoomAnimator zoomAnimator) {
-        this.zoomAnimator = zoomAnimator;
+    public UpperActionHandlers(OpenStoreAnimator openStoreAnimator) {
+        this.openStoreAnimator = openStoreAnimator;
     }
 
 
@@ -46,11 +50,24 @@ final public class UpperActionHandlers {
     }
 
     public void purchaseMolotovs(View view) {
-        Log.d(TAG, "recieved request to purchase molotovs");
+        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
+                .getBaseContext());
+        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
+                .getApplication();
+
+        openStoreAnimator.animateInventoryToStoreFromCard(
+                (InventoryViewBinding) DataBindingUtil.findBinding(view),
+                StoreViewBinding.inflate(
+                        activity.getLayoutInflater(),
+                        application.createOrGetSansUserSettingsAdapterComponent()),
+                (CardView) view.getParent().getParent(),
+                (RelativeLayout) view.getParent(),
+                view);
     }
 
     public boolean backPressedConsumed() {
-        return zoomAnimator.undoLastAnimation();
+        // do a complete redraw of the inventory if returning from store
+        return openStoreAnimator.undoLastAnimation();
 //        ((ZombieTrackerApplication) ((Activity) view.getContext()).getApplication())
 // .releaseMapComponent();  //  unaccounted for
     }

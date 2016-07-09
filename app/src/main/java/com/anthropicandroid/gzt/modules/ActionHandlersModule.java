@@ -5,9 +5,10 @@ package com.anthropicandroid.gzt.modules;
  */
 
 import com.anthropicandroid.gzt.activity.BottomNavControllers;
-import com.anthropicandroid.gzt.activity.GZTOverlayAnimator;
-import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
+import com.anthropicandroid.gzt.activity.OpenStoreAnimator;
+import com.anthropicandroid.gzt.activity.OverlayAnimator;
 import com.anthropicandroid.gzt.activity.UpperActionHandlers;
+import com.anthropicandroid.gzt.activity.ZoomAnimator;
 
 import javax.inject.Singleton;
 
@@ -19,29 +20,33 @@ public class ActionHandlersModule {
 
     @Provides
     @Singleton
-    UpperActionHandlers getUpperActionHandlers(GZTZoomAnimator gztZoomAnimator) {
-        return new UpperActionHandlers(gztZoomAnimator);
+    UpperActionHandlers getUpperActionHandlers(OpenStoreAnimator openStoreAnimator) {
+        return new UpperActionHandlers(openStoreAnimator);
     }
 
     @Provides
     @Singleton
-    GZTZoomAnimator getGZTAnimatorSetRepository() {
-        return new GZTZoomAnimator();
+    ZoomAnimator getGZTAnimatorSetRepository() {
+        return new ZoomAnimator();
     }
 
     @Provides
     @Singleton
-    GZTOverlayAnimator getGZTOverlayAnimator() {
-        return new GZTOverlayAnimator();
+    OverlayAnimator getGZTOverlayAnimator() {
+        return new OverlayAnimator();
     }
+
+    @Provides
+    @Singleton
+    OpenStoreAnimator getOpenStoreAnimator() { return new OpenStoreAnimator(); }
 
     @Provides
     @Singleton
     BottomNavControllers getBottomNavHandlers(
             UpperActionHandlers upperActionHandlers,
-            GZTOverlayAnimator gztOverlayAnimator) {
+            OverlayAnimator overlayAnimator) {
         return new BottomNavControllers(
                 upperActionHandlers,
-                gztOverlayAnimator);
+                overlayAnimator);
     }
 }

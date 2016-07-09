@@ -20,9 +20,9 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.Stack;
 
-public class GZTZoomAnimator {
+public class ZoomAnimator {
 
-    public static final String TAG = GZTZoomAnimator.class.getSimpleName();
+    public static final String TAG = ZoomAnimator.class.getSimpleName();
     public static final int UNZOOM_SPEED = 500;
     public static final int ZOOM_SPEED = 700;
 
@@ -31,7 +31,7 @@ public class GZTZoomAnimator {
 
     private final SparseArray<AnimationPrecursor> animationPrecursors = new SparseArray<>();
 
-    public GZTZoomAnimator() {
+    public ZoomAnimator() {
     }
 
     public void addViewAndPrepareToZoom(View targetView, View beginningView, View viewToMatch) {

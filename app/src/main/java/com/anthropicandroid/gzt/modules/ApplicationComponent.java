@@ -3,7 +3,7 @@ package com.anthropicandroid.gzt.modules;
 import android.app.Application;
 
 import com.anthropicandroid.gzt.activity.BottomNavControllers;
-import com.anthropicandroid.gzt.activity.GZTZoomAnimator;
+import com.anthropicandroid.gzt.activity.ZoomAnimator;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 import com.anthropicandroid.gzt.services.SubscriptionAccountant;
 
@@ -28,7 +28,7 @@ public interface ApplicationComponent {
 
     ApplicationPreferences getPreferenceStorage();
 
-    GZTZoomAnimator getGZTAnimatorSetRepository();
+    ZoomAnimator getGZTAnimatorSetRepository();
 
     SubscriptionAccountant getSubscriptionAccountant();
 

@@ -27,14 +27,14 @@ public class BottomNavControllers {
 
     public static final String TAG = BottomNavControllers.class.getSimpleName();
     private UpperActionHandlers upperActionHandlers;
-    private GZTOverlayAnimator gztOverlayAnimator;
+    private OverlayAnimator overlayAnimator;
     private HashMap<BottomNav, Integer> childrenIndices = new HashMap<>();
 
     public BottomNavControllers(
             UpperActionHandlers upperActionHandlers,
-            GZTOverlayAnimator gztOverlayAnimator) {
+            OverlayAnimator overlayAnimator) {
         this.upperActionHandlers = upperActionHandlers;
-        this.gztOverlayAnimator = gztOverlayAnimator;
+        this.overlayAnimator = overlayAnimator;
     }
 
     public boolean backPressedConsumed() {
@@ -61,7 +61,7 @@ public class BottomNavControllers {
                 return true;
             }
             if (activeView.getVisibility() == View.VISIBLE) return false;
-            gztOverlayAnimator.updateVisibleChildAt(
+            overlayAnimator.updateVisibleChildAt(
                     contentFrame,
                     activeView,
                     view.getLeft() + event.getX());
@@ -81,7 +81,7 @@ public class BottomNavControllers {
                 settingsAdapterComponent);
         // set handlers, animate to the view and remember this
         statsViewBinding.setUserActionHandlers(upperActionHandlers);
-        gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
+        overlayAnimator.replaceFrameContentsAt( //  view is added here
                 contentFrame,
                 statsViewBinding.statsRootView,
                 view.getLeft() + event.getX());
@@ -105,7 +105,7 @@ public class BottomNavControllers {
                 return true;
             }
             if (activeView.getVisibility() == View.VISIBLE) return false;
-            gztOverlayAnimator.updateVisibleChildAt(
+            overlayAnimator.updateVisibleChildAt(
                     contentFrame,
                     activeView,
                     view.getLeft() + event.getX());
@@ -128,7 +128,7 @@ public class BottomNavControllers {
                 settingsAdapterComponent);
         // set handlers, animate to the view and remember this
         inventoryViewBinding.setUserActionHandlers(upperActionHandlers);
-        gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
+        overlayAnimator.replaceFrameContentsAt( //  view is added here
                 contentFrame,
                 inventoryViewBinding.inventoryRootView,
                 view.getLeft() + event.getX());
@@ -162,7 +162,7 @@ public class BottomNavControllers {
                 return true;
             }
             if (activeView.getVisibility() == View.VISIBLE) return false;
-            gztOverlayAnimator.updateVisibleChildAt(
+            overlayAnimator.updateVisibleChildAt(
                     contentFrame,
                     activeView,
                     view.getLeft() + event.getX());
@@ -183,7 +183,7 @@ public class BottomNavControllers {
                 mapComponent);
         // set handlers, animate to the view and remember this
         powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
-        gztOverlayAnimator.replaceFrameContentsAt( //  view is added here
+        overlayAnimator.replaceFrameContentsAt( //  view is added here
                 contentFrame,
                 powerUpsMapViewBinding.extranetMapView,
                 view.getLeft() + event.getX());

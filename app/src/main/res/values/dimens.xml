@@ -2,4 +2,5 @@
 <resources>
     <dimen name="settings_cards_elevation">15dp</dimen>
     <dimen name="powerup_map_view_elevation">20dp</dimen>
+    <dimen name="cards_margin_top">10dp</dimen>
 </resources>
