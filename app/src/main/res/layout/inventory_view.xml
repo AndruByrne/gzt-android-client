@@ -69,6 +69,7 @@
                     android:layout_marginBottom="5dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
+                    android:animateLayoutChanges="true"
                     android:gravity="center_vertical">
 
                     <TextView
@@ -106,6 +107,7 @@
                         android:text="+"
                         android:textColor="@color/bright_green" />
 
+
                     <Button
                         android:id="@+id/purchased_molotovs_button"
                         android:layout_width="30dp"
@@ -113,7 +115,7 @@
                         android:layout_toLeftOf="@id/molotov_readout_plus_sign"
                         android:layout_toStartOf="@id/molotov_readout_plus_sign"
                         android:layout_centerVertical="true"
-                        android:translationY="2dp"
+                        android:animateLayoutChanges="true"
                         android:background="@color/light_purpley_gray"
                         android:onClick="@{user_action_handlers::purchaseMolotovs}"
                         app:purchased_settings_value="@{Preferences.NUMBER_OF_PURCHASED_MOLOTOVS}" />
