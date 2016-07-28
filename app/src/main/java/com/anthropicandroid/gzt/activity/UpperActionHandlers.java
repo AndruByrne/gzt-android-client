@@ -63,7 +63,7 @@ final public class UpperActionHandlers {
                 StoreViewBinding.inflate(
                         activity.getLayoutInflater(),
                         application.createOrGetSansUserSettingsAdapterComponent()),
-                (CardView) view.getParent().getParent(),
+                (CardView) view.getParent().getParent(), //  go up view hierarchy to card
                 (RelativeLayout) view.getParent(),
                 view);
     }

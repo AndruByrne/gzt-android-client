@@ -1,13 +1,14 @@
 package com.anthropicandroid.gzt.activity;
 
 import android.databinding.BindingAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
+
+import java.text.NumberFormat;
 
 /*
  * Created by Andrew Brin on 5/6/2016.
@@ -33,7 +34,8 @@ public class SettingsAdapter {
         ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent
                 .getPreferenceStorage();
         // set string value
-        textView.setText(Integer.toString(preferenceStorage.getPreference(preference)));
+        textView.setText(NumberFormat.getIntegerInstance().format(preferenceStorage.getPreference
+                (preference)));
     }
 
     @BindingAdapter("settings_warning_value")
@@ -49,13 +51,13 @@ public class SettingsAdapter {
         else
             textView.setTextColor(textView.getResources().getColor(R.color.bright_green));
 
-        textView.setText(Integer.toString(userPreference));
+        textView.setText(NumberFormat.getIntegerInstance().format(userPreference));
     }
 
     @BindingAdapter("purchased_settings_value")
     public static void getPurchasedSettingsValue(
             SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent,
-            Button button,
+            TextView button,
             ApplicationPreferences.Preferences preference) {
         ApplicationPreferences preferenceStorage = sansUserSettingsAdapterComponent
                 .getPreferenceStorage();
@@ -65,7 +67,7 @@ public class SettingsAdapter {
         else
             button.setTextColor(button.getResources().getColor(R.color.bright_green));
 
-        button.setText(Integer.toString(userPreference));
+        button.setText(NumberFormat.getIntegerInstance().format(userPreference));
     }
 
     @BindingAdapter("settings_health_value")
