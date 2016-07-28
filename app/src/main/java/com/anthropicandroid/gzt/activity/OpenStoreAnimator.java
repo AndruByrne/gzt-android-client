@@ -311,7 +311,10 @@ public class OpenStoreAnimator {
                 inventoryViewBinding,
                 rootStoreLayout));
         animatorSet
-                .play(getStoreContentEntry(storeContentView, buttonRect, rootViewRect))
+                .play(getStoreContentEntry(
+                        storeContentView,
+                        buttonRect,
+                        parentCardRect))
                 .with(storeRootEntry);
         animatorSet.setDuration(HALF_DURATION);
 //        animatorSet.addListener(getLoggingListener(storeContentView, "store root view"));
@@ -380,14 +383,16 @@ public class OpenStoreAnimator {
     private AnimatorSet getStoreContentEntry(
             RelativeLayout contentView,
             Rect buttonRect,
-            Rect rootViewRect) {
-        final float widthScalingInv = ((float) buttonRect.width()) / rootViewRect.width();
+            Rect parentCardRect) {
+        final float widthScalingInv = ((float) buttonRect.width()) / parentCardRect.width();
+        final float heightScalingInv = ((float) buttonRect.height()) / parentCardRect.height();
+
         AnimatorSet animatorSet = new AnimatorSet();
-        // y values handled by expanding root view + layout_margin
+        // y Trans handled by expanding root view + layout_margin
         ObjectAnimator xTrans = ObjectAnimator.ofFloat(
                 contentView,
                 View.TRANSLATION_X,
-                buttonRect.left - (rootViewRect.width() * (1 - widthScalingInv)) / 2,
+                buttonRect.left - (parentCardRect.width() * (1 - widthScalingInv)) / 2,
                 0);
         reversableStoreInAnims.add(xTrans);
         ObjectAnimator xScale = ObjectAnimator.ofFloat(
@@ -396,8 +401,15 @@ public class OpenStoreAnimator {
                 widthScalingInv,
                 1);
         reversableStoreInAnims.add(xScale);
+        ObjectAnimator yScale = ObjectAnimator.ofFloat(
+                contentView,
+                View.SCALE_Y,
+                heightScalingInv,
+                1);
+        reversableStoreInAnims.add(yScale);
         animatorSet
                 .play(xTrans)
+                .with(yScale)
                 .with(xScale);
         return animatorSet;
     }

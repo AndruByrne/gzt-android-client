@@ -85,7 +85,6 @@ final public class GZTSettingsActivity extends AppCompatActivity {
                         new Action1<Boolean>() {
                             @Override
                             public void call(Boolean result) {
-                                Log.d(TAG, "get result of value: " + result);
                                 if (!result) backpressNotHandled();
                             }
                         },
