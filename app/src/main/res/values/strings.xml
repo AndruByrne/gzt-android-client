@@ -14,4 +14,9 @@
     <string name="zombie_status_label">Zombie</string>
     <string name="inventory_card_title">Inventory</string>
     <string name="slain_zombies_label">Slain Zombies</string>
+    <string name="inventory_button_title">Inventory</string>
+    <string name="stats_button_title">Stats</string>
+    <string name="map_button_title">Map</string>
+    <string name="plus_sign">+</string>
+    <string name="mute_notifications_label">Mute Notifications (not recommended)</string>
 </resources>

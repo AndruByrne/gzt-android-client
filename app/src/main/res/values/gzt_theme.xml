@@ -2,8 +2,8 @@
 <resources>
     <style name="GZTTheme"
         parent="Theme.AppCompat">
-        <item name="colorPrimary">@color/pure_black</item>
-        <item name="colorAccent">@color/dark_green</item>
-        <item name="android:textColor">@color/bright_green</item>
+        <item name="colorPrimary">@color/color_pure_black</item>
+        <item name="colorAccent">@color/color_dark_green</item>
+        <item name="android:textColor">@color/color_bright_green</item>
     </style>
 </resources>

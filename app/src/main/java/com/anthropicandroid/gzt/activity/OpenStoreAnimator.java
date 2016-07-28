@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
@@ -158,23 +158,23 @@ public class OpenStoreAnimator {
         Rect buttonRect = new Rect();
         Rect rootViewRect = new Rect();
         Point rootViewOffset = new Point();
-        LinearLayout rootView = inventoryViewBinding.inventoryRootView;
+        FrameLayout rootView = inventoryViewBinding.inventoryRootView;
         final RelativeLayout rootStoreLayout = storeViewBinding.storeRootView;
+
         // get offset
         rootView.getGlobalVisibleRect(rootViewRect, rootViewOffset);
+
         // get coordinates of pressed button and surrounding card view
         parentCard.getGlobalVisibleRect(parentCardRect);
         clickedButton.getGlobalVisibleRect(buttonRect);
+
         // transmit offset
         rootViewRect.offset(-rootViewOffset.x, -rootViewOffset.y);
         parentCardRect.offset(-rootViewOffset.x, -rootViewOffset.y);
         buttonRect.offset(-rootViewOffset.x, -rootViewOffset.y);
 
-        // set incoming view visibility to gone so as to not disrupt current layout on add
-        rootStoreLayout.setVisibility(View.GONE);
-
         // add store hierarchy
-        rootView.addView(rootStoreLayout);
+        rootView.addView(rootStoreLayout, 1, 1);
 
         // define animation
         animatorSet
@@ -185,12 +185,13 @@ public class OpenStoreAnimator {
                 .with(cardClearingAnimation(
                         parentRelativeLayout,
                         clickedButton.getId()))
-                .before(getStoreEntryAnimation(
+                .with(getStoreEntryAnimation(
                         rootViewRect,
                         parentCardRect,
                         buttonRect,
                         storeViewBinding,
                         inventoryViewBinding));
+
         // add new hierarchy
         animatorSet.setInterpolator(new LinearInterpolator());
         // animate
@@ -215,7 +216,6 @@ public class OpenStoreAnimator {
             }
         }
         animatorSet.playTogether(animators);
-        animatorSet.setStartDelay(HALF_DURATION);
         animatorSet.setDuration(HALF_DURATION);
         animatorSet.setInterpolator(new LinearInterpolator());
         return animatorSet;
@@ -316,8 +316,8 @@ public class OpenStoreAnimator {
                         buttonRect,
                         parentCardRect))
                 .with(storeRootEntry);
+        animatorSet.setStartDelay(HALF_DURATION);
         animatorSet.setDuration(HALF_DURATION);
-//        animatorSet.addListener(getLoggingListener(storeContentView, "store root view"));
         animatorSet.setInterpolator(new AccelerateInterpolator());
         return animatorSet;
     }
@@ -328,14 +328,12 @@ public class OpenStoreAnimator {
             final RelativeLayout rootStoreLayout) {
         return new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-            }
-
-            @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-                rootStoreLayout.setVisibility(View.VISIBLE);
+                FrameLayout inventoryRootView = inventoryViewBinding.inventoryRootView;
+                rootStoreLayout.setLayoutParams(new FrameLayout.LayoutParams(
+                        inventoryRootView.getWidth(),
+                        inventoryRootView.getHeight()));
                 currentStoreLayout = rootStoreLayout;
             }
         };

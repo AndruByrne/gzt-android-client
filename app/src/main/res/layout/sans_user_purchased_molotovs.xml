@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="du0"
-        android:background="@color/purpley_gray"
-        android:textColor="@color/trans_red"
+        android:background="@color/color_purpley_gray"
+        android:textColor="@color/color_trans_red"
         />
 </layout>

@@ -47,9 +47,9 @@ public class SettingsAdapter {
                 .getPreferenceStorage();
         Integer userPreference = preferenceStorage.getPreference(preference);
         if (userPreference == 0)
-            textView.setTextColor(textView.getResources().getColor(R.color.stop_red));
+            textView.setTextColor(textView.getResources().getColor(R.color.color_stop_red));
         else
-            textView.setTextColor(textView.getResources().getColor(R.color.bright_green));
+            textView.setTextColor(textView.getResources().getColor(R.color.color_bright_green));
 
         textView.setText(NumberFormat.getIntegerInstance().format(userPreference));
     }
@@ -63,9 +63,9 @@ public class SettingsAdapter {
                 .getPreferenceStorage();
         Integer userPreference = preferenceStorage.getPreference(preference);
         if (userPreference == 0)
-            button.setTextColor(button.getResources().getColor(R.color.trans_red));
+            button.setTextColor(button.getResources().getColor(R.color.color_trans_red));
         else
-            button.setTextColor(button.getResources().getColor(R.color.bright_green));
+            button.setTextColor(button.getResources().getColor(R.color.color_bright_green));
 
         button.setText(NumberFormat.getIntegerInstance().format(userPreference));
     }
@@ -80,13 +80,13 @@ public class SettingsAdapter {
         Integer userPreference = preferenceStorage.getPreference(preference);
         if (userPreference == 0) {
             textView.setText(R.string.healthy_status_label);
-            textView.setTextColor(textView.getResources().getColor(R.color.bright_green));
+            textView.setTextColor(textView.getResources().getColor(R.color.color_bright_green));
         } else if (userPreference == 1) {
             textView.setText(R.string.bitten_status_label);
-            textView.setTextColor(textView.getResources().getColor(R.color.trans_red));
+            textView.setTextColor(textView.getResources().getColor(R.color.color_trans_red));
         } else if (userPreference > 1) {
             textView.setText(R.string.zombie_status_label);
-            textView.setTextColor(textView.getResources().getColor(R.color.pure_black));
+            textView.setTextColor(textView.getResources().getColor(R.color.color_pure_black));
         }
     }
 }

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.anthropicandroid.gzt.services.ApplicationPreferences.Preferences" />
+
+        <import type="com.anthropicandroid.gzt.services.ApplicationPreferences.Preferences"/>
 
         <variable
             name="user_action_handlers"
-            type="com.anthropicandroid.gzt.activity.UpperActionHandlers" />
+            type="com.anthropicandroid.gzt.activity.UpperActionHandlers"/>
+
     </data>
 
     <LinearLayout
@@ -21,26 +23,27 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/purpley_gray"
+            android:background="@color/color_purpley_gray"
             >
+
             <TextView
                 android:id="@+id/status_card_label_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
-                android:background="@color/purpley_gray"
+                android:background="@color/color_purpley_gray"
                 android:text="@string/status_card_label"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@id/status_card_label_field"
                 android:gravity="center"
-                android:textColor="@color/super_light_gray"
                 android:text="fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text fun text "
+                android:textColor="@color/color_super_light_gray"
                 />
         </RelativeLayout>
 
@@ -58,30 +61,28 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/cards_margin_top"
                 android:elevation="@dimen/settings_cards_elevation"
-                card_view:cardBackgroundColor="@color/purpley_gray">
+                card_view:cardBackgroundColor="@color/color_purpley_gray">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center_vertical">
 
                     <TextView
                         android:id="@+id/health_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
-                        android:layout_marginLeft="10dp"
                         android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
                         android:text="@string/health_label"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/bright_green" />
+                        android:textColor="@color/color_bright_green"/>
 
                     <TextView
                         android:id="@+id/health_readout"
@@ -89,9 +90,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@id/health_label"
                         android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        app:settings_health_value="@{Preferences.PLAYER_HEALTH}" />
+                        app:settings_health_value="@{Preferences.PLAYER_HEALTH}"/>
 
                 </RelativeLayout>
 
@@ -102,7 +102,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/cards_margin_top"
                 android:elevation="@dimen/settings_cards_elevation"
-                card_view:cardBackgroundColor="@color/purpley_gray">
+                card_view:cardBackgroundColor="@color/color_purpley_gray">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -111,19 +112,18 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical">
+
                     <TextView
                         android:id="@+id/slain_zombies_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
-                        android:layout_marginLeft="10dp"
                         android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
                         android:text="@string/slain_zombies_label"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/bright_green" />
+                        android:textColor="@color/color_bright_green"/>
 
                     <TextView
                         android:id="@+id/slain_zombies_readout"
@@ -131,9 +131,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@id/slain_zombies_label"
                         android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        app:settings_health_value="@{Preferences.SLAIN_ZOMBIES}" />
+                        app:settings_health_value="@{Preferences.SLAIN_ZOMBIES}"/>
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
 
@@ -143,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/cards_margin_top"
                 android:elevation="@dimen/settings_cards_elevation"
-                card_view:cardBackgroundColor="@color/purpley_gray">
+                card_view:cardBackgroundColor="@color/color_purpley_gray">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -158,22 +157,20 @@
                         android:id="@+id/mute_notifications_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:text="Mute Notifications (not recommended)"
+                        android:text="@string/mute_notifications_label"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/bright_green" />
+                        android:textColor="@color/color_bright_green"/>
 
                     <CheckBox
                         android:id="@+id/mute_notifications_checkmark"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
                         android:layout_alignBaseline="@id/mute_notifications_label"
+                        android:layout_alignParentEnd="true"
                         android:onClick="@{user_action_handlers::muteNotifications}"
-                        android:textColor="@color/bright_green"
-                        app:checked_settings_value="@{Preferences.MUTE_NOTIFICATIONS}" />
+                        android:textColor="@color/color_bright_green"
+                        app:checked_settings_value="@{Preferences.MUTE_NOTIFICATIONS}"/>
 
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
