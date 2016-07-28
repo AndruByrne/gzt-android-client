@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.anthropicandroid.gzt.R;
@@ -12,6 +13,8 @@ import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 
 import javax.inject.Inject;
+
+import rx.functions.Action1;
 
 final public class GZTSettingsActivity extends AppCompatActivity {
 
@@ -40,7 +43,7 @@ final public class GZTSettingsActivity extends AppCompatActivity {
         gztSettingsActivityBinding.setBottomNavControllers(bottomNavControllers);
         bottomNavControllers.showStats(
                 gztSettingsActivityBinding.statsNavButton,
-                MotionEvent.obtain(
+                MotionEvent.obtain( //  honestly...
                         SystemClock.uptimeMillis(), //  downtime
                         SystemClock.uptimeMillis(), //  eventTime
                         MotionEvent.ACTION_DOWN, //  action
@@ -76,7 +79,26 @@ final public class GZTSettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!bottomNavControllers.backPressedConsumed())
-            super.onBackPressed();
+        bottomNavControllers
+                .backPressedConsumed()
+                .subscribe(
+                        new Action1<Boolean>() {
+                            @Override
+                            public void call(Boolean result) {
+                                Log.d(TAG, "get result of value: " + result);
+                                if (!result) backpressNotHandled();
+                            }
+                        },
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                Log.e(TAG, "error performing backpress: " + throwable.getMessage());
+                                throwable.printStackTrace();
+                            }
+                        });
+    }
+
+    private void backpressNotHandled() {
+        super.onBackPressed();
     }
 }

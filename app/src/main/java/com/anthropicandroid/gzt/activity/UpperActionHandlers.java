@@ -13,6 +13,8 @@ import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
 import com.anthropicandroid.gzt.databinding.StoreViewBinding;
 import com.anthropicandroid.gzt.services.ApplicationPreferences;
 
+import rx.Observable;
+
 /*
  * Created by Andrew Brin on 4/6/2016.
  */
@@ -49,6 +51,7 @@ final public class UpperActionHandlers {
                 0);
     }
 
+//    public boolean purchaseMolotovs(View view, MotionEvent motionEvent) {}
     public void purchaseMolotovs(View view) {
         AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
                 .getBaseContext());
@@ -65,7 +68,7 @@ final public class UpperActionHandlers {
                 view);
     }
 
-    public boolean backPressedConsumed() {
+    public Observable<Boolean> backPressedConsumed() {
         // do a complete redraw of the inventory if returning from store
         return openStoreAnimator.undoLastAnimation();
 //        ((ZombieTrackerApplication) ((Activity) view.getContext()).getApplication())

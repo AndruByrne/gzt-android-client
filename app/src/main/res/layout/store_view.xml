@@ -3,7 +3,7 @@
 
     <data>
     </data>
-
+<!--add elevation after seeing normal work-->
     <RelativeLayout
         android:id="@+id/store_root_view"
         android:layout_width="match_parent"
@@ -12,6 +12,7 @@
         >
         <RelativeLayout
             android:id="@+id/store_view_content"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/light_purpley_gray">

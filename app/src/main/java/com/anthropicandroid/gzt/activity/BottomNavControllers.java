@@ -20,6 +20,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.HashMap;
 
+import rx.Observable;
+
 /*
  * Created by Andrew Brin on 6/30/2016.
  */
@@ -37,7 +39,7 @@ public class BottomNavControllers {
         this.overlayAnimator = overlayAnimator;
     }
 
-    public boolean backPressedConsumed() {
+    public Observable<Boolean> backPressedConsumed() {
         return upperActionHandlers.backPressedConsumed();
     }
 

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.databinding.DataBindingUtil;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -21,6 +22,14 @@ import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
 import com.anthropicandroid.gzt.databinding.StoreViewBinding;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
 /*
  * Created by Andrew Brin on 7/7/2016.
@@ -28,14 +37,118 @@ import java.util.ArrayList;
 public class OpenStoreAnimator {
 
     public static final String TAG = OpenStoreAnimator.class.getSimpleName();
-    public static final int DURATION = 1500;
+    public static final int DURATION = 666;
+    public static final int HALF_DURATION = DURATION / 2;
+    private Queue<ObjectAnimator> reversableListOutAnims = new LinkedList<>();
+    private Queue<ObjectAnimator> reversableStoreInAnims = new LinkedList<>();
+    private ViewGroup currentStoreLayout;
 
-    public boolean undoLastAnimation() {
-        return false;
+    public Observable<Boolean> undoLastAnimation() {
+        if (currentStoreLayout == null
+                || reversableStoreInAnims.size() == 0
+                || reversableListOutAnims.size() == 0)
+            return Observable.just(false);
+        // Get binding for removing view after animations
+        final InventoryViewBinding binding = DataBindingUtil
+                .findBinding((ViewGroup) currentStoreLayout.getParent());
+        // Will emit queue of store animations after 2 subscriptions
+        Observable<ObjectAnimator> animatorObs = Observable
+                .from(reversableStoreInAnims)
+                .publish()
+                .autoConnect(2);
+        // Will reverse each animator
+        Observable<Boolean> reversals = animatorObs
+                .map(new Func1<ObjectAnimator, Boolean>() {
+                    @Override
+                    public Boolean call(ObjectAnimator objectAnimator) {
+                        objectAnimator.reverse();
+                        return true;
+                    }
+                });
+        // Will subscribe to the last animator, return true & remove store view on listener callback
+        Observable<Boolean> lastListeningObs = animatorObs
+                .last()
+                .flatMap(new Func1<ObjectAnimator, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(final ObjectAnimator objectAnimator) {
+                        return Observable
+                                .create(new Observable.OnSubscribe<Boolean>() {
+                                    @Override
+                                    public void call(final Subscriber<? super Boolean> subscriber) {
+                                        objectAnimator.addListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                super.onAnimationEnd(animation);
+                                                subscriber.onNext(true);
+                                            }
+                                        });
+                                        if (!objectAnimator.isRunning()) {
+                                            subscriber.onNext(true);
+                                        }
+                                    }
+                                })
+                                .take(1);
+                    }
+                })
+                .map(new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean aBoolean) {
+                        binding.inventoryRootView.removeView(currentStoreLayout);
+                        currentStoreLayout = null;
+                        return true;
+                    }
+                });
+        // Will pass subscribing action to both obs above, on both returning, returns true
+        // and removes remaining animations, then clears queues.
+        return Observable.combineLatest(
+                lastListeningObs,
+                reversals,
+                new Func2<Boolean, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean listenerReturn, Boolean aBoolean2) {
+                        return listenerReturn;
+                    }
+                })
+                .filter(new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean success) {
+                        return success;
+                    }
+                })
+                .first()
+                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Boolean result) {
+                        // Simpler process with rest of animations
+                        return reverseLaterAnimations();
+                    }
+                })
+                .doOnNext(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        // Clear queue
+                        reversableStoreInAnims.clear();
+                        reversableListOutAnims.clear();
+                    }
+                });
+    }
+
+    private Observable<Boolean> reverseLaterAnimations() {
+        // Reverse the inventory animations then return true
+        return Observable
+                .from(reversableListOutAnims)
+                .map(new Func1<ObjectAnimator, Boolean>() {
+                    @Override
+                    public Boolean call(ObjectAnimator objectAnimator) {
+                        objectAnimator.reverse();
+                        return true;
+                    }
+                })
+                .last();
     }
 
     public void animateInventoryToStoreFromCard(
-            InventoryViewBinding inventoryViewBinding,
+            final InventoryViewBinding inventoryViewBinding,
             StoreViewBinding storeViewBinding,
             CardView parentCard,
             RelativeLayout parentRelativeLayout,
@@ -45,20 +158,25 @@ public class OpenStoreAnimator {
         Rect buttonRect = new Rect();
         Rect rootViewRect = new Rect();
         Point rootViewOffset = new Point();
-        ((View) inventoryViewBinding.inventoryListView.getParent())
-                .getGlobalVisibleRect(rootViewRect, rootViewOffset);
+        LinearLayout rootView = inventoryViewBinding.inventoryRootView;
+        final RelativeLayout rootStoreLayout = storeViewBinding.storeRootView;
+        // get offset
+        rootView.getGlobalVisibleRect(rootViewRect, rootViewOffset);
         // get coordinates of pressed button and surrounding card view
         parentCard.getGlobalVisibleRect(parentCardRect);
         clickedButton.getGlobalVisibleRect(buttonRect);
+        // transmit offset
         rootViewRect.offset(-rootViewOffset.x, -rootViewOffset.y);
         parentCardRect.offset(-rootViewOffset.x, -rootViewOffset.y);
         buttonRect.offset(-rootViewOffset.x, -rootViewOffset.y);
 
         // set incoming view visibility to gone so as to not disrupt current layout on add
-        storeViewBinding.storeRootView.setVisibility(View.GONE);
-        // add view
-        parentRelativeLayout.addView(storeViewBinding.storeRootView);
-        // craft animation
+        rootStoreLayout.setVisibility(View.GONE);
+
+        // add store hierarchy
+        rootView.addView(rootStoreLayout);
+
+        // define animation
         animatorSet
                 .play(inventoryLeavingAnimation(
                         inventoryViewBinding,
@@ -67,18 +185,14 @@ public class OpenStoreAnimator {
                 .with(cardClearingAnimation(
                         parentRelativeLayout,
                         clickedButton.getId()))
-                .before(storeEntryAnimation(
-                        parentCard,
-                        parentCardRect,
+                .before(getStoreEntryAnimation(
                         rootViewRect,
-                        parentRelativeLayout,
-                        clickedButton,
+                        parentCardRect,
                         buttonRect,
-                        storeViewBinding));
+                        storeViewBinding,
+                        inventoryViewBinding));
         // add new hierarchy
         animatorSet.setInterpolator(new LinearInterpolator());
-        // set view params
-//        alignEnteringViewToTarget(storeViewBinding, buttonRect, rootViewRect);
         // animate
         animatorSet.start();
         // remove old views (will ensure a refresh by drawing new view in backPress handling)
@@ -87,6 +201,7 @@ public class OpenStoreAnimator {
     private AnimatorSet cardClearingAnimation(
             RelativeLayout parentRelativeLayout,
             int clickedButtonId) {
+        // Remove items in the card whose button was clicked
         AnimatorSet animatorSet = new AnimatorSet();
         ArrayList<Animator> animators = new ArrayList<>();
         int childCount = parentRelativeLayout.getChildCount();
@@ -94,23 +209,23 @@ public class OpenStoreAnimator {
         for (; i < childCount; i++) {
             View childAt = parentRelativeLayout.getChildAt(i);
             if (childAt.getId() != clickedButtonId) {
-                animators.add(ObjectAnimator.ofFloat(childAt, View.ALPHA, 1f, 0f));
-                addViewToBeDeleted(childAt);
+                ObjectAnimator animator = ObjectAnimator.ofFloat(childAt, View.ALPHA, 1f, 0f);
+                animators.add(animator);
+                reversableListOutAnims.add(animator);
             }
         }
         animatorSet.playTogether(animators);
+        animatorSet.setStartDelay(HALF_DURATION);
+        animatorSet.setDuration(HALF_DURATION);
         animatorSet.setInterpolator(new LinearInterpolator());
         return animatorSet;
-    }
-
-    private void addViewToBeDeleted(View view) {
-
     }
 
     private AnimatorSet inventoryLeavingAnimation(
             final InventoryViewBinding inventoryViewBinding,
             int parentCardId,
             Rect parentCardRect) {
+        // Part cards on top and bottom of card with clicked button
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet
                 .play(headerLeaving(inventoryViewBinding.inventoryCardHeader))
@@ -118,8 +233,7 @@ public class OpenStoreAnimator {
                         inventoryViewBinding.inventoryListView,
                         parentCardId,
                         parentCardRect));
-        final LinearLayout inventoryRootView = inventoryViewBinding.inventoryRootView;
-        animatorSet.addListener(getExitingViewRemover(inventoryRootView, inventoryViewBinding));
+        animatorSet.setDuration(DURATION);
         return animatorSet;
     }
 
@@ -136,103 +250,155 @@ public class OpenStoreAnimator {
                 Rect itemRect = new Rect();
                 inventoryItem.getGlobalVisibleRect(itemRect);
                 if (itemRect.bottom <= parentRect.bottom) {
-                    animators.add(upwardsItemLeaving(inventoryItem));
-                    addViewToBeDeleted(inventoryItem);
+                    ObjectAnimator animator = upwardsItemLeaving(inventoryItem);
+                    animators.add(animator);
+                    reversableListOutAnims.add(animator);
                 } else {
-                    animators.add(downwardsItemLeaving(inventoryItem, listRect.bottom));
-                    addViewToBeDeleted(inventoryItem);
+                    ObjectAnimator animator = downwardsItemLeaving(inventoryItem, listRect.bottom);
+                    animators.add(animator);
+                    reversableListOutAnims.add(animator);
                 }
             }
         }
 
         animatorSet.playSequentially(animators);
-        animatorSet.setInterpolator(new DecelerateInterpolator(7f));
+        animatorSet.setInterpolator(new DecelerateInterpolator(2f));
         return animatorSet;
     }
 
-    private AnimatorSet downwardsItemLeaving(View item, int parentBottom) {
-        AnimatorSet animatorSet = new AnimatorSet();
+    private ObjectAnimator downwardsItemLeaving(View item, int parentBottom) {
         // should be using the item Rect for the Y of the item?
-        animatorSet
-                .play(ObjectAnimator.ofFloat(
-                        item,
-                        View.TRANSLATION_Y,
-                        item.getY(),
-                        parentBottom + item
-                                .getHeight()));
-        return animatorSet;
+        return ObjectAnimator.ofFloat(
+                item,
+                View.TRANSLATION_Y,
+                0,
+                parentBottom - item.getTop());
     }
 
-    private AnimatorSet upwardsItemLeaving(View item) {
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet
-                .play(ObjectAnimator.ofFloat(item, View.TRANSLATION_Y, item.getY(), 0));
-        return animatorSet;
+    private ObjectAnimator upwardsItemLeaving(View item) {
+        return ObjectAnimator.ofFloat(item, View.TRANSLATION_Y, item.getY(), 0);
     }
 
     private AnimatorSet headerLeaving(RelativeLayout header) {
         AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet
-                .play(ObjectAnimator.ofFloat(
-                        header,
-                        View.TRANSLATION_Y,
-                        header.getY(),
-                        0 - header.getHeight()));
-//                .with(ObjectAnimator.ofFloat(header, View.ALPHA, 1f, 0f));;
+        ObjectAnimator animator = ObjectAnimator.ofFloat(
+                header,
+                View.TRANSLATION_Y,
+                0,
+                0 - header.getHeight());
+        animatorSet.play(animator);
+        reversableListOutAnims.add(animator);
         animatorSet.setInterpolator(new AccelerateInterpolator());
-        addViewToBeDeleted(header);
         return animatorSet;
     }
 
-    private AnimatorSet storeEntryAnimation(
-            final CardView parentCard,
-            Rect parentCardRect,
+    private AnimatorSet getStoreEntryAnimation(
             final Rect rootViewRect,
-            final RelativeLayout parentRelativeLayout,
-            final View clickedButton,
+            Rect parentCardRect,
             final Rect buttonRect,
-            final StoreViewBinding storeViewBinding) {
+            final StoreViewBinding storeViewBinding,
+            final InventoryViewBinding inventoryViewBinding) {
+        final RelativeLayout storeContentView = storeViewBinding.storeViewContent;
+        final RelativeLayout rootStoreLayout = storeViewBinding.storeRootView;
         AnimatorSet animatorSet = new AnimatorSet();
-        final RelativeLayout storeRootView = storeViewBinding.storeRootView;
-        float leftBar = storeRootView.getTranslationX();
-        final float heightScalingInv = ((float) buttonRect.height()) / rootViewRect.height();
-        final float widthScalingInv = ((float) buttonRect.width()) / rootViewRect.width();
 
-        // craft animation
+        // define animation
+        AnimatorSet storeRootEntry = getStoreRootEntry(
+                rootStoreLayout,
+                parentCardRect,
+                rootViewRect);
+        storeRootEntry.addListener(getLayoutLogisticsListener(
+                inventoryViewBinding,
+                rootStoreLayout));
         animatorSet
-                .play(ObjectAnimator.ofFloat(
-                        storeRootView,
-                        View.TRANSLATION_Y,
-                        buttonRect.top-(rootViewRect.height()*(1-widthScalingInv))/2,
-                        0))
-                .with(ObjectAnimator.ofFloat(
-                        storeRootView,
-                        View.TRANSLATION_X,
-                        buttonRect.left - rootViewRect.width()*(1-widthScalingInv) / 2,
-                        0))
-                .with(ObjectAnimator.ofFloat(
-                        storeRootView,
-                        View.SCALE_X,
-                        widthScalingInv,
-                        1))
-                .with(ObjectAnimator.ofFloat(
-                        storeRootView,
-                        View.SCALE_Y,
-                        heightScalingInv,
-                        1));
-        animatorSet.setDuration(DURATION);
-        animatorSet.addListener(new AnimatorListenerAdapter() {
+                .play(getStoreContentEntry(storeContentView, buttonRect, rootViewRect))
+                .with(storeRootEntry);
+        animatorSet.setDuration(HALF_DURATION);
+//        animatorSet.addListener(getLoggingListener(storeContentView, "store root view"));
+        animatorSet.setInterpolator(new AccelerateInterpolator());
+        return animatorSet;
+    }
+
+    @NonNull
+    private AnimatorListenerAdapter getLayoutLogisticsListener(
+            final InventoryViewBinding inventoryViewBinding,
+            final RelativeLayout rootStoreLayout) {
+        return new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+            }
+
             @Override
             public void onAnimationStart(Animator animation) {
-                storeRootView.setVisibility(View.VISIBLE);
-                parentRelativeLayout.removeView(clickedButton);
                 super.onAnimationStart(animation);
+                rootStoreLayout.setVisibility(View.VISIBLE);
+                currentStoreLayout = rootStoreLayout;
             }
-        });
-        animatorSet.addListener(getLoggingListener(parentCard, "parent card"));
-        animatorSet.addListener(getLoggingListener(
-                storeRootView, "store root view"));
-        animatorSet.setInterpolator(new AccelerateInterpolator());
+        };
+    }
+
+    private AnimatorSet getStoreRootEntry(
+            RelativeLayout rootStoreLayout,
+            Rect parentCardRect,
+            Rect rootViewRect) {
+        final float heightScalingInv = ((float) parentCardRect.height()) / rootViewRect.height();
+        final float widthScalingInv = ((float) parentCardRect.width()) / rootViewRect.width();
+        AnimatorSet animatorSet = new AnimatorSet();
+        ObjectAnimator yTrans = ObjectAnimator.ofFloat(
+                rootStoreLayout,
+                View.TRANSLATION_Y,
+                parentCardRect.top - (rootViewRect.height() * (1 - heightScalingInv)) / 2,
+                0);
+        reversableStoreInAnims.add(yTrans);
+        ObjectAnimator xTrans = ObjectAnimator.ofFloat(
+                rootStoreLayout,
+                View.TRANSLATION_X,
+                parentCardRect.left - (rootViewRect.width() * (1 - widthScalingInv)) / 2,
+                0);
+        reversableStoreInAnims.add(xTrans);
+        ObjectAnimator yScale = ObjectAnimator.ofFloat(
+                rootStoreLayout,
+                View.SCALE_Y,
+                heightScalingInv,
+                1);
+        reversableStoreInAnims.add(yScale);
+        ObjectAnimator xScale = ObjectAnimator.ofFloat(
+                rootStoreLayout,
+                View.SCALE_X,
+                widthScalingInv,
+                1);
+        reversableStoreInAnims.add(xScale);
+        animatorSet
+                .play(yTrans)
+                .with(xTrans)
+                .with(yScale)
+                .with(xScale);
+        return animatorSet;
+    }
+
+    private AnimatorSet getStoreContentEntry(
+            RelativeLayout contentView,
+            Rect buttonRect,
+            Rect rootViewRect) {
+        final float widthScalingInv = ((float) buttonRect.width()) / rootViewRect.width();
+        AnimatorSet animatorSet = new AnimatorSet();
+        // y values handled by expanding root view + layout_margin
+        ObjectAnimator xTrans = ObjectAnimator.ofFloat(
+                contentView,
+                View.TRANSLATION_X,
+                buttonRect.left - (rootViewRect.width() * (1 - widthScalingInv)) / 2,
+                0);
+        reversableStoreInAnims.add(xTrans);
+        ObjectAnimator xScale = ObjectAnimator.ofFloat(
+                contentView,
+                View.SCALE_X,
+                widthScalingInv,
+                1);
+        reversableStoreInAnims.add(xScale);
+        animatorSet
+                .play(xTrans)
+                .with(xScale);
         return animatorSet;
     }
 
@@ -267,36 +433,6 @@ public class OpenStoreAnimator {
                                 + " scalingY: " + view.getScaleY()
                                 + " ytrans: " + view.getTranslationY()
                                 + " y: " + view.getY());
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        };
-    }
-
-    @NonNull
-    private Animator.AnimatorListener getExitingViewRemover(
-            final LinearLayout inventoryRootView, final InventoryViewBinding inventoryViewBinding) {
-        return new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-//                ((ViewGroup) inventoryViewBinding.molotovsCard.getChildAt(0)).removeView
-//                        (inventoryViewBinding.purchasedMolotovsButton);
-//
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                inventoryRootView.removeView(inventoryViewBinding.inventoryCardHeader);
-                inventoryViewBinding.inventoryListView.removeView(inventoryViewBinding
-                        .garlicClovesCard);
             }
 
             @Override
