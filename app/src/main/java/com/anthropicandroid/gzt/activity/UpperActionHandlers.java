@@ -31,7 +31,7 @@ final public class UpperActionHandlers {
     public void muteNotifications(View view) {
         CheckBox checkBox = (CheckBox) view;
         ApplicationPreferences preferenceStorage = ((ZombieTrackerApplication) ((AppCompatActivity)
-                checkBox.getContext()).getApplication())
+                ((ContextWrapper) checkBox.getContext()).getBaseContext()).getApplication())
                 .getApplicationComponent().getPreferenceStorage();
         checkBox.setChecked(
                 checkBox.isChecked() ?
