@@ -181,7 +181,8 @@ public class OpenStoreAnimator {
                 .play(inventoryLeavingAnimation(
                         inventoryViewBinding,
                         parentCard.getId(),
-                        parentCardRect))
+                        parentCardRect,
+                        rootViewOffset))
                 .with(cardClearingAnimation(
                         parentRelativeLayout,
                         clickedButton.getId()))
@@ -224,7 +225,8 @@ public class OpenStoreAnimator {
     private AnimatorSet inventoryLeavingAnimation(
             final InventoryViewBinding inventoryViewBinding,
             int parentCardId,
-            Rect parentCardRect) {
+            Rect parentCardRect,
+            Point rootViewOffset) {
         // Part cards on top and bottom of card with clicked button
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet
@@ -232,16 +234,22 @@ public class OpenStoreAnimator {
                 .with(listParting(
                         inventoryViewBinding.inventoryListView,
                         parentCardId,
-                        parentCardRect));
+                        parentCardRect,
+                        rootViewOffset));
         animatorSet.setDuration(DURATION);
         return animatorSet;
     }
 
-    private AnimatorSet listParting(ViewGroup listView, int parentCardId, Rect parentRect) {
+    private AnimatorSet listParting(
+            ViewGroup listView,
+            int parentCardId,
+            Rect parentRect,
+            Point rootViewOffset) {
         AnimatorSet animatorSet = new AnimatorSet();
         ArrayList<Animator> animators = new ArrayList<>();
         Rect listRect = new Rect();
         listView.getGlobalVisibleRect(listRect);
+        listRect.offset(-rootViewOffset.x, -rootViewOffset.y);
         int inventoryItems = listView.getChildCount();
         int i = 0;
         for (; i < inventoryItems; i++) {
@@ -249,6 +257,7 @@ public class OpenStoreAnimator {
             if (inventoryItem.getId() != parentCardId) {
                 Rect itemRect = new Rect();
                 inventoryItem.getGlobalVisibleRect(itemRect);
+                itemRect.offset(-rootViewOffset.x, -rootViewOffset.y);
                 if (itemRect.bottom <= parentRect.bottom) {
                     ObjectAnimator animator = upwardsItemLeaving(inventoryItem);
                     animators.add(animator);

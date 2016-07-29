@@ -32,6 +32,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/stats_button_title"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:drawableTop="@drawable/ic_favorite"
                 android:onTouch="@{bottom_nav_controllers::showStats}"
                 style="?android:attr/borderlessButtonStyle"/>
@@ -41,6 +42,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/inventory_button_title"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:drawableTop="@drawable/ic_local_pharmacy"
                 android:onTouch="@{bottom_nav_controllers::showInventory}"
                 style="?android:attr/borderlessButtonStyle"/>
@@ -50,6 +52,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/map_button_title"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:drawableTop="@drawable/ic_explore"
                 android:onTouch="@{bottom_nav_controllers::showMap}"
                 style="?android:attr/borderlessButtonStyle"/>
@@ -58,6 +61,7 @@
             android:id="@+id/gzt_settings_content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/color_purpley_gray"
             android:layout_above="@id/bottom_nav_bar">
         </FrameLayout>
     </RelativeLayout>

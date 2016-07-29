@@ -8,19 +8,20 @@
         android:id="@+id/store_root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_purpley_gray"
+        android:background="@color/color_pure_black"
         >
         <RelativeLayout
             android:id="@+id/store_view_content"
             android:layout_margin="20dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/color_light_purpley_gray">
+            android:background="@color/color_light_purpley_gray"
+            >
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:text="top text"/>
+                android:text="Store"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <attr format="reference" name="zombieCardStyle"/>
     <style name="GZTTheme"
-        parent="Theme.AppCompat">
+           parent="Theme.AppCompat">
         <item name="colorPrimary">@color/color_pure_black</item>
         <item name="colorAccent">@color/color_dark_green</item>
         <item name="android:textColor">@color/color_bright_green</item>
-        <item name="cardBackgroundColor">@color/color_purpley_gray</item>
+        <item name="android:actionBarStyle">@style/AppBar.Dark.Custom</item>
+        <item name="android:windowBackground">@color/color_purpley_gray</item>
+        <item name="zombieCardStyle">@style/CardView.Dark.Custom</item>
+    </style>
+
+    <style name="CardView.Dark.Custom" parent="CardView.Dark">
+        <item name="cardBackgroundColor">@color/color_pure_black</item>
+    </style>
+    <style name="AppBar.Dark.Custom" parent="Base.ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="background">@color/color_purpley_gray</item>
     </style>
 </resources>

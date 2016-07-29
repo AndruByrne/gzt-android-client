@@ -53,6 +53,8 @@ final public class UpperActionHandlers {
 
 //    public boolean purchaseMolotovs(View view, MotionEvent motionEvent) {}
     public void purchaseMolotovs(View view) {
+        // Put in something to decipher with item to bring into focus
+        // Get context
         AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
                 .getBaseContext());
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
