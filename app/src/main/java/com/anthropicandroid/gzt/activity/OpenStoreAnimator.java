@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -18,6 +19,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
 import com.anthropicandroid.gzt.databinding.StoreViewBinding;
 
@@ -37,11 +39,16 @@ import rx.functions.Func2;
 public class OpenStoreAnimator {
 
     public static final String TAG = OpenStoreAnimator.class.getSimpleName();
-    public static final int DURATION = 666;
-    public static final int HALF_DURATION = DURATION / 2;
+    public final int DURATION;
+    public final int HALF_DURATION;
     private Queue<ObjectAnimator> reversableListOutAnims = new LinkedList<>();
     private Queue<ObjectAnimator> reversableStoreInAnims = new LinkedList<>();
     private ViewGroup currentStoreLayout;
+
+    public OpenStoreAnimator(Resources resources) {
+        DURATION = resources.getInteger(R.integer.duration_open_store);
+        HALF_DURATION = DURATION / 2;
+    }
 
     public Observable<Boolean> undoLastAnimation() {
         if (currentStoreLayout == null
@@ -158,6 +165,7 @@ public class OpenStoreAnimator {
         Rect buttonRect = new Rect();
         Rect rootViewRect = new Rect();
         Point rootViewOffset = new Point();
+
         FrameLayout rootView = inventoryViewBinding.inventoryRootView;
         final RelativeLayout rootStoreLayout = storeViewBinding.storeRootView;
 
@@ -194,10 +202,8 @@ public class OpenStoreAnimator {
                         inventoryViewBinding));
 
         // add new hierarchy
-        animatorSet.setInterpolator(new LinearInterpolator());
         // animate
         animatorSet.start();
-        // remove old views (will ensure a refresh by drawing new view in backPress handling)
     }
 
     private AnimatorSet cardClearingAnimation(
@@ -236,7 +242,6 @@ public class OpenStoreAnimator {
                         parentCardId,
                         parentCardRect,
                         rootViewOffset));
-        animatorSet.setDuration(DURATION);
         return animatorSet;
     }
 
@@ -259,7 +264,10 @@ public class OpenStoreAnimator {
                 inventoryItem.getGlobalVisibleRect(itemRect);
                 itemRect.offset(-rootViewOffset.x, -rootViewOffset.y);
                 if (itemRect.bottom <= parentRect.bottom) {
-                    ObjectAnimator animator = upwardsItemLeaving(inventoryItem);
+                    ObjectAnimator animator = upwardsItemLeaving(
+                            inventoryItem,
+                            i,
+                            parentRect.width());
                     animators.add(animator);
                     reversableListOutAnims.add(animator);
                 } else {
@@ -270,22 +278,30 @@ public class OpenStoreAnimator {
             }
         }
 
-        animatorSet.playSequentially(animators);
-        animatorSet.setInterpolator(new DecelerateInterpolator(2f));
+        animatorSet.playTogether(animators);
         return animatorSet;
     }
 
-    private ObjectAnimator downwardsItemLeaving(View item, int parentBottom) {
+    private ObjectAnimator downwardsItemLeaving(View item, int listBottom) {
         // should be using the item Rect for the Y of the item?
-        return ObjectAnimator.ofFloat(
+        ObjectAnimator animator = ObjectAnimator.ofFloat(
                 item,
                 View.TRANSLATION_Y,
                 0,
-                parentBottom - item.getTop());
+                listBottom - item.getTop()); // distance from top to bottom of parent
+        animator.setDuration(DURATION);
+        animator.setInterpolator(new AccelerateInterpolator());
+        return animator;
     }
 
-    private ObjectAnimator upwardsItemLeaving(View item) {
-        return ObjectAnimator.ofFloat(item, View.TRANSLATION_Y, item.getY(), 0);
+    private ObjectAnimator upwardsItemLeaving(View item, int i, int width) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(
+                item,
+                View.TRANSLATION_X,
+                i % 2 == 0 ? width : -width);
+        animator.setDuration(HALF_DURATION/(i+1));
+        animator.setInterpolator(new LinearInterpolator());
+        return animator;
     }
 
     private AnimatorSet headerLeaving(RelativeLayout header) {
@@ -295,9 +311,11 @@ public class OpenStoreAnimator {
                 View.TRANSLATION_Y,
                 0,
                 0 - header.getHeight());
-        animatorSet.play(animator);
+        animator.setStartDelay(HALF_DURATION);
+        animator.setDuration(HALF_DURATION-DURATION/128);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animatorSet.play(animator); // leaving as a set b/c may want other anims here
         reversableListOutAnims.add(animator);
-        animatorSet.setInterpolator(new AccelerateInterpolator());
         return animatorSet;
     }
 
@@ -327,7 +345,7 @@ public class OpenStoreAnimator {
                 .with(storeRootEntry);
         animatorSet.setStartDelay(HALF_DURATION);
         animatorSet.setDuration(HALF_DURATION);
-        animatorSet.setInterpolator(new AccelerateInterpolator());
+        animatorSet.setInterpolator(new DecelerateInterpolator());
         return animatorSet;
     }
 

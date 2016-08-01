@@ -7,6 +7,7 @@ package com.anthropicandroid.gzt.activity;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -15,9 +16,16 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
+import com.anthropicandroid.gzt.R;
+
 public class OverlayAnimator {
 
     public static final String TAG = OverlayAnimator.class.getSimpleName();
+    private final int DURATION;
+
+    public OverlayAnimator(Resources resources) {
+        DURATION = resources.getInteger(R.integer.duration_overlay_view);
+    }
 
     public void replaceFrameContentsAt(
             final FrameLayout contentFrame,
@@ -33,8 +41,6 @@ public class OverlayAnimator {
             View activeView,
             float xOrigin) {
         try {
-            Rect readerRect = new Rect();
-            activeView.getGlobalVisibleRect(readerRect);
             AnimatorSet animatorSet = getAnimatorSet(contentFrame, activeView, xOrigin);
             animatorSet.start();
             return true;
@@ -78,36 +84,8 @@ public class OverlayAnimator {
                     .with(getLeavingAlphaAnim(visibleView));
         }
         animatorSet.setInterpolator(new DecelerateInterpolator());
+        animatorSet.setDuration(DURATION);
         return animatorSet;
-    }
-
-    @NonNull
-    private Animator.AnimatorListener getLoggingListener(final View activeView) {
-        return new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                Rect readerRect = new Rect();
-                activeView.getGlobalVisibleRect(readerRect);
-                Log.d(TAG, "active view X top: " + readerRect.top + " bottom: " + readerRect
-                        .bottom + " right: " + readerRect.right + " left: " + readerRect.left);
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        };
     }
 
     @NonNull

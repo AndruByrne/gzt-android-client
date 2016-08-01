@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/color_light_purpley_gray">
+            android:background="@color/color_darker_purple">
             <Button
                 android:id="@+id/stats_nav_button"
                 android:layout_width="0dp"
@@ -34,6 +34,7 @@
                 android:text="@string/stats_button_title"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:drawableTop="@drawable/ic_favorite"
+                android:drawableTint="@color/color_pure_white"
                 android:onTouch="@{bottom_nav_controllers::showStats}"
                 style="?android:attr/borderlessButtonStyle"/>
             <Button
@@ -44,6 +45,7 @@
                 android:text="@string/inventory_button_title"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:drawableTop="@drawable/ic_local_pharmacy"
+                android:drawableTint="@color/color_pure_white"
                 android:onTouch="@{bottom_nav_controllers::showInventory}"
                 style="?android:attr/borderlessButtonStyle"/>
             <Button
@@ -54,6 +56,7 @@
                 android:text="@string/map_button_title"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:drawableTop="@drawable/ic_explore"
+                android:drawableTint="@color/color_pure_white"
                 android:onTouch="@{bottom_nav_controllers::showMap}"
                 style="?android:attr/borderlessButtonStyle"/>
         </LinearLayout>

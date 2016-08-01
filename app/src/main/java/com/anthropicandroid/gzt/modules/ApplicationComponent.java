@@ -17,6 +17,7 @@ import dagger.Component;
 
 @Singleton //  Singleton is the annotation for the Application scope
 @Component(modules = {
+        AnimationModule.class,
         AppModule.class,
         PreferenceStorageModule.class,
         SubscriptionAccountantModule.class,

@@ -8,7 +8,6 @@ import com.anthropicandroid.gzt.activity.BottomNavControllers;
 import com.anthropicandroid.gzt.activity.OpenStoreAnimator;
 import com.anthropicandroid.gzt.activity.OverlayAnimator;
 import com.anthropicandroid.gzt.activity.UpperActionHandlers;
-import com.anthropicandroid.gzt.activity.ZoomAnimator;
 
 import javax.inject.Singleton;
 
@@ -23,22 +22,6 @@ public class ActionHandlersModule {
     UpperActionHandlers getUpperActionHandlers(OpenStoreAnimator openStoreAnimator) {
         return new UpperActionHandlers(openStoreAnimator);
     }
-
-    @Provides
-    @Singleton
-    ZoomAnimator getGZTAnimatorSetRepository() {
-        return new ZoomAnimator();
-    }
-
-    @Provides
-    @Singleton
-    OverlayAnimator getGZTOverlayAnimator() {
-        return new OverlayAnimator();
-    }
-
-    @Provides
-    @Singleton
-    OpenStoreAnimator getOpenStoreAnimator() { return new OpenStoreAnimator(); }
 
     @Provides
     @Singleton
