@@ -6,6 +6,7 @@ package com.anthropicandroid.extranetbrowser.model;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,6 +40,7 @@ public class ExtranetOccasionProvider {
         this.waspHolder = waspHolder;
         this.extranetAPI = extranetAPI;
         this.locationProvider = locationProvider;
+        Log.i(this.getClass().getSimpleName(),"EOP created");
     }
 
     public Observable<Occasion> getContinuousOccasionsSubset(final List<String> keysToShow) {

@@ -8,7 +8,7 @@
         <import type="com.anthropicandroid.gzt.services.ApplicationPreferences.Preferences"/>
 
         <variable
-            name="user_action_handlers"
+            name="userActionHandlers"
             type="com.anthropicandroid.gzt.activity.UpperActionHandlers"/>
 
     </data>
@@ -164,7 +164,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@id/mute_notifications_label"
                         android:layout_alignParentEnd="true"
-                        android:onClick="@{user_action_handlers::muteNotifications}"
+                        android:onClick="@{userActionHandlers::muteNotifications}"
                         android:textColor="@color/color_bright_green"
                         app:checked_settings_value="@{Preferences.MUTE_NOTIFICATIONS}"/>
 

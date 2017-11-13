@@ -30,8 +30,8 @@ final public class UpperActionHandlers {
 
     public void muteNotifications(View view) {
         CheckBox checkBox = (CheckBox) view;
-        ApplicationPreferences preferenceStorage = ((ZombieTrackerApplication) ((AppCompatActivity)
-                ((ContextWrapper) checkBox.getContext()).getBaseContext()).getApplication())
+        ApplicationPreferences preferenceStorage = ((ZombieTrackerApplication) (
+                (AppCompatActivity) checkBox.getContext()).getApplication())
                 .getApplicationComponent().getPreferenceStorage();
         checkBox.setChecked(
                 checkBox.isChecked() ?
@@ -55,8 +55,7 @@ final public class UpperActionHandlers {
     public void purchaseMolotovs(View view) {
         // Put in something to decipher with item to bring into focus
         // Get context
-        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
-                .getBaseContext());
+        AppCompatActivity activity = (AppCompatActivity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
 

@@ -1,6 +1,7 @@
 package com.anthropicandroid.extranetbrowser.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import net.rehacktive.waspdb.WaspDb;
 import net.rehacktive.waspdb.WaspFactory;
@@ -30,12 +31,14 @@ public class WaspHolder {
     private final ConnectableObservable<Boolean> waspDBInitObservable;
 
     public WaspHolder(final Context context) {
+        Log.i(this.getClass().getSimpleName(),"creating waspholder");
         waspDBInitObservable = Observable
                 .create(new Observable.OnSubscribe<Boolean>() {
                     @Override
                     public void call(final Subscriber<? super Boolean> subscriber) {
                         String path = context.getFilesDir().getPath(); //  TODO(Andrew Brin):
                         // extend path for specific directory
+                        Log.i(this.getClass().getSimpleName(),"opening db");
                         WaspFactory.openOrCreateDatabase(
                                 path,
                                 ExtranetOccasionProvider.EXTRANET_DATABASE,
@@ -52,7 +55,9 @@ public class WaspHolder {
                 .take(1) //  do once
                 .subscribeOn(Schedulers.computation()) //  allow for as many threads as processors
                 .replay(Schedulers.io());
+        Log.i(this.getClass().getSimpleName(),"obs defined");
         waspDBInitObservable.connect(); //  start DB init
+        Log.i(this.getClass().getSimpleName(),"obs connected");
     }
 
     private void initHolder(WaspDb waspDb) {

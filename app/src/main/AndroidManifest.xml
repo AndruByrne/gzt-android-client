@@ -7,7 +7,7 @@
 
     <application
         android:title="GZT"
-        android:name="com.anthropicandroid.gzt.ZombieTrackerApplication"
+        android:name=".ZombieTrackerApplication"
         android:theme="@style/GZTTheme">
         <activity
             android:name=".activity.GZTSettingsActivity"
@@ -23,6 +23,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDiPAq5KSsoqk9dNZfN-SjGZW7V5YqH1ik"/>
+
 
     </application>
 

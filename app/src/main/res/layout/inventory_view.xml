@@ -7,7 +7,7 @@
         <import type="com.anthropicandroid.gzt.services.ApplicationPreferences.Preferences"/>
 
         <variable
-            name="user_action_handlers"
+            name="userActionHandlers"
             type="com.anthropicandroid.gzt.activity.UpperActionHandlers"/>
 
     </data>
@@ -114,7 +114,7 @@
                             android:layout_margin="5dp"
                             android:layout_toStartOf="@id/molotov_readout_plus_sign"
                             android:background="@color/color_light_purpley_gray"
-                            android:onClick="@{user_action_handlers::purchaseMolotovs}"
+                            android:onClick="@{userActionHandlers::purchaseMolotovs}"
                             android:padding="5dp"
                             android:paddingEnd="10dp"
                             android:paddingStart="10dp"
@@ -180,7 +180,7 @@
                             android:layout_margin="5dp"
                             android:layout_toStartOf="@id/garlic_readout_plus_sign"
                             android:background="@color/color_light_purpley_gray"
-                            android:onClick="@{user_action_handlers::purchaseMolotovs}"
+                            android:onClick="@{userActionHandlers::purchaseMolotovs}"
                             android:padding="5dp"
                             android:paddingEnd="10dp"
                             android:paddingStart="10dp"

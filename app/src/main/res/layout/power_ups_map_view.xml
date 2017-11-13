@@ -5,7 +5,7 @@
     <data>
         <import type="java.lang.Boolean"/>
         <variable
-            name="user_action_handlers"
+            name="userActionHandlers"
             type="com.anthropicandroid.gzt.activity.UpperActionHandlers" />
     </data>
 

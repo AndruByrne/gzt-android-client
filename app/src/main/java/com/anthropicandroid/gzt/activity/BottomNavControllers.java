@@ -72,8 +72,7 @@ public class BottomNavControllers {
     }
 
     private void replaceStatsViewAt(FrameLayout contentFrame, View view, MotionEvent event) {
-        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
-                .getBaseContext());
+        AppCompatActivity activity = (AppCompatActivity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
         SansUserSettingsAdapterComponent settingsAdapterComponent = application
@@ -119,8 +118,7 @@ public class BottomNavControllers {
             FrameLayout contentFrame,
             View view,
             MotionEvent event) {
-        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
-                .getBaseContext());
+        AppCompatActivity activity = (AppCompatActivity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
         SansUserSettingsAdapterComponent settingsAdapterComponent = application
@@ -144,8 +142,7 @@ public class BottomNavControllers {
                 .findBinding(
                         view))
                 .gztSettingsContentFrame;
-        AppCompatActivity activity = ((AppCompatActivity) ((ContextWrapper) view.getContext())
-                .getBaseContext());
+        AppCompatActivity activity = (AppCompatActivity) view.getContext();
         if (childIndex == null) {
             if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
                     != ConnectionResult.SUCCESS) {
