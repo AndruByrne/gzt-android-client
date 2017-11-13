@@ -30,9 +30,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // Android libraries
-    compile 'com.android.support:appcompat-v7:27.0.0'
-    compile 'com.google.android.gms:play-services-maps:11.4.2'
-    compile 'com.google.android.gms:play-services-location:11.4.2'
+    compile 'com.android.support:appcompat-v7:27.0.0'  // conflict comes from dependency of gms:play-services-maps:11.6.0 (via play-services-basement) that is not updated from 25.2.0
+    compile 'com.google.android.gms:play-services-maps:11.6.0'
+    compile 'com.google.android.gms:play-services-location:11.6.0'
 
     // Dagger and viz
     compile 'com.google.dagger:dagger:2.11'
