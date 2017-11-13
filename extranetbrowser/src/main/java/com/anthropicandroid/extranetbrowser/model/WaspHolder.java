@@ -3,11 +3,6 @@ package com.anthropicandroid.extranetbrowser.model;
 import android.content.Context;
 import android.util.Log;
 
-import net.rehacktive.waspdb.WaspDb;
-import net.rehacktive.waspdb.WaspFactory;
-import net.rehacktive.waspdb.WaspHash;
-import net.rehacktive.waspdb.WaspListener;
-
 import java.util.List;
 
 import rx.Observable;
@@ -24,10 +19,6 @@ import rx.schedulers.Schedulers;
 public class WaspHolder {
 
     public static final String TAG = WaspHolder.class.getSimpleName();
-    private WaspDb waspDb;
-    WaspHash bulkAddedListsHash;
-    WaspHash extranetOccasionsHash;
-    WaspHash erroneousOccasionsHash;
     private final ConnectableObservable<Boolean> waspDBInitObservable;
 
     public WaspHolder(final Context context) {

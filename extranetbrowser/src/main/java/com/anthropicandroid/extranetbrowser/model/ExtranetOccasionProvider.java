@@ -26,7 +26,6 @@ public class ExtranetOccasionProvider {
     public static final String EXTRANET_OCCASIONS_HASH = "ExtranetOccasionsHash";
     public static final String BULK_LIST_HASH = "BulkListHash";
     public static final String ERRONEOUS_OCCASION_HASH = "erroneous_occasions_hash";
-    private final Context context; //  may well be used
     private final WaspHolder waspHolder;
     private ExtranetAPIModule.ExtranetAPI extranetAPI;
     private Observable<LatLng> locationProvider;
@@ -36,7 +35,6 @@ public class ExtranetOccasionProvider {
             WaspHolder waspHolder,
             ExtranetAPIModule.ExtranetAPI extranetAPI,
             Observable<LatLng> locationProvider) {
-        this.context = context;
         this.waspHolder = waspHolder;
         this.extranetAPI = extranetAPI;
         this.locationProvider = locationProvider;
