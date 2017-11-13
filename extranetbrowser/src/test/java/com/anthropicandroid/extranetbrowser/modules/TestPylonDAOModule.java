@@ -14,7 +14,7 @@ public class TestPylonDAOModule
 {
 
     @Override
-    public PylonDAO getWaspHolder(Context context) {
+    public PylonDAO getPylonDAO(Context context) {
         return Mockito.mock(PylonDAO.class);
     }
 }

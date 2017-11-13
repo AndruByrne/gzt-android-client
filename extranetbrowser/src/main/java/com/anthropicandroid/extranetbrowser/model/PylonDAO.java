@@ -1,16 +1,18 @@
 package com.anthropicandroid.extranetbrowser.model;
 
-import android.content.Context;
 import android.util.Log;
+
+import com.sparsity.sparksee.gdb.AttributeKind;
+import com.sparsity.sparksee.gdb.DataType;
+import com.sparsity.sparksee.gdb.Database;
+import com.sparsity.sparksee.gdb.Graph;
+import com.sparsity.sparksee.gdb.Session;
 
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.observables.ConnectableObservable;
-import rx.schedulers.Schedulers;
 
 /*
  * Created by Andrew Brin on 5/24/2016.
@@ -20,66 +22,60 @@ public class PylonDAO
 {
 
     public static final String TAG = PylonDAO.class.getSimpleName();
-    private final ConnectableObservable<Boolean> dBInitObservable;
+    private final Session session;
+    private final Graph   graph;
 
-    public PylonDAO(final Context context) {
-        Log.i(this.getClass().getSimpleName(),"creating waspholder");
-        dBInitObservable = Observable
-                .create(new Observable.OnSubscribe<Boolean>() {
-                    @Override
-                    public void call(final Subscriber<? super Boolean> subscriber) {
-                        String path = context.getFilesDir().getPath();
-                        Log.i(this.getClass().getSimpleName(),"opening db");
-                        WaspFactory.openOrCreateDatabase(
-                                path,
-                                ExtranetOccasionProvider.EXTRANET_DATABASE,
-                                "password",
-                                new WaspListener<WaspDb>() {
-                                    @Override
-                                    public void onDone(WaspDb waspDb) {
-                                        initHolder(waspDb); //  this ordering important
-                                        subscriber.onNext(true);
-                                    }
-                                });
-                    }
-                })
-                .take(1) //  do once
-                .subscribeOn(Schedulers.computation()) //  allow for as many threads as processors
-                .replay(Schedulers.io());
-        Log.i(this.getClass().getSimpleName(),"obs defined");
-        dBInitObservable.connect(); //  start DB init
-        Log.i(this.getClass().getSimpleName(),"obs connected");
+    public PylonDAO(
+            final Database database
+    ) {
+        Log.i(
+                this.getClass()
+                    .getSimpleName(),
+                "starting db");
+        session = database.newSession();
+        graph = session.getGraph();
+        initDBIfNew();
     }
 
-    private void initHolder(WaspDb waspDb) {
+    private void initDBIfNew() {
         // TODO(Andrew Brin): the db reads will generate a "Serialization Error" if the Occasion
         // fields have changed but the program only update; may need to test and delete
-        if (this.waspDb == null) { //  if waspDb null, add db and create Hashes
-            this.waspDb = waspDb;
-            bulkAddedListsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider.BULK_LIST_HASH);
-            extranetOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider
-                    .EXTRANET_OCCASIONS_HASH);
-            erroneousOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider
-                    .ERRONEOUS_OCCASION_HASH);
+        if (graph.countEdges() + graph.countNodes() < 1) {
+            int occasionType = graph.newNodeType("OCCASION");
+            int occasionIdType = graph.newAttribute(
+                    occasionType,
+                    "ID",
+                    DataType.Long,
+                    AttributeKind.Unique);
+            int occasionSuccessfulType = graph.newAttribute(
+                    occasionType,
+                    "SUCCESSFUL",
+                    DataType.Boolean,
+                    AttributeKind.Indexed);
         }
+//            bulkAddedListsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider.BULK_LIST_HASH);
+//            extranetOccasionsHash = waspDb.openOrCreateHash(ExtranetOccasionProvider
+//                                                                    .EXTRANET_OCCASIONS_HASH);
     }
 
     public Observable<List<String>> getOccasionKeys() {
 //        return dBInitObservable //  subscribing to replaying obs. field to prevent race bet
 // . init & first get
         return setDemoOccasion() //  wait for demo occasion to be inserted
-                .map(new Func1<Boolean, List<String>>() {
-                    @Override
-                    public List<String> call(Boolean initSuccess) {
-                        return extranetOccasionsHash.getAllKeys();
-                    }
-                })
-                .take(1);
+                                 .map(new Func1<Boolean, List<String>>()
+                                 {
+                                     @Override
+                                     public List<String> call(Boolean initSuccess) {
+                                         return extranetOccasionsHash.getAllKeys();
+                                     }
+                                 })
+                                 .take(1);
     }
 
     private Observable<Boolean> setDemoOccasion() {
         return dBInitObservable
-                .map(new Func1<Boolean, Boolean>() {
+                .map(new Func1<Boolean, Boolean>()
+                {
                     @Override
                     public Boolean call(Boolean aBoolean) {
                         extranetOccasionsHash.put(
@@ -94,7 +90,8 @@ public class PylonDAO
         if (waspDb == null)
             dBInitObservable
                     .subscribe(
-                            new Action1<Boolean>() {
+                            new Action1<Boolean>()
+                            {
                                 @Override
                                 public void call(Boolean aBoolean) {
                                     bulkAddedListsHash.put(listKey, list);
@@ -106,7 +103,8 @@ public class PylonDAO
     public void addErroneousOccasion(final String key) {
         if (waspDb == null)
             dBInitObservable
-                    .subscribe(new Action1<Boolean>() {
+                    .subscribe(new Action1<Boolean>()
+                    {
                         @Override
                         public void call(Boolean aBoolean) {
                             erroneousOccasionsHash.put(key, 0);
@@ -117,12 +115,16 @@ public class PylonDAO
 
     public List<String> getKeysForErroneousOccasions() {
         if (waspDb == null)
-            return dBInitObservable.map(new Func1<Boolean, List<String>>() {
+            return dBInitObservable.map(new Func1<Boolean, List<String>>()
+            {
                 @Override
                 public List<String> call(Boolean aBoolean) {
                     return erroneousOccasionsHash.getAllKeys();
                 }
-            }).take(1).toBlocking().first();
+            })
+                                   .take(1)
+                                   .toBlocking()
+                                   .first();
         else return extranetOccasionsHash.getAllKeys();
     }
 
@@ -133,12 +135,16 @@ public class PylonDAO
 
     public List<String> getBulkStringList(final BulkStringList listKey) {
         if (waspDb == null) {
-            return dBInitObservable.map(new Func1<Boolean, List<String>>() {
+            return dBInitObservable.map(new Func1<Boolean, List<String>>()
+            {
                 @Override
                 public List<String> call(Boolean aBoolean) {
                     return bulkAddedListsHash.get(listKey);
                 }
-            }).take(1).toBlocking().first();
+            })
+                                   .take(1)
+                                   .toBlocking()
+                                   .first();
         } else {
             return bulkAddedListsHash.get(listKey);
         }
@@ -158,8 +164,9 @@ public class PylonDAO
         }
     }
 
-    public enum BulkStringList {
-        REQUESTED_BROADCAST_KEYS,
-        RECENTLY_DISPLAYED_KEYS
-    }
+public enum BulkStringList
+{
+    REQUESTED_BROADCAST_KEYS,
+    RECENTLY_DISPLAYED_KEYS
+}
 }
