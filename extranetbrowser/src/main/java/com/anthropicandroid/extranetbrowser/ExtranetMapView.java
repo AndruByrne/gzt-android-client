@@ -18,7 +18,7 @@ import com.anthropicandroid.extranetbrowser.modules.ExtranetRegistrationModule;
 import com.anthropicandroid.extranetbrowser.modules.LocationModule;
 import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
-import com.anthropicandroid.extranetbrowser.modules.WaspModule;
+import com.anthropicandroid.extranetbrowser.modules.PylonDAOModule;
 import com.anthropicandroid.extranetbrowser.view.ExtranetMapWrapper;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -107,7 +107,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                 .locationModule(new LocationModule())
                 .mapModule(new MapModule(this))
                 .occasionProviderModule(new OccasionProviderModule())
-                .waspModule(new WaspModule())
+                .waspModule(new PylonDAOModule())
                 .build();
         extranetMapViewComponent.inject(this);
     }

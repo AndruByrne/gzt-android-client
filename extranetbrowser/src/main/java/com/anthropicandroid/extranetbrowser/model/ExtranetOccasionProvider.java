@@ -26,16 +26,16 @@ public class ExtranetOccasionProvider {
     public static final String EXTRANET_OCCASIONS_HASH = "ExtranetOccasionsHash";
     public static final String BULK_LIST_HASH = "BulkListHash";
     public static final String ERRONEOUS_OCCASION_HASH = "erroneous_occasions_hash";
-    private final WaspHolder waspHolder;
-    private ExtranetAPIModule.ExtranetAPI extranetAPI;
-    private Observable<LatLng> locationProvider;
+    private final PylonDAO                      pylonDAO;
+    private       ExtranetAPIModule.ExtranetAPI extranetAPI;
+    private       Observable<LatLng>            locationProvider;
 
     public ExtranetOccasionProvider(
             Context context,
-            WaspHolder waspHolder,
+            PylonDAO pylonDAO,
             ExtranetAPIModule.ExtranetAPI extranetAPI,
             Observable<LatLng> locationProvider) {
-        this.waspHolder = waspHolder;
+        this.pylonDAO = pylonDAO;
         this.extranetAPI = extranetAPI;
         this.locationProvider = locationProvider;
         Log.i(this.getClass().getSimpleName(),"EOP created");
@@ -43,7 +43,7 @@ public class ExtranetOccasionProvider {
 
     public Observable<Occasion> getContinuousOccasionsSubset(final List<String> keysToShow) {
         // may want to remove this write
-        waspHolder.setBulkStringList(WaspHolder.BulkStringList.RECENTLY_DISPLAYED_KEYS, keysToShow);
+        pylonDAO.setBulkStringList(PylonDAO.BulkStringList.RECENTLY_DISPLAYED_KEYS, keysToShow);
         // async start serviceIntent for data downloads with preference to this method(we have
         // requested keys, should d/l data)
         // (with download limitations passed into ExtranetMapView)
@@ -53,7 +53,7 @@ public class ExtranetOccasionProvider {
     }
 
     public Observable<Occasion> getContinuousGlobalOccasions() {
-        return waspHolder
+        return pylonDAO
                 .getOccasionKeys()
                 .flatMap(new Func1<List<String>, Observable<Occasion>>() {
                     @Override
@@ -73,7 +73,7 @@ public class ExtranetOccasionProvider {
         return locationProvider.take(1).flatMap(new Func1<LatLng, Observable<Occasion>>() {
             @Override
             public Observable<Occasion> call(LatLng latLng) {
-                List<String> erroneousOccasions = waspHolder.getKeysForErroneousOccasions();
+                List<String> erroneousOccasions = pylonDAO.getKeysForErroneousOccasions();
                 return extranetAPI.getOccasionsFromLocation(
                         latLng.latitude,
                         latLng.longitude,
@@ -88,10 +88,10 @@ public class ExtranetOccasionProvider {
             @Override
             public void call(Subscriber<? super Occasion> subscriber) {
                 for (String key : keys) {
-                    Occasion occasion = waspHolder.getCachedOccasion(key);
+                    Occasion occasion = pylonDAO.getCachedOccasion(key);
                     if (occasion != null) {
                         subscriber.onNext(occasion);
-                    } else waspHolder.addErroneousOccasion(key);
+                    } else pylonDAO.addErroneousOccasion(key);
                 }
                 subscriber.onCompleted();
             }

@@ -17,7 +17,7 @@ import dagger.Component;
                 LocationModule.class,
                 MapModule.class,
                 OccasionProviderModule.class,
-                WaspModule.class
+                PylonDAOModule.class
         })
 public interface ExtranetMapViewComponent {
     void inject(ExtranetMapView extranetMapView);

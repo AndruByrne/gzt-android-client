@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
-import com.anthropicandroid.extranetbrowser.model.WaspHolder;
+import com.anthropicandroid.extranetbrowser.model.PylonDAO;
 import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
@@ -54,17 +54,17 @@ public class ExtranetRegistrationTest extends TestCase {
     public static final int MOCK_NOTIFICATION_ICON_RES_ID = 234;
     public static final int MOCK_DEFAULT_ICON_RES_ID = 654;
     public static final String MOCK_NOTIFICATION_TEXT = "Notification Text";
-    private ExtranetRegistration subject;
-    private WaspHolder mockWaspHolder;
-    private GeofencingApi mockGeofencingApi;
+    private ExtranetRegistration     subject;
+    private PylonDAO                 mockPylonDAO;
+    private GeofencingApi            mockGeofencingApi;
     private ExtranetOccasionProvider mockOccasionProvider;
-    private PendingIntent mockPendingIntent;
-    private GoogleApiClient mockApiClient;
+    private PendingIntent            mockPendingIntent;
+    private GoogleApiClient          mockApiClient;
 
     @Before
     public void setUp() throws Exception {
         ShadowLog.stream = System.out;
-        mockWaspHolder = Mockito.mock(WaspHolder.class);
+        mockPylonDAO = Mockito.mock(PylonDAO.class);
         mockGeofencingApi = Mockito.mock(LocationServices.GeofencingApi.getClass());
         mockApiClient = Mockito.mock(GoogleApiClient.class);
         mockOccasionProvider = Mockito.mock(ExtranetOccasionProvider.class);
@@ -74,7 +74,7 @@ public class ExtranetRegistrationTest extends TestCase {
                 mockOccasionProvider,
                 mockGeofencingApi,
                 mockPendingIntent,
-                mockWaspHolder);
+                mockPylonDAO);
     }
 
     @Test
@@ -90,13 +90,13 @@ public class ExtranetRegistrationTest extends TestCase {
         final List<Occasion> occasionsSubset = TestingModel.getMockOccasionsSubset();
         List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
         ArgumentCaptor<GeofencingRequest> geofencingAddRequestCaptor = ArgumentCaptor.forClass(GeofencingRequest.class);
-        ArgumentCaptor<PendingIntent> pendingAddIntentCaptor = ArgumentCaptor.forClass(PendingIntent.class);
-        ArgumentCaptor<GoogleApiClient> apiClientCaptor = ArgumentCaptor.forClass(GoogleApiClient.class);
-        ArgumentCaptor<PendingIntent> pendingRemoveIntentCaptor = ArgumentCaptor.forClass(PendingIntent.class);
-        ArgumentCaptor<List> requestedWaspKeysCaptor = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<List> requestedEOPKeysCaptor = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<WaspHolder.BulkStringList> bulkStringListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
-        ArgumentCaptor<WaspHolder.BulkStringList> addBulkStringListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
+        ArgumentCaptor<PendingIntent>           pendingAddIntentCaptor      = ArgumentCaptor.forClass(PendingIntent.class);
+        ArgumentCaptor<GoogleApiClient>         apiClientCaptor             = ArgumentCaptor.forClass(GoogleApiClient.class);
+        ArgumentCaptor<PendingIntent>           pendingRemoveIntentCaptor   = ArgumentCaptor.forClass(PendingIntent.class);
+        ArgumentCaptor<List>                    requestedWaspKeysCaptor     = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List>                    requestedEOPKeysCaptor      = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<PylonDAO.BulkStringList> bulkStringListTypeCaptor    = ArgumentCaptor.forClass(PylonDAO.BulkStringList.class);
+        ArgumentCaptor<PylonDAO.BulkStringList> addBulkStringListTypeCaptor = ArgumentCaptor.forClass(PylonDAO.BulkStringList.class);
 
         ArgumentCaptor<Integer> maxReturnCaptor = ArgumentCaptor.forClass(int.class);
         when(mockOccasionProvider.getSegmentedOccasionsSubsetNoMoreThan(
@@ -122,12 +122,12 @@ public class ExtranetRegistrationTest extends TestCase {
                 pendingRemoveIntentCaptor.getValue().equals(mockPendingIntent));
 
         // Should write request keys to DB
-        verify(mockWaspHolder).clearBulkStringList(addBulkStringListTypeCaptor.capture());
-        verify(mockWaspHolder).addToBulkStringList(
+        verify(mockPylonDAO).clearBulkStringList(addBulkStringListTypeCaptor.capture());
+        verify(mockPylonDAO).addToBulkStringList(
                 bulkStringListTypeCaptor.capture(),
                 requestedWaspKeysCaptor.capture());
         assertEquals(
-                WaspHolder.BulkStringList.REQUESTED_BROADCAST_KEYS,
+                PylonDAO.BulkStringList.REQUESTED_BROADCAST_KEYS,
                 bulkStringListTypeCaptor.getValue());
         List<String> requestedWaspKeys = requestedWaspKeysCaptor.getAllValues().get(0);
         Log.d(TAG, "mockReqKeys: " + mockGlobalKeys.toString());

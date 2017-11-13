@@ -7,7 +7,7 @@ package com.anthropicandroid.extranetbrowser.modules;
 import android.content.Context;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
-import com.anthropicandroid.extranetbrowser.model.WaspHolder;
+import com.anthropicandroid.extranetbrowser.model.PylonDAO;
 import com.google.android.gms.maps.model.LatLng;
 
 import javax.inject.Named;
@@ -23,9 +23,9 @@ public class OccasionProviderModule {
     @ExtranetMapViewScope
     public ExtranetOccasionProvider getExtranetOccasionProvider(
             Context context,
-            WaspHolder waspHolder,
+            PylonDAO pylonDAO,
             ExtranetAPIModule.ExtranetAPI extranetAPI,
             @Named("LocationProvider") Observable<LatLng> locationProvider) {
-        return new ExtranetOccasionProvider(context, waspHolder, extranetAPI, locationProvider);
+        return new ExtranetOccasionProvider(context, pylonDAO, extranetAPI, locationProvider);
     }
 }

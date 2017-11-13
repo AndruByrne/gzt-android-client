@@ -17,7 +17,7 @@ import com.anthropicandroid.extranetbrowser.modules.TestExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.TestExtranetRegistrationModule;
 import com.anthropicandroid.extranetbrowser.modules.TestMapModule;
 import com.anthropicandroid.extranetbrowser.modules.TestOccasionProviderModule;
-import com.anthropicandroid.extranetbrowser.modules.TestWaspModule;
+import com.anthropicandroid.extranetbrowser.modules.TestPylonDAOModule;
 import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
@@ -95,7 +95,7 @@ public class ExtranetMapViewTest extends TestCase {
                 .locationModule(testLocationModule)
                 .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), mockWrapper))
                 .occasionProviderModule(new TestOccasionProviderModule(mockOccasionProvider))
-                .waspModule(new TestWaspModule()) //  not needed for these tests
+                .waspModule(new TestPylonDAOModule()) //  not needed for these tests
                 .build();
         subject = new ExtranetMapView(testContext, testComponent);
     }

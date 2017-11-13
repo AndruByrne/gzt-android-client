@@ -8,7 +8,7 @@ import android.app.PendingIntent;
 
 import com.anthropicandroid.extranetbrowser.ExtranetRegistration;
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
-import com.anthropicandroid.extranetbrowser.model.WaspHolder;
+import com.anthropicandroid.extranetbrowser.model.PylonDAO;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.GeofencingApi;
 
@@ -28,12 +28,13 @@ public class ExtranetRegistrationModule {
             ExtranetOccasionProvider extranetOccasionProvider,
             GeofencingApi geofencingApi,
             @Named("GeofencePendingIntent") PendingIntent pendingIntent,
-            WaspHolder waspHolder) {
+            PylonDAO pylonDAO
+    ) {
         return new ExtranetRegistration(
                 apiClientObservable,
                 extranetOccasionProvider, geofencingApi,
                 pendingIntent,
-                waspHolder);
+                pylonDAO);
     }
 
 }

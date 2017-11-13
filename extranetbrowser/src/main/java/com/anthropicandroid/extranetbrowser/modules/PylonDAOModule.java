@@ -6,18 +6,19 @@ package com.anthropicandroid.extranetbrowser.modules;
 
 import android.content.Context;
 
-import com.anthropicandroid.extranetbrowser.model.WaspHolder;
+import com.anthropicandroid.extranetbrowser.model.PylonDAO;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class WaspModule {
+public class PylonDAOModule
+{
 
     @Provides
     @ExtranetMapViewScope
-    public WaspHolder getWaspHolder(Context context) {
-        return new WaspHolder(context);
+    public PylonDAO getWaspHolder(Context context) {
+        return new PylonDAO(context);
     }
 
 }

@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
-import com.anthropicandroid.extranetbrowser.model.WaspHolder;
+import com.anthropicandroid.extranetbrowser.model.PylonDAO;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingApi;
@@ -37,30 +37,31 @@ public class ExtranetRegistration {
     public static final int GEOFENCE_EXPIRATION_IN_MILLISECONDS = 60480000;
     public static final int GEOFENCE_RESPONSIVENESS_IN_MILLISECONDS = 500;
     private final ConnectableObservable<GoogleApiClient> googleApiClientObservable;
-    private final GeofencingApi geofencingApi;
-    private final PendingIntent pendingIntent;
-    private WaspHolder waspHolder;
-    private ExtranetOccasionProvider extranetOccasionProvider;
+    private final GeofencingApi                          geofencingApi;
+    private final PendingIntent                          pendingIntent;
+    private       PylonDAO                               pylonDAO;
+    private       ExtranetOccasionProvider               extranetOccasionProvider;
 
     public ExtranetRegistration(
             Observable<GoogleApiClient> googleApiClientObservable,
             ExtranetOccasionProvider extranetOccasionProvider,
             GeofencingApi geofencingApi,
             PendingIntent pendingIntent,
-            WaspHolder waspHolder) {
+            PylonDAO pylonDAO
+    ) {
         this.extranetOccasionProvider = extranetOccasionProvider;
         this.googleApiClientObservable = googleApiClientObservable.replay();
         this.geofencingApi = geofencingApi;
         this.pendingIntent = pendingIntent;
-        this.waspHolder = waspHolder;
+        this.pylonDAO = pylonDAO;
         this.googleApiClientObservable.connect();
     }
 
     public void registerAppForKeys(Registration registration, List<String> requestedKeys) {
         // subscription to wait for both apiclient and occasionProvider, assign occasions to
         // geofences and register app
-        waspHolder.clearBulkStringList(
-                WaspHolder.BulkStringList.REQUESTED_BROADCAST_KEYS);
+        pylonDAO.clearBulkStringList(
+                PylonDAO.BulkStringList.REQUESTED_BROADCAST_KEYS);
         Observable.combineLatest(
                 googleApiClientObservable,
                 extranetOccasionProvider
@@ -112,8 +113,8 @@ public class ExtranetRegistration {
                             ArrayList<String> occasionKeys = new ArrayList<>();
                             for (Occasion o : occasions)
                                 occasionKeys.add(o.getKey());
-                            waspHolder.addToBulkStringList(
-                                    WaspHolder.BulkStringList.REQUESTED_BROADCAST_KEYS,
+                            pylonDAO.addToBulkStringList(
+                                    PylonDAO.BulkStringList.REQUESTED_BROADCAST_KEYS,
                                     occasionKeys);
                         }
                     }

@@ -12,7 +12,7 @@ import com.anthropicandroid.extranetbrowser.modules.MapModule;
 import com.anthropicandroid.extranetbrowser.modules.OccasionProviderModule;
 import com.anthropicandroid.extranetbrowser.modules.TestExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.TestMapModule;
-import com.anthropicandroid.extranetbrowser.modules.TestWaspModule;
+import com.anthropicandroid.extranetbrowser.modules.TestPylonDAOModule;
 import com.anthropicandroid.extranetbrowser.testUtils.MapViewTestActivity;
 import com.anthropicandroid.extranetbrowser.testUtils.RoboTestRunner;
 import com.anthropicandroid.extranetbrowser.testUtils.TestingModel;
@@ -60,7 +60,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
     ExtranetOccasionProvider subject;
 
     @Inject
-    WaspHolder mockWaspHolder;
+    PylonDAO mockPylonDAO;
 
     @Inject
     ExtranetAPIModule.ExtranetAPI mockExtranetAPI;
@@ -82,7 +82,7 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 .locationModule(testLocationModule)
                 .mapModule(new TestMapModule(getGoogleMapAsyncGetter(), testWrapper))
                 .occasionProviderModule(new OccasionProviderModule()) //  provides class under test
-                .waspModule(new TestWaspModule())
+                .waspModule(new TestPylonDAOModule())
                 .build();
         testComponent.inject(this);
     }
@@ -104,12 +104,12 @@ public class ExtranetOccasionProviderTest extends TestCase {
         // mock getCachedOccasion
         final List<Occasion> mockOccasionsSubset = TestingModel.getMockOccasionsSubset();
         ArgumentCaptor<String> requestedKeyCaptor = ArgumentCaptor.forClass(String.class);
-        when(mockWaspHolder.getCachedOccasion(requestedKeyCaptor.capture()))
+        when(mockPylonDAO.getCachedOccasion(requestedKeyCaptor.capture()))
                 .thenReturn(mockOccasionsSubset.get(0))
                 .thenReturn(mockOccasionsSubset.get(1))
                 .thenReturn(null)
                 .thenReturn(mockOccasionsSubset.get(3));
-        when(mockWaspHolder.getKeysForErroneousOccasions())
+        when(mockPylonDAO.getKeysForErroneousOccasions())
                 .thenReturn(new ArrayList<String>(){{add(mockRequestingKeys.get(2));}});
         // mock getOccasionsFromExtranet
         ArgumentCaptor<String> networkKeyCaptor = ArgumentCaptor.forClass(String.class);
@@ -132,20 +132,20 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 mockRequestingKeys,
                 requestedKeyCaptor.getAllValues());
         // requested keys should be stored exactly as is
-        ArgumentCaptor<List> bulkListAddCaptor = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<WaspHolder.BulkStringList> bulkListTypeCaptor = ArgumentCaptor.forClass(WaspHolder.BulkStringList.class);
-        verify(mockWaspHolder).setBulkStringList(
+        ArgumentCaptor<List>                    bulkListAddCaptor  = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<PylonDAO.BulkStringList> bulkListTypeCaptor = ArgumentCaptor.forClass(PylonDAO.BulkStringList.class);
+        verify(mockPylonDAO).setBulkStringList(
                 bulkListTypeCaptor.capture(),
                 bulkListAddCaptor.capture());
         assertEquals(
                 bulkListTypeCaptor.getValue(),
-                WaspHolder.BulkStringList.RECENTLY_DISPLAYED_KEYS);
+                PylonDAO.BulkStringList.RECENTLY_DISPLAYED_KEYS);
         assertEquals(
                 bulkListAddCaptor.getValue(),
                 mockRequestingKeys);
         // erroneous key should be stored with identification
         ArgumentCaptor<String> erroneousKeyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(mockWaspHolder, times(1)).addErroneousOccasion(
+        verify(mockPylonDAO, times(1)).addErroneousOccasion(
                 erroneousKeyCaptor.capture());
         assertEquals(
                 mockRequestingKeys.get(2),
@@ -178,14 +178,14 @@ public class ExtranetOccasionProviderTest extends TestCase {
         final List<Occasion> mockGlobalOccasions = TestingModel.getMockGlobalOccasions();
         final List<String> mockGlobalKeys = TestingModel.getMockGlobalKeys();
         ArgumentCaptor<String> requestedKeyCaptor = ArgumentCaptor.forClass(String.class);
-        when(mockWaspHolder.getOccasionKeys())
+        when(mockPylonDAO.getOccasionKeys())
                 .thenReturn(Observable.just(mockGlobalKeys));
-        when(mockWaspHolder.getCachedOccasion(requestedKeyCaptor.capture()))
+        when(mockPylonDAO.getCachedOccasion(requestedKeyCaptor.capture()))
                 .thenReturn(mockGlobalOccasions.get(0))
                 .thenReturn(null)
                 .thenReturn(mockGlobalOccasions.get(2))
                 .thenReturn(mockGlobalOccasions.get(3));
-        when(mockWaspHolder.getKeysForErroneousOccasions())
+        when(mockPylonDAO.getKeysForErroneousOccasions())
                 .thenReturn((List<String>) new ArrayList<String>(){{
                     add(mockGlobalKeys.get(1));
                     add(mockGlobalKeys.get(2));
@@ -211,10 +211,10 @@ public class ExtranetOccasionProviderTest extends TestCase {
                 mockGlobalKeys,
                 requestedKeyCaptor.getAllValues());
         // "requested" keys should not be stored
-        verify(mockWaspHolder, never()).setBulkStringList(any(WaspHolder.BulkStringList.class), anyListOf(String.class));
+        verify(mockPylonDAO, never()).setBulkStringList(any(PylonDAO.BulkStringList.class), anyListOf(String.class));
         // erroneous key should be stored with identification
         ArgumentCaptor<String> erroneousKeyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(mockWaspHolder, times(1)).addErroneousOccasion(
+        verify(mockPylonDAO, times(1)).addErroneousOccasion(
                 erroneousKeyCaptor.capture());
         assertEquals(
                 mockGlobalKeys.get(1),
