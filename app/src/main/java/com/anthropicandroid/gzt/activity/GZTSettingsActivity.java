@@ -41,13 +41,13 @@ final public class GZTSettingsActivity extends AppCompatActivity {
         mapViewHolder.onCreate(savedInstanceState);
         // assign user action handlers
         gztSettingsActivityBinding.setBottomNavControllers(bottomNavControllers);
-        bottomNavControllers.showStats(
+        bottomNavControllers.showInventory(
                 gztSettingsActivityBinding.statsNavButton,
                 MotionEvent.obtain( //  honestly...
                         SystemClock.uptimeMillis(), //  downtime
                         SystemClock.uptimeMillis(), //  eventTime
                         MotionEvent.ACTION_DOWN, //  action
-                        (float) getResources().getConfiguration().screenWidthDp / 6, // 3 button x
+                        (float) getResources().getConfiguration().screenWidthDp / 2, // 3 button x
                         0f, //  y
                         1f, //  pressure
                         .5f, //  size
@@ -57,6 +57,22 @@ final public class GZTSettingsActivity extends AppCompatActivity {
                         0, //  deviceId
                         0 //  edgeFlags
                 ));
+//        bottomNavControllers.showStats(
+//                gztSettingsActivityBinding.statsNavButton,
+//                MotionEvent.obtain( //  honestly...
+//                        SystemClock.uptimeMillis(), //  downtime
+//                        SystemClock.uptimeMillis(), //  eventTime
+//                        MotionEvent.ACTION_DOWN, //  action
+//                        (float) getResources().getConfiguration().screenWidthDp / 6, // 3 button x
+//                        0f, //  y
+//                        1f, //  pressure
+//                        .5f, //  size
+//                        0, //  metaState
+//                        1f, //  xPrecision
+//                        1f, //  yPrecision
+//                        0, //  deviceId
+//                        0 //  edgeFlags
+//                ));
     }
 
     @Override
