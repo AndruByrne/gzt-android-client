@@ -8,6 +8,7 @@ import com.sparsity.sparksee.gdb.Database;
 import com.sparsity.sparksee.gdb.Graph;
 import com.sparsity.sparksee.gdb.Session;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
@@ -61,107 +62,112 @@ public class PylonDAO
     public Observable<List<String>> getOccasionKeys() {
 //        return dBInitObservable //  subscribing to replaying obs. field to prevent race bet
 // . init & first get
-        return setDemoOccasion() //  wait for demo occasion to be inserted
-                                 .map(new Func1<Boolean, List<String>>()
-                                 {
-                                     @Override
-                                     public List<String> call(Boolean initSuccess) {
-                                         return extranetOccasionsHash.getAllKeys();
-                                     }
-                                 })
-                                 .take(1);
+//        return setDemoOccasion() //  wait for demo occasion to be inserted
+//                                 .map(new Func1<Boolean, List<String>>()
+//                                 {
+//                                     @Override
+//                                     public List<String> call(Boolean initSuccess) {
+//                                         return extranetOccasionsHash.getAllKeys();
+//                                     }
+//                                 })
+//                                 .take(1);
+        return Observable.empty(); // stand-in stub to get lib compiling for UI
     }
 
     private Observable<Boolean> setDemoOccasion() {
-        return dBInitObservable
-                .map(new Func1<Boolean, Boolean>()
-                {
-                    @Override
-                    public Boolean call(Boolean aBoolean) {
-                        extranetOccasionsHash.put(
-                                "Demo Key 1",
-                                new Occasion("Demo Key 1", 37.85d, -122.48d, 5));
-                        return true;
-                    }
-                });
+        return Observable.empty(); // stand-in stub to get lib compiling for UI
+//        return dBInitObservable
+//                .map(new Func1<Boolean, Boolean>()
+//                {
+//                    @Override
+//                    public Boolean call(Boolean aBoolean) {
+//                        extranetOccasionsHash.put(
+//                                "Demo Key 1",
+//                                new Occasion("Demo Key 1", 37.85d, -122.48d, 5));
+//                        return true;
+//                    }
+//                });
     }
 
     public void setBulkStringList(final BulkStringList listKey, final List<String> list) {
-        if (waspDb == null)
-            dBInitObservable
-                    .subscribe(
-                            new Action1<Boolean>()
-                            {
-                                @Override
-                                public void call(Boolean aBoolean) {
-                                    bulkAddedListsHash.put(listKey, list);
-                                }
-                            });
-        else bulkAddedListsHash.put(listKey, list);
+//        if (waspDb == null)
+//            dBInitObservable
+//                    .subscribe(
+//                            new Action1<Boolean>()
+//                            {
+//                                @Override
+//                                public void call(Boolean aBoolean) {
+//                                    bulkAddedListsHash.put(listKey, list);
+//                                }
+//                            });
+//        else bulkAddedListsHash.put(listKey, list);
     }
 
     public void addErroneousOccasion(final String key) {
-        if (waspDb == null)
-            dBInitObservable
-                    .subscribe(new Action1<Boolean>()
-                    {
-                        @Override
-                        public void call(Boolean aBoolean) {
-                            erroneousOccasionsHash.put(key, 0);
-                        }
-                    });
-        else erroneousOccasionsHash.put(key, 0);
+//        if (waspDb == null)
+//            dBInitObservable
+//                    .subscribe(new Action1<Boolean>()
+//                    {
+//                        @Override
+//                        public void call(Boolean aBoolean) {
+//                            erroneousOccasionsHash.put(key, 0);
+//                        }
+//                    });
+//        else erroneousOccasionsHash.put(key, 0);
     }
 
     public List<String> getKeysForErroneousOccasions() {
-        if (waspDb == null)
-            return dBInitObservable.map(new Func1<Boolean, List<String>>()
-            {
-                @Override
-                public List<String> call(Boolean aBoolean) {
-                    return erroneousOccasionsHash.getAllKeys();
-                }
-            })
-                                   .take(1)
-                                   .toBlocking()
-                                   .first();
-        else return extranetOccasionsHash.getAllKeys();
+//        if (waspDb == null)
+//            return dBInitObservable.map(new Func1<Boolean, List<String>>()
+//            {
+//                @Override
+//                public List<String> call(Boolean aBoolean) {
+//                    return erroneousOccasionsHash.getAllKeys();
+//                }
+//            })
+//                                   .take(1)
+//                                   .toBlocking()
+//                                   .first();
+//        else return extranetOccasionsHash.getAllKeys();
+        return new ArrayList<>();
     }
 
     public Occasion getCachedOccasion(String key) {
         // This is where the Occasion is casted
-        return extranetOccasionsHash.get(key);
+//        return extranetOccasionsHash.get(key);
+        return null;
     }
 
     public List<String> getBulkStringList(final BulkStringList listKey) {
-        if (waspDb == null) {
-            return dBInitObservable.map(new Func1<Boolean, List<String>>()
-            {
-                @Override
-                public List<String> call(Boolean aBoolean) {
-                    return bulkAddedListsHash.get(listKey);
-                }
-            })
-                                   .take(1)
-                                   .toBlocking()
-                                   .first();
-        } else {
-            return bulkAddedListsHash.get(listKey);
-        }
+        return new ArrayList<>();
+//        if (waspDb == null) {
+//            return dBInitObservable.map(new Func1<Boolean, List<String>>()
+//            {
+//                @Override
+//                public List<String> call(Boolean aBoolean) {
+//                    return bulkAddedListsHash.get(listKey);
+//                }
+//            })
+//                                   .take(1)
+//                                   .toBlocking()
+//                                   .first();
+//        } else {
+//            return bulkAddedListsHash.get(listKey);
+//        }
     }
 
     public void clearBulkStringList(BulkStringList listKey) {
-        bulkAddedListsHash.remove(listKey);
+//        bulkAddedListsHash.remove(listKey);
     }
 
     public void addToBulkStringList(BulkStringList listKey, List<String> occasionKeys) {
-        List<String> bulkStringList = getBulkStringList(listKey);
-        if (bulkStringList == null)
-            bulkAddedListsHash.put(listKey, occasionKeys);
-        else {
-            bulkStringList.addAll(occasionKeys);
-            bulkAddedListsHash.put(listKey, bulkStringList);
-        }
+//        List<String> bulkStringList = getBulkStringList(listKey);
+//        if (bulkStringList == null)
+//            bulkAddedListsHash.put(listKey, occasionKeys);
+//        else {
+//            bulkStringList.addAll(occasionKeys);
+//            bulkAddedListsHash.put(listKey, bulkStringList);
+//        }
     }
 
 public enum BulkStringList
