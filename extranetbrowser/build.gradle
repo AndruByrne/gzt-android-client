@@ -49,8 +49,7 @@ dependencies {
 //    testCompile 'com.google.guava:guava:19.0'
 
     // NoSQL data store
-//    compile project(":waspdb")
-    implementation 'com.github.rehacktive:waspdb:1.1.1'
+    implementation 'com.sparsity:sparkseejava:5.0.0'
 
     //rxAndroid
     implementation 'io.reactivex:rxandroid:1.2.1'
