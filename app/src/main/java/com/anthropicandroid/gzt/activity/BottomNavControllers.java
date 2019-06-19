@@ -1,6 +1,5 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.content.ContextWrapper;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -135,6 +134,7 @@ public class BottomNavControllers {
     }
 
     public boolean showMap(View view, MotionEvent event) {
+        if(true)return false;
         if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
         BottomNav navigation = BottomNav.MAP;
         Integer childIndex = childrenIndices.get(navigation);
@@ -174,6 +174,7 @@ public class BottomNavControllers {
             MotionEvent event,
             FrameLayout contentFrame,
             AppCompatActivity activity) {
+        if(true)return;
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
         GZTMapComponent mapComponent = application.createMapComponent();
