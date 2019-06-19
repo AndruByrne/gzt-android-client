@@ -21,6 +21,11 @@ public class PylonDAOModule
 {
 
     static final String OCCASIONS_STORE_PATH = "OccasionsStore.gdb";
+    private String filesDir;
+
+    public PylonDAOModule(String filesDir) {
+        this.filesDir = filesDir;
+    }
 
     @Provides
     @ExtranetMapViewScope
@@ -34,7 +39,6 @@ public class PylonDAOModule
     @Provides
     @ExtranetMapViewScope
     public Database getDatabase(
-            String path
     ) {
         return Observable
                 .fromCallable(new Callable<Database>()
@@ -44,7 +48,7 @@ public class PylonDAOModule
                             throws Exception {
                         return new Sparksee(new SparkseeConfig())
                                 .open(
-                                        path + OCCASIONS_STORE_PATH,
+                                        filesDir+OCCASIONS_STORE_PATH,
                                         false);
                     }
                 })

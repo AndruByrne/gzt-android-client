@@ -107,7 +107,7 @@ public class ExtranetMapView extends MapView implements MapModule.GoogleMapAsync
                 .locationModule(new LocationModule())
                 .mapModule(new MapModule(this))
                 .occasionProviderModule(new OccasionProviderModule())
-                .waspModule(new PylonDAOModule())
+//                .pylonDAO(new PylonDAOModule(context.getFilesDir().getPath()))
                 .build();
         extranetMapViewComponent.inject(this);
     }
