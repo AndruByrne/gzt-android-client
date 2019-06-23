@@ -62,6 +62,8 @@ final public class GZTSettingsView extends RelativeLayout {
         settingsView.setLayoutParams(CanvasQuad.getLayoutParams());
         settingsView.setVisibility(VISIBLE);
         settingsView.showInventory(gztSettingsOverViewBinding.inventoryNavButton);
+        // Insert the view into the view hierarchy of the parent
+        parent.addView(settingsView, 0);
 
         return settingsView;
     }
