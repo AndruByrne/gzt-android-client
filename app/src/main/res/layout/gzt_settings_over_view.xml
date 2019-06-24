@@ -18,8 +18,16 @@
         android:id="@+id/settings_root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="horizontal"
         android:background="@color/color_pure_white">
 
+        <FrameLayout
+            android:id="@+id/gzt_settings_content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/color_purpley_gray"
+            android:layout_above="@id/bottom_nav_bar">
+        </FrameLayout>
         <LinearLayout
             android:id="@+id/bottom_nav_bar"
             android:orientation="horizontal"
@@ -61,12 +69,5 @@
                 android:onTouch="@{bottom_nav_controllers::showMap}"
                 style="?android:attr/borderlessButtonStyle"/>
         </LinearLayout>
-        <FrameLayout
-            android:id="@+id/gzt_settings_content_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/color_purpley_gray"
-            android:layout_above="@id/bottom_nav_bar">
-        </FrameLayout>
     </com.anthropicandroid.gzt.activity.GZTSettingsView>
 </layout>
