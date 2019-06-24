@@ -45,6 +45,7 @@ final public class GZTSettingsView extends RelativeLayout {
 
     public GZTSettingsView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        // Do not need to call super.setWillNotDraw(false); the gvrView does not refresh this view.
     }
 
     @MainThread
