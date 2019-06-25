@@ -182,11 +182,9 @@ public class GZTSettingsActivity extends AppCompatActivity {
          */
         @MainThread
         public Renderer(ViewGroup parent) {
-            Pair<SceneRenderer, GZTSettingsView> pair
-                    = SceneRenderer.createForVR(GZTSettingsActivity.this, parent);
-            scene = pair.first;
-            settingsView = pair.second;
-
+            scene = SceneRenderer.createForVR((canvasQuad) -> settingsView = GZTSettingsView
+                    .createForOpenGl(GZTSettingsActivity.this, parent, canvasQuad));
+            scene.setVideoFrameListener(settingsView.uiUpdater);
             settingsView.setVrIconClickListener(
                     new View.OnClickListener() {
                         @Override

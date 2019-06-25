@@ -124,6 +124,17 @@ public final class SceneRenderer {
         return Pair.create(scene, gztSettingsView);
     }
 
+    public interface QuadToView {
+        ViewGroup createViewFromQuad(CanvasQuad canvasQuad);
+    }
+
+    public static SceneRenderer createForVR(QuadToView quadToViewFcn) {
+        CanvasQuad canvasQuad = new CanvasQuad();
+        ViewGroup viewFromQuad = quadToViewFcn.createViewFromQuad(canvasQuad);
+        return new SceneRenderer(
+                canvasQuad, viewFromQuad, new Handler(Looper.getMainLooper()), null);
+    }
+
     /**
      * Performs initialization on the GL thread. The scene isn't fully initialized until
      * glConfigureScene() completes successfully.
