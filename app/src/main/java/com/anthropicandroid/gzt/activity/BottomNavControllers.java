@@ -7,13 +7,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.databinding.GztSettingsOverViewBinding;
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
 import com.anthropicandroid.gzt.databinding.PowerUpsMapViewBinding;
 import com.anthropicandroid.gzt.databinding.StatsViewBinding;
-import com.anthropicandroid.gzt.modules.GZTMapComponent;
-import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -72,13 +69,8 @@ public class BottomNavControllers {
 
     private void replaceStatsViewAt(FrameLayout contentFrame, View view, MotionEvent event) {
         Activity activity = (Activity) view.getContext();
-        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
-                .getApplication();
-        SansUserSettingsAdapterComponent settingsAdapterComponent = application
-                .createOrGetSansUserSettingsAdapterComponent();
         StatsViewBinding statsViewBinding = StatsViewBinding.inflate(
-                activity.getLayoutInflater(),
-                settingsAdapterComponent);
+                activity.getLayoutInflater());
         // set handlers, animate to the view and remember this
         statsViewBinding.setUserActionHandlers(upperActionHandlers);
         overlayAnimator.replaceFrameContentsAt( //  view is added here
@@ -118,13 +110,8 @@ public class BottomNavControllers {
             View view,
             MotionEvent event) {
         Activity activity = (Activity) view.getContext();
-        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
-                .getApplication();
-        SansUserSettingsAdapterComponent settingsAdapterComponent = application
-                .createOrGetSansUserSettingsAdapterComponent();
         InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(
-                activity.getLayoutInflater(),
-                settingsAdapterComponent);
+                activity.getLayoutInflater());
         // set handlers, animate to the view and remember this
         inventoryViewBinding.setUserActionHandlers(upperActionHandlers);
         overlayAnimator.replaceFrameContentsAt( //  view is added here
@@ -175,12 +162,8 @@ public class BottomNavControllers {
             FrameLayout contentFrame,
             Activity activity) {
         if(true)return;
-        ZombieTrackerApplication application = (ZombieTrackerApplication) activity
-                .getApplication();
-        GZTMapComponent mapComponent = application.createMapComponent();
         PowerUpsMapViewBinding powerUpsMapViewBinding = PowerUpsMapViewBinding.inflate(
-                activity.getLayoutInflater(),
-                mapComponent);
+                activity.getLayoutInflater());
         // set handlers, animate to the view and remember this
         powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
         overlayAnimator.replaceFrameContentsAt( //  view is added here
