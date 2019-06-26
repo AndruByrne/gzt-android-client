@@ -5,15 +5,19 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.SurfaceTexture;
+import android.graphics.SurfaceTexture.OnFrameAvailableListener;
 import android.media.MediaPlayer;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.AnyThread;
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 
@@ -26,6 +30,7 @@ final public class GZTSettingsView extends RelativeLayout {
 
     public static final String TAG = GZTSettingsView.class.getSimpleName();
 
+    UiUpdater uiUpdater = new UiUpdater();
     // Since MediaPlayer lacks synchronization for internal events, it should only be accessed on the
     // main thread.
     @Nullable
@@ -182,5 +187,41 @@ final public class GZTSettingsView extends RelativeLayout {
     public void setVrIconClickListener(OnClickListener listener) {
 //        ImageButton vrIcon = (ImageButton) findViewById(R.id.enter_exit_vr);
 //        vrIcon.setOnClickListener(listener);
+    }
+
+    /**
+     * Gets the listener used to update the seek bar's position on each new video frame.
+     *
+     * @return a listener that can be passed to
+     * {@link SurfaceTexture#setOnFrameAvailableListener(OnFrameAvailableListener)}
+     */
+    public SurfaceTexture.OnFrameAvailableListener getFrameListener() {
+        return uiUpdater;
+    }
+
+    /**
+     * Updates the seek bar and status text.
+     */
+    private final class UiUpdater implements SurfaceTexture.OnFrameAvailableListener {
+        private int videoDurationMs = 0;
+
+        // onFrameAvailable is called on an arbitrary thread, but we can only access mediaPlayer on the
+        // main thread.
+        private Runnable uiThreadUpdater = new Runnable() {
+            @Override
+            public void run() {
+                if (canvasQuad != null) {
+                    // When in VR, we will need to manually invalidate this View.
+                    invalidate();
+                }
+            }
+        };
+
+        @AnyThread
+        @Override
+        public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+            Log.d(TAG, "invalidating view");
+            post(uiThreadUpdater);
+        }
     }
 }
