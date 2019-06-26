@@ -1,1 +1,1 @@
-include ':app', ':extranetbrowser', ':'
+include ':app', ':extranetbrowser', ':', ':sdk-base-1.200.0'
