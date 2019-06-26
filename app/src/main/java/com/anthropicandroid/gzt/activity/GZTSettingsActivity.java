@@ -17,6 +17,7 @@ import com.anthropicandroid.gzt.activity.rendering.SceneRenderer;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.google.vr.ndk.base.DaydreamApi;
 import com.google.vr.sdk.base.Eye;
+import com.google.vr.sdk.base.GvrActivity;
 import com.google.vr.sdk.base.GvrView;
 import com.google.vr.sdk.base.HeadTransform;
 import com.google.vr.sdk.base.Viewport;
@@ -28,7 +29,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 
 import rx.functions.Action1;
 
-public class GZTSettingsActivity extends AppCompatActivity {
+public class GZTSettingsActivity extends GvrActivity {
     public static final String TAG = GZTSettingsActivity.class.getSimpleName();
     private static final int EXIT_FROM_VR_REQUEST_CODE = 42;
 
@@ -114,6 +115,11 @@ public class GZTSettingsActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
