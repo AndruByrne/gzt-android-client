@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 27 //  max targetSDK for robolectric 3.0
         versionCode 2
         versionName "1.0.0-SNAPSHOT"
