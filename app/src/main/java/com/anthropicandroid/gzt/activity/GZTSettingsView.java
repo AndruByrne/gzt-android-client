@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.SystemClock;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
@@ -24,6 +25,10 @@ final public class GZTSettingsView extends RelativeLayout {
 
     public static final String TAG = GZTSettingsView.class.getSimpleName();
 
+    // Since MediaPlayer lacks synchronization for internal events, it should only be accessed on the
+    // main thread.
+    @Nullable
+    private MediaPlayer mediaPlayer;
     // The canvasQuad is only not null when this View is in a VR Activity. It provides the backing
     // canvas that standard Android child Views render to.
     @Nullable
@@ -84,6 +89,17 @@ final public class GZTSettingsView extends RelativeLayout {
         super.dispatchDraw(glCanvas);
         // Commit the changes.
         canvasQuad.unlockCanvasAndPost(glCanvas);
+    }
+
+    /**
+     * Binds the media player in order to update video position if the Activity is showing a video.
+     * This is also used to clear the bound mediaPlayer when the Activity exits to avoid trying to
+     * access the mediaPlayer while it is in an invalid state.
+     */
+    @MainThread
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
+        postInvalidate();
     }
 
     private boolean showInventory(View animationOrigin) {
@@ -156,5 +172,14 @@ final public class GZTSettingsView extends RelativeLayout {
             // Not in VR mode so use standard behavior.
             return super.onTouchEvent(event);
         }
+    }
+
+    /**
+     * Sets the OnClickListener used to switch Activities.
+     */
+    @MainThread
+    public void setVrIconClickListener(OnClickListener listener) {
+//        ImageButton vrIcon = (ImageButton) findViewById(R.id.enter_exit_vr);
+//        vrIcon.setOnClickListener(listener);
     }
 }
