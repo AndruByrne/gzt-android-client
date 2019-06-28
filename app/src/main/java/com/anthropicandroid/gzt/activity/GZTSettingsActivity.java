@@ -45,7 +45,8 @@ public class GZTSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Inflate and Bind
+        mediaLoader = new MediaLoader(this);
+
         ZombieTrackerApplication application = (ZombieTrackerApplication) getApplication();
         SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent = application
                 .createOrGetSansUserSettingsAdapterComponent();
@@ -116,16 +117,22 @@ public class GZTSettingsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mapViewHolder.onResume();
+        controllerManager.start();
+        mediaLoader.resume();
     }
 
     @Override
     protected void onPause() {
+        mediaLoader.pause();
+        controllerManager.stop();
         mapViewHolder.onPause();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        mediaLoader.destroy();
+        settingsView.setMediaPlayer(null);
         mapViewHolder.onDestroy();
         super.onDestroy();
     }
