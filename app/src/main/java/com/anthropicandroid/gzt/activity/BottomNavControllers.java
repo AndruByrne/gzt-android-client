@@ -48,13 +48,13 @@ public class BottomNavControllers {
                         view))
                 .gztSettingsContentFrame;
         if (childIndex == null) {
-            replaceStatsViewAt(contentFrame, view, event); //  view added here
+            replaceStatsViewAt(contentFrame, view.getLeft() + event.getX()); //  view added here
             childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
             return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
             if (activeView == null) {
-                replaceStatsViewAt(contentFrame, view, event); //  view added here
+                replaceStatsViewAt(contentFrame, view.getLeft() + event.getX()); //  view added here
                 childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
                 return true;
             }
@@ -67,8 +67,8 @@ public class BottomNavControllers {
         }
     }
 
-    private void replaceStatsViewAt(FrameLayout contentFrame, View view, MotionEvent event) {
-        Activity activity = (Activity) view.getContext();
+    private void replaceStatsViewAt(FrameLayout contentFrame, float xOrigin) {
+        Activity activity = (Activity) contentFrame.getContext();
         StatsViewBinding statsViewBinding = StatsViewBinding.inflate(
                 activity.getLayoutInflater());
         // set handlers, animate to the view and remember this
@@ -76,7 +76,7 @@ public class BottomNavControllers {
         overlayAnimator.replaceFrameContentsAt( //  view is added here
                 contentFrame,
                 statsViewBinding.statsRootView,
-                view.getLeft() + event.getX());
+                xOrigin);
     }
 
     public boolean showInventory(View view, MotionEvent event) {
@@ -86,13 +86,13 @@ public class BottomNavControllers {
         FrameLayout contentFrame = ((GztSettingsOverViewBinding) DataBindingUtil.findBinding(view))
                 .gztSettingsContentFrame;
         if (childIndex == null) {
-            replaceInventoryViewAt(contentFrame, view, event); //  view added here
+            replaceInventoryViewAt(contentFrame, view.getLeft() + event.getX()); //  view added here
             childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
             return true;
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
             if (activeView == null) {
-                replaceInventoryViewAt(contentFrame, view, event); //  view added here
+                replaceInventoryViewAt(contentFrame, view.getLeft() + event.getX()); //  view added here
                 childrenIndices.put(navigation, contentFrame.getChildCount() - 1); //  so -1 here
                 return true;
             }
@@ -107,9 +107,8 @@ public class BottomNavControllers {
 
     private void replaceInventoryViewAt(
             FrameLayout contentFrame,
-            View view,
-            MotionEvent event) {
-        Activity activity = (Activity) view.getContext();
+            float xOrigin) {
+        Activity activity = (Activity) contentFrame.getContext();
         InventoryViewBinding inventoryViewBinding = InventoryViewBinding.inflate(
                 activity.getLayoutInflater());
         // set handlers, animate to the view and remember this
@@ -117,7 +116,7 @@ public class BottomNavControllers {
         overlayAnimator.replaceFrameContentsAt( //  view is added here
                 contentFrame,
                 inventoryViewBinding.inventoryRootView,
-                view.getLeft() + event.getX());
+                xOrigin);
     }
 
     public boolean showMap(View view, MotionEvent event) {
@@ -135,7 +134,7 @@ public class BottomNavControllers {
                     != ConnectionResult.SUCCESS) {
                 Log.e(TAG, "google play services not available");
             } else {
-                replaceWithMapViewAt(view, event, contentFrame, activity);
+                replaceWithMapViewAt(contentFrame, view.getLeft() + event.getX());
                 childrenIndices.put(navigation, contentFrame.getChildCount() - 1);
                 return true;
             }
@@ -143,7 +142,7 @@ public class BottomNavControllers {
         } else {
             View activeView = contentFrame.getChildAt(childIndex);
             if (activeView == null) {
-                replaceWithMapViewAt(view, event, contentFrame, activity);
+                replaceWithMapViewAt(contentFrame, view.getLeft() + event.getX());
                 childrenIndices.put(navigation, contentFrame.getChildCount() - 1);
                 return true;
             }
@@ -157,19 +156,17 @@ public class BottomNavControllers {
     }
 
     private void replaceWithMapViewAt(
-            View view,
-            MotionEvent event,
             FrameLayout contentFrame,
-            Activity activity) {
-        if(true)return;
+            float xOrigin) {
+        if (true) return;
         PowerUpsMapViewBinding powerUpsMapViewBinding = PowerUpsMapViewBinding.inflate(
-                activity.getLayoutInflater());
+                ((Activity) contentFrame.getContext()).getLayoutInflater());
         // set handlers, animate to the view and remember this
         powerUpsMapViewBinding.setUserActionHandlers(upperActionHandlers);
         overlayAnimator.replaceFrameContentsAt( //  view is added here
                 contentFrame,
                 powerUpsMapViewBinding.extranetMapView,
-                view.getLeft() + event.getX());
+                xOrigin);
     }
 
     enum BottomNav {
