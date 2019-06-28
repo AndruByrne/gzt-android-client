@@ -4,7 +4,7 @@ package com.anthropicandroid.gzt.modules;
  * Created by Andrew Brin on 5/10/2016.
  */
 
-import android.databinding.DataBindingComponent;
+import androidx.databinding.DataBindingComponent;
 
 import com.anthropicandroid.gzt.activity.MapViewLifecycleHolder;
 import com.anthropicandroid.gzt.activity.ZoomAnimator;

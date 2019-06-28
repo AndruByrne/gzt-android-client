@@ -14,7 +14,7 @@ android {
         }
     }
 
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     dataBinding {
         enabled = true
@@ -22,11 +22,11 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 27 //  max targetSDK for robolectric 3.0
+        targetSdkVersion 28 //  max targetSDK for robolectric 3.0????
         versionCode 2
         versionName "1.0.0-SNAPSHOT"
         applicationId "com.anthropicandroid.gzt"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     packagingOptions {
@@ -46,15 +46,12 @@ android {
 }
 
 dependencies {
-//    implementation 'com.android.support:appcompat-v7:23.2.0'
-}
-dependencies {
     // get any jars in lib
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Card Views
-    implementation 'com.android.support:appcompat-v7:27.0.0'  // conflict comes from dependency of gms:play-services-maps:11.6.0 (via play-services-basement) that is not updated from 25.2.0
-    implementation 'com.android.support:cardview-v7:27.0.2'
+    implementation 'com.google.android.material:material:1.1.0-alpha07'
+
 
     implementation project(path: ":extranetbrowser", configuration: "default")
     implementation project(':sdk-base-1.200.0')
@@ -88,7 +85,7 @@ dependencies {
     testImplementation 'org.apache.maven:maven-ant-tasks:2.1.3'
     testImplementation 'org.robolectric:robolectric:3.0'
     testImplementation "org.robolectric:shadows-play-services:3.0"
-    testImplementation "org.robolectric:shadows-support-v4:3.0"
+//    testImplementation "org.robolectric:shadows-support-v4:3.0"
     // updated indirect dependency
     testImplementation 'org.ow2.asm:asm:5.0.4'
 

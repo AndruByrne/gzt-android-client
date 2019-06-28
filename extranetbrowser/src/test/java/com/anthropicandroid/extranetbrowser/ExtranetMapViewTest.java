@@ -2,13 +2,13 @@ package com.anthropicandroid.extranetbrowser;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.anthropicandroid.extranetbrowser.model.ExtranetOccasionProvider;
 import com.anthropicandroid.extranetbrowser.model.Occasion;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;
-import com.anthropicandroid.extranetbrowser.modules.DaggerExtranetMapViewTestComponent;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.anthropicandroid.extranetbrowser.modules.ExtranetMapViewTestComponent;
 import com.anthropicandroid.extranetbrowser.modules.LocationModule;

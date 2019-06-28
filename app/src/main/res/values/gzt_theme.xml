@@ -3,20 +3,20 @@
 
     <attr format="reference" name="zombieCardStyle"/>
     <style name="GZTTheme"
-           parent="Theme.AppCompat">
+           parent="Theme.MaterialComponents">
         <item name="colorPrimary">@color/color_pure_black</item>
         <item name="colorAccent">@color/color_dark_green</item>
         <item name="android:textColor">@color/color_bright_green</item>
         <item name="android:textColorPrimary">@color/color_bright_green</item>
-        <item name="actionBarStyle">@style/AppBar.Dark.Custom</item>
+        <item name="android:actionBarStyle">@style/AppBar.Dark.Custom</item>
         <item name="android:windowBackground">@color/color_purpley_gray</item>
         <item name="zombieCardStyle">@style/CardView.Dark.Custom</item>
     </style>
 
-    <style name="CardView.Dark.Custom" parent="CardView.Dark">
+    <style name="CardView.Dark.Custom" parent="@style/Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">@color/color_pure_black</item>
     </style>
-    <style name="AppBar.Dark.Custom" parent="Widget.AppCompat.ActionBar.Solid">
+    <style name="AppBar.Dark.Custom" parent="@android:style/Widget.Holo.ActionBar.Solid">
         <item name="background">@color/color_darker_purple</item>
     </style>
 

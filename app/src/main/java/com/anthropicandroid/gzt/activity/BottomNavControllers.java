@@ -1,7 +1,7 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
+import androidx.databinding.DataBindingUtil;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,7 +71,7 @@ public class BottomNavControllers {
     }
 
     private void replaceStatsViewAt(FrameLayout contentFrame, View view, MotionEvent event) {
-        AppCompatActivity activity = (AppCompatActivity) view.getContext();
+        Activity activity = (Activity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
         SansUserSettingsAdapterComponent settingsAdapterComponent = application
@@ -117,7 +117,7 @@ public class BottomNavControllers {
             FrameLayout contentFrame,
             View view,
             MotionEvent event) {
-        AppCompatActivity activity = (AppCompatActivity) view.getContext();
+        Activity activity = (Activity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
         SansUserSettingsAdapterComponent settingsAdapterComponent = application
@@ -142,7 +142,7 @@ public class BottomNavControllers {
                 .findBinding(
                         view))
                 .gztSettingsContentFrame;
-        AppCompatActivity activity = (AppCompatActivity) view.getContext();
+        Activity activity = (Activity) view.getContext();
         if (childIndex == null) {
             if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
                     != ConnectionResult.SUCCESS) {
@@ -173,7 +173,7 @@ public class BottomNavControllers {
             View view,
             MotionEvent event,
             FrameLayout contentFrame,
-            AppCompatActivity activity) {
+            Activity activity) {
         if(true)return;
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();

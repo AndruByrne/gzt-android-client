@@ -1,8 +1,9 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.databinding.BindingAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import androidx.databinding.BindingAdapter;
 
 import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;

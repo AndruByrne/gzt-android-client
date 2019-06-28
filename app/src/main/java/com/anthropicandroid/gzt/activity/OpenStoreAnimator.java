@@ -5,11 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.res.Resources;
-import android.databinding.DataBindingUtil;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +15,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.databinding.DataBindingUtil;
 
 import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;

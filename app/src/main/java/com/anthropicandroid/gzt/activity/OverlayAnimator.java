@@ -10,11 +10,12 @@ import android.animation.ObjectAnimator;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
 
 import com.anthropicandroid.gzt.R;
 

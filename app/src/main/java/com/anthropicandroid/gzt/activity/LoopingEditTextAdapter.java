@@ -1,11 +1,12 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.databinding.BindingAdapter;
-import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 
 /*
  * Created by Andrew Brin on 4/17/2016.

@@ -4,12 +4,13 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.opengl.Matrix;
 import android.os.Bundle;
-import android.support.annotation.MainThread;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+
+import androidx.annotation.MainThread;
+import androidx.core.content.ContextCompat;
 
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.activity.rendering.SceneRenderer;

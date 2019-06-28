@@ -7,14 +7,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.SystemClock;
-import android.support.annotation.MainThread;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.MainThread;
+import androidx.annotation.Nullable;
 
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.activity.rendering.CanvasQuad;

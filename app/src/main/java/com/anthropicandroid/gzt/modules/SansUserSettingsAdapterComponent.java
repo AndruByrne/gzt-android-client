@@ -4,7 +4,7 @@ package com.anthropicandroid.gzt.modules;
  * Created by Andrew Brin on 5/4/2016.
  */
 
-import android.databinding.DataBindingComponent;
+import androidx.databinding.DataBindingComponent;
 
 import com.anthropicandroid.gzt.activity.BottomNavControllers;
 import com.anthropicandroid.gzt.activity.GZTSettingsActivity;

@@ -1,12 +1,12 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.content.ContextWrapper;
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
+import android.app.Activity;
+import androidx.databinding.DataBindingUtil;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
+
+import androidx.cardview.widget.CardView;
 
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
@@ -31,7 +31,7 @@ final public class UpperActionHandlers {
     public void muteNotifications(View view) {
         CheckBox checkBox = (CheckBox) view;
         ApplicationPreferences preferenceStorage = ((ZombieTrackerApplication) (
-                (AppCompatActivity) checkBox.getContext()).getApplication())
+                (Activity) checkBox.getContext()).getApplication())
                 .getApplicationComponent().getPreferenceStorage();
         checkBox.setChecked(
                 checkBox.isChecked() ?
@@ -55,7 +55,7 @@ final public class UpperActionHandlers {
     public void purchaseMolotovs(View view) {
         // Put in something to decipher with item to bring into focus
         // Get context
-        AppCompatActivity activity = (AppCompatActivity) view.getContext();
+        Activity activity = (Activity) view.getContext();
         ZombieTrackerApplication application = (ZombieTrackerApplication) activity
                 .getApplication();
 

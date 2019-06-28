@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <data>
-        <import type="java.lang.Boolean"/>
         <variable
             name="userActionHandlers"
             type="com.anthropicandroid.gzt.activity.UpperActionHandlers" />

@@ -1,6 +1,6 @@
 package com.anthropicandroid.extranetbrowser.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.anthropicandroid.extranetbrowser.BuildConfig;
 import com.anthropicandroid.extranetbrowser.modules.ContextModule;

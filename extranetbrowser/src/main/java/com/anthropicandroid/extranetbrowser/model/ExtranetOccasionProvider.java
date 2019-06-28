@@ -5,8 +5,9 @@ package com.anthropicandroid.extranetbrowser.model;
  */
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.anthropicandroid.extranetbrowser.modules.ExtranetAPIModule;
 import com.google.android.gms.maps.model.LatLng;

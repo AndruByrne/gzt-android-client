@@ -8,8 +8,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.anthropicandroid.extranetbrowser.model.GeofencingOccasionService;
 import com.google.android.gms.common.ConnectionResult;
