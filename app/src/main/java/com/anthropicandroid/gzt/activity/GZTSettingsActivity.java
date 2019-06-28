@@ -1,8 +1,11 @@
 package com.anthropicandroid.gzt.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -77,7 +80,22 @@ public class GZTSettingsActivity extends AppCompatActivity {
         controller.setEventListener(listener);
         // controller.start() is called in onResume().
 
+        checkPermissionAndInitialize();
    }
+
+    /**
+     * Initializes the Activity only if the permission has been granted.
+     */
+    private void checkPermissionAndInitialize() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            mediaLoader.handleIntent(getIntent(), settingsView);
+        } else {
+            exitFromVr();
+            // This method will return false on Cardboard devices. This case isn't handled in this sample
+            // but it should be handled for VR Activities that run on Cardboard devices.
+        }
+    }
 
     /**
      * Tries to exit gracefully from VR using a VR transition dialog.
