@@ -1,7 +1,9 @@
 package com.anthropicandroid.gzt.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.MainThread;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
 import com.anthropicandroid.gzt.activity.rendering.SceneRenderer;
@@ -52,6 +55,7 @@ public class GZTSettingsActivity extends GvrActivity {
         ZombieTrackerApplication application = (ZombieTrackerApplication) getApplication();
         SansUserSettingsAdapterComponent sansUserSettingsAdapterComponent = application
                 .createOrGetSansUserSettingsAdapterComponent();
+        DataBindingUtil.setDefaultComponent(sansUserSettingsAdapterComponent);
         // bootstrap into dagger graph
         sansUserSettingsAdapterComponent.inject(this);
 
@@ -83,7 +87,7 @@ public class GZTSettingsActivity extends GvrActivity {
         // controller.start() is called in onResume().
 
         checkPermissionAndInitialize();
-   }
+    }
 
     /**
      * Initializes the Activity only if the permission has been granted.
@@ -91,7 +95,12 @@ public class GZTSettingsActivity extends GvrActivity {
     private void checkPermissionAndInitialize() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-            mediaLoader.handleIntent(getIntent(), settingsView);
+            // Intent for media sent via command: adb push ~/Downloads/PANO.jpg /sdcard/
+            Intent intent = new Intent("android.intent.action.VIEW",
+                    Uri.parse("file:///sdcard/PANO.jpg"),
+                    getApplicationContext(),
+                    this.getClass());
+            mediaLoader.handleIntent(intent, settingsView);
         } else {
             exitFromVr();
             // This method will return false on Cardboard devices. This case isn't handled in this sample
@@ -210,6 +219,7 @@ public class GZTSettingsActivity extends GvrActivity {
 
         @Override
         public void onDrawEye(Eye eye) {
+
             Matrix.multiplyMM(
                     viewProjectionMatrix, 0, eye.getPerspective(Z_NEAR, Z_FAR), 0, eye.getEyeView(), 0);
             scene.glDrawFrame(viewProjectionMatrix, eye.getType());
