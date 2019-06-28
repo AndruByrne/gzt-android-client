@@ -32,6 +32,7 @@ public class GZTSettingsActivity extends AppCompatActivity {
     public MapViewLifecycleHolder mapViewHolder;
 
     private GZTSettingsView settingsView;
+    private GvrView gvrView;
     private Renderer renderer;
     private ControllerManager controllerManager;
     private Controller controller;
@@ -50,6 +51,32 @@ public class GZTSettingsActivity extends AppCompatActivity {
         sansUserSettingsAdapterComponent.inject(this);
 
         mapViewHolder.onCreate(savedInstanceState);
+
+
+        gvrView = new GvrView(this);
+        // Since the videos have fewer pixels per degree than the phones, reducing the render target
+        // scaling factor reduces the work required to render the scene. This factor can be adjusted at
+        // runtime depending on the resolution of the loaded video.
+        // You can use Eye.getViewport() in the overridden onDrawEye() method to determine the current
+        // render target size in pixels.
+        gvrView.setRenderTargetScale(.5f);
+
+        // Standard GvrView configuration
+        renderer = new Renderer(gvrView);
+        gvrView.setEGLConfigChooser(
+                8, 8, 8, 8,  // RGBA bits.
+                16,  // Depth bits.
+                0);  // Stencil bits.
+        gvrView.setRenderer(renderer);
+        setContentView(gvrView);
+
+        // Configure Controller.
+        ControllerEventListener listener = new ControllerEventListener();
+        controllerManager = new ControllerManager(this, listener);
+        controller = controllerManager.getController();
+        controller.setEventListener(listener);
+        // controller.start() is called in onResume().
+
    }
 
     /**
