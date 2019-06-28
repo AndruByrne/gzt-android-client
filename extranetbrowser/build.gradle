@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 21
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
@@ -30,7 +30,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Android libraries
-//    implementation 'com.android.support:appcompat-v7:28.0.3'  // conflict comes from dependency of gms:play-services-maps:11.6.0 (via play-services-basement) that is not updated from 25.2.0
     implementation 'com.google.android.gms:play-services-maps:11.6.0'
     implementation 'com.google.android.gms:play-services-location:11.6.0'
 
@@ -68,7 +67,7 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest-library:1.3'
     testImplementation 'org.apache.maven:maven-ant-tasks:2.1.3'
     testImplementation 'org.robolectric:robolectric:3.0'
-    testImplementation "org.robolectric:shadows-support-v4:3.0"
+//    testImplementation "org.robolectric:shadows-support-v4:3.0"
     testImplementation "org.robolectric:shadows-core:3.0"
 //    testImplementation "org.robolectric:shadows-play-services:3.0"
 
