@@ -15,6 +15,7 @@
 
     <application
         android:title="GZT"
+        android:largeHeap="true"
         android:name=".ZombieTrackerApplication"
         android:theme="@style/GZTTheme">
         <activity
