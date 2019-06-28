@@ -20,6 +20,10 @@
         <activity
             android:name=".activity.GZTSettingsActivity"
             android:label="Global Zombie Tracking"
+            android:configChanges="orientation|keyboardHidden|screenSize|uiMode|navigation"
+            android:resizeableActivity="false"
+            android:enableVrMode="@string/gvr_vr_mode_component"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
