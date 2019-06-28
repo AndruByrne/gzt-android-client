@@ -1,19 +1,15 @@
 package com.anthropicandroid.gzt.activity;
 
-import android.databinding.DataBindingUtil;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.anthropicandroid.gzt.R;
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
-import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
+import com.anthropicandroid.gzt.activity.rendering.SceneRenderer;
 import com.anthropicandroid.gzt.modules.SansUserSettingsAdapterComponent;
 import com.google.vr.ndk.base.DaydreamApi;
 import com.google.vr.sdk.base.Eye;
@@ -32,8 +28,8 @@ public class GZTSettingsActivity extends AppCompatActivity {
     public static final String TAG = GZTSettingsActivity.class.getSimpleName();
     private static final int EXIT_FROM_VR_REQUEST_CODE = 42;
 
-    @Inject public MapViewLifecycleHolder mapViewHolder;
-    @Inject public BottomNavControllers bottomNavControllers;
+    @Inject
+    public MapViewLifecycleHolder mapViewHolder;
 
     private GZTSettingsView settingsView;
     private Renderer renderer;
@@ -52,48 +48,9 @@ public class GZTSettingsActivity extends AppCompatActivity {
                 .createOrGetSansUserSettingsAdapterComponent();
         // bootstrap into dagger graph
         sansUserSettingsAdapterComponent.inject(this);
-        final GztSettingsActivityBinding gztSettingsActivityBinding = DataBindingUtil
-                .setContentView(
-                        this,
-                        R.layout.gzt_settings_activity,
-                        sansUserSettingsAdapterComponent);
 
         mapViewHolder.onCreate(savedInstanceState);
-        // assign user action handlers
-        gztSettingsActivityBinding.setBottomNavControllers(bottomNavControllers);
-        bottomNavControllers.showInventory(
-                gztSettingsActivityBinding.statsNavButton,
-                MotionEvent.obtain( //  honestly...
-                        SystemClock.uptimeMillis(), //  downtime
-                        SystemClock.uptimeMillis(), //  eventTime
-                        MotionEvent.ACTION_DOWN, //  action
-                        (float) getResources().getConfiguration().screenWidthDp / 2, // 3 button x
-                        0f, //  y
-                        1f, //  pressure
-                        .5f, //  size
-                        0, //  metaState
-                        1f, //  xPrecision
-                        1f, //  yPrecision
-                        0, //  deviceId
-                        0 //  edgeFlags
-                ));
-//        bottomNavControllers.showStats(
-//                gztSettingsActivityBinding.statsNavButton,
-//                MotionEvent.obtain( //  honestly...
-//                        SystemClock.uptimeMillis(), //  downtime
-//                        SystemClock.uptimeMillis(), //  eventTime
-//                        MotionEvent.ACTION_DOWN, //  action
-//                        (float) getResources().getConfiguration().screenWidthDp / 6, // 3 button x
-//                        0f, //  y
-//                        1f, //  pressure
-//                        .5f, //  size
-//                        0, //  metaState
-//                        1f, //  xPrecision
-//                        1f, //  yPrecision
-//                        0, //  deviceId
-//                        0 //  edgeFlags
-//                ));
-    }
+   }
 
     /**
      * Tries to exit gracefully from VR using a VR transition dialog.
@@ -139,7 +96,7 @@ public class GZTSettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        bottomNavControllers
+        settingsView.bottomNavControllers
                 .backPressedConsumed()
                 .subscribe(
                         new Action1<Boolean>() {
@@ -151,8 +108,7 @@ public class GZTSettingsActivity extends AppCompatActivity {
                         new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
-                                Log.e(TAG, "error performing backpress: " + throwable.getMessage());
-                                throwable.printStackTrace();
+                                Log.e(TAG, "error performing backpress: ", throwable);
                             }
                         });
     }

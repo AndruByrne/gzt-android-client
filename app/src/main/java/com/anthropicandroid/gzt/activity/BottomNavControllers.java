@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.anthropicandroid.gzt.ZombieTrackerApplication;
-import com.anthropicandroid.gzt.databinding.GztSettingsActivityBinding;
+import com.anthropicandroid.gzt.databinding.GztSettingsOverViewBinding;
 import com.anthropicandroid.gzt.databinding.InventoryViewBinding;
 import com.anthropicandroid.gzt.databinding.PowerUpsMapViewBinding;
 import com.anthropicandroid.gzt.databinding.StatsViewBinding;
@@ -46,7 +46,7 @@ public class BottomNavControllers {
         if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
         BottomNav navigation = BottomNav.STATS;
         Integer childIndex = childrenIndices.get(navigation);
-        FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
+        FrameLayout contentFrame = ((GztSettingsOverViewBinding) DataBindingUtil
                 .findBinding(
                         view))
                 .gztSettingsContentFrame;
@@ -91,7 +91,7 @@ public class BottomNavControllers {
         if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
         BottomNav navigation = BottomNav.INVENTORY;
         Integer childIndex = childrenIndices.get(navigation);
-        FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil.findBinding(view))
+        FrameLayout contentFrame = ((GztSettingsOverViewBinding) DataBindingUtil.findBinding(view))
                 .gztSettingsContentFrame;
         if (childIndex == null) {
             replaceInventoryViewAt(contentFrame, view, event); //  view added here
@@ -134,11 +134,11 @@ public class BottomNavControllers {
     }
 
     public boolean showMap(View view, MotionEvent event) {
-        if(true)return false;
+        if (true) return false;
         if (event.getAction() != MotionEvent.ACTION_DOWN) return false;
         BottomNav navigation = BottomNav.MAP;
         Integer childIndex = childrenIndices.get(navigation);
-        FrameLayout contentFrame = ((GztSettingsActivityBinding) DataBindingUtil
+        FrameLayout contentFrame = ((GztSettingsOverViewBinding) DataBindingUtil
                 .findBinding(
                         view))
                 .gztSettingsContentFrame;

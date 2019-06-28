@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config;
 @Config(constants = BuildConfig.class,
         application = TestZombieTrackerApplication.class,
         sdk = 21)
-public class GZTSettingsActivityTest {
+public class GZTSettingsViewTest {
 
     @Before
     public void setUp() throws Exception {

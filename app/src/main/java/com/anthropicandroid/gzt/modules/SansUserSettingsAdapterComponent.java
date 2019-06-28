@@ -31,5 +31,5 @@ public interface SansUserSettingsAdapterComponent extends DataBindingComponent {
 
     ZoomAnimator getGZTZoomAnimator();
 
-    void inject(GZTSettingsActivity GZTSettingsActivity);
+    void inject(GZTSettingsActivity gztSettingsActivity);
 }
